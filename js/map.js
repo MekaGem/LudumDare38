@@ -74,7 +74,7 @@ Map.prototype.transformToWater = function(x, y) {
     var map = this;
     createjs.Tween.get(oldShape)
         .to({alpha : 0}, 1000)
-        .call(function() { map.removeUnit(x, y); });
+        .call(function() { map.removeUnitsInCell(x, y); });
 }
 
 Map.prototype.cellIsValid = function(x, y) {

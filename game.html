@@ -3,14 +3,26 @@
 <head>
     <title>Take this</title>
     <script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+    <script src="js/levelgen.js"></script>
     <script type="text/javascript">
         function init() {
             var stage = new createjs.Stage("demoCanvas");
-            var circle = new createjs.Shape();
-            circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-            circle.x = 100;
-            circle.y = 100;
-            stage.addChild(circle);
+            
+            var w = h = 5;
+            var k = 6;
+            var island = GenerateIsland(w, h, k);
+            
+            for (var y = 0; y < h; y++) {
+                for (var x = 0; x < w; x++) {
+                    if (island[y][x]) {
+                        var cell = new createjs.Shape();
+                        cell.graphics.beginFill("Black").drawRect(0, 0, 10, 10);
+                        cell.x = x * 10;
+                        cell.y = y * 10;
+                        stage.addChild(cell);
+                    }
+                }
+            }
             stage.update();
         }
     </script>

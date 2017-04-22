@@ -113,6 +113,6 @@ function getBorderCells(map) {
 
 function pickRandomBorderCell(map) {
     var borderCells = getBorderCells(map);
-    var id = math.getRandomInt(0, borderCells.length);
+    var id = getRandomInt(0, borderCells.length);
     return borderCells[id];
 }

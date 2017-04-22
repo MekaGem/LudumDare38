@@ -51,12 +51,21 @@ Map.prototype.addUnit = function(unit) {
 
 Map.prototype.transformToWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
-    oldShape = this.cells[x][y].shape;
-    newCell = new Cell("W");
-    newCell.shape.x = oldShape.x;
-    newCell.shape.y = oldShape.y;
-    this.container.addChild(newCell.shape);
+    var oldShape = this.cells[x][y].shape;
+    var oldShapeIndex = this.container.getChildIndex(oldShape);
+
+    var newCell = new Cell("W");
+    var newShape = newCell.shape;
+    newShape.x = oldShape.x;
+    newShape.y = oldShape.y;
+
+    this.container.addChildAt(newCell.shape, oldShapeIndex);
     this.cells[x][y] = newCell;
+
+    var container = this.container
+    createjs.Tween.get(oldShape)
+        .to({alpha : 0}, 1000)
+        .call(function() { container.removeChild(oldShape); });
 }
 
 Map.prototype.cellIsValid = function(x, y) {

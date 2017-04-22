@@ -7,6 +7,7 @@ function init() {
     stage.addChild(circle);
     stage.update();
 
+    var map = new Map(100, 100);
     var world = simpleWorld();
     stage.addChild(world.container);
 

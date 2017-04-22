@@ -21,17 +21,39 @@ function Cell(type) {
     gfx.moveTo(0, CELL_SIZE / 2).lineTo(CELL_SIZE, CELL_SIZE).lineTo(CELL_SIZE * 2, CELL_SIZE / 2).lineTo(CELL_SIZE, 0);
 }
 
-function isPassable(cell) {
-    if (cell.type == "G") {
-        return true;
-    } else {
-        return false;
+function Map(width, height) {
+    this.width = width;
+    this.height = height;
+    this.cells = [];
+    this.worlds = []
+    this.container = new createjs.Container();
+
+    for (var x = 0; x < width; ++x) {
+        this.cells.push([]);
+        for (var y = 0; y < height; ++y) {
+            this.cells[x].push(new Cell("W"));
+            shape = this.cells[x][y].shape;
+            iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+            shape.x = iso.x - CELL_SIZE;
+            shape.y = iso.y;
+            this.container.addChild(shape);
+        }
     }
 }
 
-function World(width, height) {
+Map.prototype.addWorld = function(world) {
+    this.world.push(world);
+    this.container.addChild(world.container);
+    iso = cartesianToIsometric(world.x * CELL_SIZE, world.y * CELL_SIZE);
+    world.container.x = iso.x;
+    world.container.y = iso.y;
+}
+
+function World(width, height, x, y) {
     this.width = width;
     this.height = height;
+    this.x = x;
+    this.y = y;
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
@@ -102,6 +124,10 @@ World.prototype.cellIsWater = function (x, y) {
 
 World.prototype.cellIsLand = function (x, y) {
     return this.cells[x][y].type == "G";
+}
+
+World.prototype.cellIsPassable = function(x, y) {
+    return this.cellIsValid(x, y) && this.cells[x][y].type == "G";
 }
 
 World.prototype.cellIsBorder = function (x, y) {
@@ -182,7 +208,7 @@ function isometricToCartesian(isoX, isoY) {
 }
 
 function simpleWorld() {
-    var world = new World(10, 10);
+    var world = new World(10, 10, 5, 5);
     world.container.x = 400;
     world.container.y = 300;
     return world;

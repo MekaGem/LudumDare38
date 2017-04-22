@@ -49,6 +49,46 @@ Map.prototype.addUnit = function(unit) {
     console.log(unit.view);
 }
 
+Map.prototype.transformToWater = function(x, y) {
+    console.log("Transforming (" + x + ", " + y + ") to water.");
+    oldShape = this.cells[x][y].shape;
+    newCell = new Cell("W");
+    newCell.shape.x = oldShape.x;
+    newCell.shape.y = oldShape.y;
+    this.container.addChild(newCell.shape);
+    this.cells[x][y] = newCell;
+}
+
+Map.prototype.cellIsValid = function(x, y) {
+    return x >= 0 && y >= 0 && x < this.width && y < this.height;
+}
+
+Map.prototype.cellIsWater = function (x, y) {
+    return this.cells[x][y].type == "W";
+}
+
+Map.prototype.cellIsLand = function (x, y) {
+    return this.cells[x][y].type == "G";
+}
+
+Map.prototype.cellIsBorder = function (x, y) {
+    var dirs = [
+        { x: 1, y: 0 },
+        { x: 0, y: 1 },
+        { x: -1, y: 0 },
+        { x: 0, y: -1 }
+    ];
+
+    for (var d = 0; d < 4; ++d) {
+        var nx = x + dirs[d].x;
+        var ny = y + dirs[d].y;
+        if (!this.cellIsValid(nx, ny) || this.cellIsWater(nx, ny)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function Point(x, y) {
     this.x = x;
     this.y = y;
@@ -71,4 +111,25 @@ function simpleMap() {
     map.container.x = 400;
     map.container.y = 300;
     return map;
+}
+
+function getBorderCells(map) {
+    var borderCells = [];
+    for (var x = 0; x < map.width; ++x) {
+        for (var y = 0; y < map.height; ++y) {
+            if (map.cellIsLand(x, y) && map.cellIsBorder(x, y)) {
+                borderCells.push({x: x, y: y})
+            }
+        }
+    }
+    return borderCells;
+}
+
+function pickRandomBorderCell(map) {
+    var borderCells = getBorderCells(map);
+    if (borderCells.length == 0) {
+        return null;
+    }
+    var id = getRandomInt(0, borderCells.length);
+    return borderCells[id];
 }

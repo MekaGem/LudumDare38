@@ -69,8 +69,8 @@ function GenerateIsland(w, h, k) {
         
         if (outedge.length == 0) break;
         
-        var t = Math.floor(Math.random() * outedge.length);
-        island[outedge[t].x][outedge[t].y] = false;
+        var id = getRandomInt(0, outedge.length);
+        island[outedge[id].x][outedge[id].y] = false;
     }
     
     return island;

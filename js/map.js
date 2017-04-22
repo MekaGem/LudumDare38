@@ -24,7 +24,7 @@ function Map(width, height) {
     for (var x = 0; x < width; ++x) {
         this.cells[x] = [];
         for (var y = 0; y < height; ++y) {
-            if (level[y][x]) {
+            if (level[x][y]) {
                 this.cells[x][y] = new Cell("W");
             }
         }
@@ -50,7 +50,7 @@ function isometricToCartesian(isoX, isoY) {
 }
 
 function simpleMap(stage) {
-    var map = new Map(8, 8);
+    var map = new Map(4, 8);
     var mapContainer = new createjs.Container();
     for (var x = 0; x < map.width; ++x) {
         for (var y = 0; y < map.height; ++y) {

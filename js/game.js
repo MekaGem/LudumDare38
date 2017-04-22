@@ -25,7 +25,7 @@ function init() {
     stage.addChild(circle);
     stage.update();
 
-    var map = new Map(100, 100);
+    var map = new Map(100, 50);
     var world = new World(10, 10, 10, 10);
     map.addWorld(world);
     camera = world.getCenter();

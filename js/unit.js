@@ -6,8 +6,12 @@ function Unit(x, y, view) {
 
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y, spriteSheet) {
-    var view = new createjs.Sprite(spriteSheet, "stand");
-    view.regX = 32;
-    view.regY = 32;
+    var view = new createjs.Sprite(spriteSheet, "tree");
+    Unit.call(this, x, y, view);
+}
+
+Rock.prototype = Object.create(Unit.prototype);
+function Rock(x, y, spriteSheet) {
+    var view = new createjs.Sprite(spriteSheet, "rock");
     Unit.call(this, x, y, view);
 }

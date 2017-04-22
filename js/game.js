@@ -9,21 +9,32 @@ function init() {
 
     var map = simpleMap();
     stage.addChild(map.container);
-    stage.update();
 
     var data = {
-        images: ["assets/tree.png"],
-        frames: {
-            width: 64, height: 64
-        },
+        images: ["assets/tree.png", "assets/rock.png"],
+        frames: [
+            [0, 0, 64, 64, 0, 32, 32],
+            [0, 0, 64, 64, 1, 32, 32]
+        ],
         animations: {
-            stand: 0
+            tree: 0,
+            rock: 1
         }
     };
     var spriteSheet = new createjs.SpriteSheet(data);
 
-    var t = new Tree(0, 0, spriteSheet);
-    map.addUnit(t);
+    for (var x = 0; x < map.width; ++x) {
+        for (var y = 0; y < map.height; ++y) {
+            if (map.cells[x][y].type == "G") {
+                if (x % 2 == 0) {
+                    map.addUnit(new Tree(x, y, spriteSheet));
+                } else {
+                    map.addUnit(new Rock(x, y, spriteSheet));
+                }
+            }
+        }
+    }
+
     stage.update();
 
     // Setup periodic ticker.

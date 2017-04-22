@@ -1,0 +1,9 @@
+{
+    "images": [
+        "assets/human_from_internet.png"
+    ],
+    "frames": { "width": 34, "height": 57, "count": 4 },
+    "animations": {
+        "walk": [0, 4]
+    }
+}

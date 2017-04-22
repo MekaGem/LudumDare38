@@ -1,5 +1,12 @@
 var CELL_SIZE = 64;
 
+var DIRS = [
+    {x: 1, y: 0},  // down right (SE)
+    {x: 0, y: 1},  // down left (SW)
+    {x: -1, y: 0}, // up left (NW)
+    {x: 0, y: -1}  // up right (NE)
+];
+
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
@@ -81,21 +88,56 @@ Map.prototype.cellIsLand = function (x, y) {
 }
 
 Map.prototype.cellIsBorder = function (x, y) {
-    var dirs = [
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: -1, y: 0 },
-        { x: 0, y: -1 }
-    ];
-
     for (var d = 0; d < 4; ++d) {
-        var nx = x + dirs[d].x;
-        var ny = y + dirs[d].y;
+        var nx = x + DIRS[d].x;
+        var ny = y + DIRS[d].y;
         if (!this.cellIsValid(nx, ny) || this.cellIsWater(nx, ny)) {
             return true;
         }
     }
     return false;
+}
+
+Map.prototype.cellIsCutVertex = function (x, y) {
+    var neighbor;
+    for (var d = 0; d < 4; ++d) {
+        var nx = x + DIRS[d].x;
+        var ny = y + DIRS[d].y;
+        if (this.cellIsValid(nx, ny) && !this.cellIsWater(nx, ny)) {
+            neighbor = {x: nx, y: ny};
+            break;
+        }
+    }
+    
+    if (!neighbor) return false;
+
+    var visited = [];
+    for (var xx = 0; xx < this.width; xx++) visited[xx] = [];
+    visited[neighbor.x][neighbor.y] = true;
+    var q = [neighbor];
+    while (q.length > 0) {
+        var pos = q.shift();
+        
+        for (var d = 0; d < 4; d++) {
+            var npos = {x: pos.x + DIRS[d].x, y: pos.y + DIRS[d].y};
+            if ((npos.y != y || npos.x != x) && this.cellIsValid(npos.x, npos.y) && !this.cellIsWater(npos.x, npos.y) && !visited[npos.x][npos.y]) {
+                visited[npos.x][npos.y] = true;
+                q.push(npos);
+            }
+        }
+    }
+    
+    var cutVertex = false;
+    for (var d = 0; d < 4; d++) {
+        var nx = x + DIRS[d].x;
+        var ny = y + DIRS[d].y;
+        if (this.cellIsValid(nx, ny) && !this.cellIsWater(nx, ny) && !visited[nx][ny]) {
+            cutVertex = true;
+            break;
+        }
+    }
+    
+    return cutVertex;
 }
 
 function Point(x, y) {
@@ -124,10 +166,14 @@ function simpleMap() {
 
 function getBorderCells(map) {
     var borderCells = [];
+    
+    var center = {x: (map.width - 1) / 2, y: (map.height - 1) / 2};
+    
     for (var x = 0; x < map.width; ++x) {
         for (var y = 0; y < map.height; ++y) {
-            if (map.cellIsLand(x, y) && map.cellIsBorder(x, y)) {
-                borderCells.push({x: x, y: y})
+            if (map.cellIsLand(x, y) && map.cellIsBorder(x, y) && !map.cellIsCutVertex(x, y)) {
+                var dist = Math.abs(x - center.x) + Math.abs(y - center.y);
+                borderCells.push({x: x, y: y, dist: dist})
             }
         }
     }
@@ -139,6 +185,10 @@ function pickRandomBorderCell(map) {
     if (borderCells.length == 0) {
         return null;
     }
-    var id = getRandomInt(0, borderCells.length);
+    
+    borderCells.sort(function(a, b){return b.dist - a.dist});
+    console.log(borderCells);
+    
+    var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];
 }

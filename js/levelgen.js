@@ -8,13 +8,6 @@ function GenerateIsland(w, h, k) {
         }
     }
     
-    var dirs = [
-        {x: 1, y: 0},
-        {x: 0, y: 1},
-        {x: -1, y: 0},
-        {x: 0, y: -1}
-    ];
-    
     for (var i = 0; i < k; i++) {
         var outedge = [];
         for (var x = 0; x < w; x++) {
@@ -24,8 +17,8 @@ function GenerateIsland(w, h, k) {
                 var inside = true;
                 var neighbor;
                 for (var d = 0; d < 4; d++) {
-                    var nx = x + dirs[d].x;
-                    var ny = y + dirs[d].y;
+                    var nx = x + DIRS[d].x;
+                    var ny = y + DIRS[d].y;
                     if (!island[nx] || !island[nx][ny]) {
                         inside = false;
                     } else {
@@ -43,7 +36,7 @@ function GenerateIsland(w, h, k) {
                     var pos = q.shift();
                     
                     for (var d = 0; d < 4; d++) {
-                        var npos = {x: pos.x + dirs[d].x, y: pos.y + dirs[d].y};
+                        var npos = {x: pos.x + DIRS[d].x, y: pos.y + DIRS[d].y};
                         if ((npos.y != y || npos.x != x) && island[npos.x] && island[npos.x][npos.y] && !visited[npos.x][npos.y]) {
                             visited[npos.x][npos.y] = true;
                             q.push(npos);
@@ -53,8 +46,8 @@ function GenerateIsland(w, h, k) {
                 
                 var cutVertex = false;
                 for (var d = 0; d < 4; d++) {
-                    var nx = x + dirs[d].x;
-                    var ny = y + dirs[d].y;
+                    var nx = x + DIRS[d].x;
+                    var ny = y + DIRS[d].y;
                     if (island[nx] && island[nx][ny] && !visited[nx][ny]) {
                         cutVertex = true;
                         break;

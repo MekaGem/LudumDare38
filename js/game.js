@@ -25,4 +25,26 @@ function init() {
     var t = new Tree(0, 0, spriteSheet);
     map.addUnit(t);
     stage.update();
+
+    // Setup periodic ticker.
+    createjs.Ticker.setFPS(30);
+    createjs.Ticker.addEventListener("tick", tick);
+
+    var stepPeriod = 1000; // 1 second.
+    var timePassed = 0;
+
+    function tick(event) {
+        timePassed += event.delta;
+        while (timePassed > stepPeriod) {
+            // Update game world.
+            step();
+            timePassed -= stepPeriod;
+        }
+        // Render.
+        stage.update();
+    }
+
+    function step() {
+        console.log("Step!");
+    }
 }

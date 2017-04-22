@@ -154,7 +154,7 @@ World.prototype.cellIsBorder = function (x, y) {
     return false;
 }
 
-Map.prototype.cellIsCutVertex = function (x, y) {
+World.prototype.cellIsCutVertex = function (x, y) {
     var neighbor;
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;

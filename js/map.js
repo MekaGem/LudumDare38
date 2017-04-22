@@ -48,7 +48,7 @@ Map.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
-Map.prototype.removeUnit = function(x, y) {
+Map.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
         if (this.units[i].x == x && this.units[i].y == y) {
             console.log("Removing: " + i);

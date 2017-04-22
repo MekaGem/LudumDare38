@@ -7,8 +7,8 @@ function init() {
     stage.addChild(circle);
     stage.update();
 
-    var map = simpleMap();
-    stage.addChild(map.container);
+    var world = simpleWorld();
+    stage.addChild(world.container);
 
     var data = {
         images: ["assets/tree.png", "assets/rock.png"],
@@ -23,13 +23,13 @@ function init() {
     };
     var spriteSheet = new createjs.SpriteSheet(data);
 
-    for (var x = 0; x < map.width; ++x) {
-        for (var y = 0; y < map.height; ++y) {
-            if (map.cells[x][y].type == "G") {
+    for (var x = 0; x < world.width; ++x) {
+        for (var y = 0; y < world.height; ++y) {
+            if (world.cells[x][y].type == "G") {
                 if (x % 2 == 0) {
-                    map.addUnit(new Tree(x, y, spriteSheet));
+                    world.addUnit(new Tree(x, y, spriteSheet));
                 } else {
-                    map.addUnit(new Rock(x, y, spriteSheet));
+                    world.addUnit(new Rock(x, y, spriteSheet));
                 }
             }
         }
@@ -56,9 +56,9 @@ function init() {
     }
 
     function step() {
-        borderCell = pickRandomBorderCell(map);
+        borderCell = pickRandomBorderCell(world);
         if (borderCell) {
-            map.transformToWater(borderCell.x, borderCell.y);
+            world.transformToWater(borderCell.x, borderCell.y);
         }
         console.log("Step!");
     }

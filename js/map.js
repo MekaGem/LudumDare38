@@ -32,8 +32,8 @@ function Map(width, height) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
             this.cells[x].push(new Cell("W"));
-            shape = this.cells[x][y].shape;
-            iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+            var shape = this.cells[x][y].shape;
+            var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
             shape.x = iso.x - CELL_SIZE;
             shape.y = iso.y;
             this.container.addChild(shape);
@@ -42,9 +42,9 @@ function Map(width, height) {
 }
 
 Map.prototype.addWorld = function(world) {
-    this.world.push(world);
+    this.worlds.push(world);
     this.container.addChild(world.container);
-    iso = cartesianToIsometric(world.x * CELL_SIZE, world.y * CELL_SIZE);
+    var iso = cartesianToIsometric(world.x * CELL_SIZE, world.y * CELL_SIZE);
     world.container.x = iso.x;
     world.container.y = iso.y;
 }
@@ -68,8 +68,8 @@ function World(width, height, x, y) {
             } else {
                 this.cells[x].push(new Cell("W"));
             }
-            shape = this.cells[x][y].shape;
-            iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+            var shape = this.cells[x][y].shape;
+            var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
             shape.x = iso.x - CELL_SIZE;
             shape.y = iso.y;
             this.container.addChild(shape);
@@ -77,10 +77,16 @@ function World(width, height, x, y) {
     }
 }
 
+World.prototype.getCenter = function() {
+    var x = (this.x + this.width / 2.) * CELL_SIZE;
+    var y = (this.y + this.height / 2.) * CELL_SIZE;
+    return cartesianToIsometric(x, y);
+}
+
 World.prototype.addUnit = function(unit) {
     this.units.push(unit);
     this.container.addChild(unit.view);
-    iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
+    var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
     unit.view.x = iso.x;
     unit.view.y = iso.y;
 }
@@ -205,13 +211,6 @@ function isometricToCartesian(isoX, isoY) {
     var cX = (2 * isoY + isoX) / 2;
     var cY = (2 * isoY - isoX) / 2;
     return new Point(cX, cY);
-}
-
-function simpleWorld() {
-    var world = new World(10, 10, 5, 5);
-    world.container.x = 400;
-    world.container.y = 300;
-    return world;
 }
 
 function getBorderCells(world) {

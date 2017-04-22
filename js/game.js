@@ -1,5 +1,23 @@
+var stage;
+var center;
+var camera;
+
+var CAMERA_MOVEMENT_BORDER = 80;
+var CAMERA_MOVEMENT_SPEED = 500;
+
+function resize() {
+    stage.canvas.width = window.innerWidth;
+    stage.canvas.height = window.innerHeight;
+    center = new Point(stage.canvas.width / 2, stage.canvas.height / 2);
+    console.log("Resize to: " + stage.canvas.width + ":" + stage.canvas.height);
+}
+
 function init() {
-    var stage = new createjs.Stage("demoCanvas");
+    stage = new createjs.Stage("demoCanvas");
+
+    window.addEventListener('resize', resize);
+    resize();
+
     var circle = new createjs.Shape();
     circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
     circle.x = 100;
@@ -8,8 +26,12 @@ function init() {
     stage.update();
 
     var map = new Map(100, 100);
-    var world = simpleWorld();
-    stage.addChild(world.container);
+    var world = new World(10, 10, 10, 10);
+    map.addWorld(world);
+    camera = world.getCenter();
+    console.log("Camera at " + camera.x + ":" + camera.y);
+
+    stage.addChild(map.container);
 
     var data = {
         images: ["assets/tree.png", "assets/rock.png"],
@@ -39,7 +61,7 @@ function init() {
     stage.update();
 
     // Setup periodic ticker.
-    createjs.Ticker.setFPS(30);
+    createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", tick);
 
     var stepPeriod = 1000; // 1 second.
@@ -52,6 +74,28 @@ function init() {
             step();
             timePassed -= stepPeriod;
         }
+        seconds = event.delta / 1000.;
+
+        // Move camera.
+        if (stage.mouseX < CAMERA_MOVEMENT_BORDER) {
+            camera.x -= CAMERA_MOVEMENT_SPEED * seconds;
+        }
+        if (stage.mouseX > stage.canvas.width - CAMERA_MOVEMENT_BORDER) {
+            camera.x += CAMERA_MOVEMENT_SPEED * seconds;
+        }
+        if (stage.mouseY < CAMERA_MOVEMENT_BORDER) {
+            camera.y -= CAMERA_MOVEMENT_SPEED * seconds;
+        }
+        if (stage.mouseY > stage.canvas.height - CAMERA_MOVEMENT_BORDER) {
+            camera.y += CAMERA_MOVEMENT_SPEED * seconds;
+        }
+
+        map.container.x = center.x;
+        map.container.y = center.y;
+
+        map.container.regX = camera.x;
+        map.container.regY = camera.y;
+
         // Render.
         stage.update();
     }

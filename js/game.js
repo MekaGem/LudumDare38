@@ -83,23 +83,61 @@ function initGame() {
     return game;
 }
 
+function StepTicker(period) {
+    this.stepPeriod = period;
+    this.timePassed = 0;
+    this.listeners = [];
+}
+
+StepTicker.prototype.addEventListener = function(period, callback) {
+    this.listeners.push({
+        currentTick: 0,
+        period: period,
+        callback: callback
+    });
+};
+
+StepTicker.prototype.tick = function() {
+    for (var i = 0; i < this.listeners.length; ++i) {
+        var l = this.listeners[i];
+        ++l.currentTick;
+        while (l.currentTick >= l.period) {
+            l.callback();
+            l.currentTick -= l.period;
+        }
+    }
+};
+
+StepTicker.prototype.advanceTime = function(delta) {
+    this.timePassed += delta;
+    while (this.timePassed > this.stepPeriod) {
+        this.tick();
+        this.timePassed -= this.stepPeriod;
+    }
+};
+
 function gameLoop(game) {
     // Setup periodic ticker.
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", tick);
 
-    var stepPeriod = 1000; // 1 second.
-    var timePassed = 0;
-    var humanStepPeriod = 100; // 0.1 second.
-    var humanStepTimeCounter = 0;
-    function tick(event) {
-        timePassed += event.delta;
-        humanStepTimeCounter += event.delta;
-        while (timePassed > stepPeriod) {
-            // Update game world.
-            step();
-            timePassed -= stepPeriod;
+    stepTicker = new StepTicker(100);
+
+    var sinkRandomCell = function() {
+        borderCell = pickRandomBorderCell(game.world);
+        if (borderCell) {
+            game.world.transformToWater(borderCell.x, borderCell.y);
         }
+    }
+    stepTicker.addEventListener(20, sinkRandomCell);
+
+    var shiftHuman = function() {
+        game.world.shiftHuman(game.human); // shift in cartesian coordinates.
+    }
+    stepTicker.addEventListener(1, shiftHuman);
+
+    function tick(event) {
+        stepTicker.advanceTime(event.delta);
         seconds = event.delta / 1000.;
 
         // Move camera.
@@ -122,20 +160,7 @@ function gameLoop(game) {
         game.map.container.regX = camera.x;
         game.map.container.regY = camera.y;
 
-        while (humanStepTimeCounter > humanStepPeriod) {
-            // move human slightly.
-            game.world.shiftHuman(game.human); // shift in cartesian coordinates.
-            humanStepTimeCounter -= humanStepPeriod;
-        }
         // Render.
         stage.update();
-    }
-
-    function step() {
-        borderCell = pickRandomBorderCell(game.world);
-        if (borderCell) {
-            game.world.transformToWater(borderCell.x, borderCell.y);
-        }
-        console.log("Step!");
     }
 }

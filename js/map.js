@@ -29,7 +29,7 @@ function isPassable(cell) {
     }
 }
 
-function Map(width, height) {
+function World(width, height) {
     this.width = width;
     this.height = height;
     this.cells = [];
@@ -55,7 +55,7 @@ function Map(width, height) {
     }
 }
 
-Map.prototype.addUnit = function(unit) {
+World.prototype.addUnit = function(unit) {
     this.units.push(unit);
     this.container.addChild(unit.view);
     iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
@@ -63,7 +63,7 @@ Map.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
-Map.prototype.removeUnitsInCell = function(x, y) {
+World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
         if (this.units[i].x == x && this.units[i].y == y) {
             console.log("Removing: " + i);
@@ -73,7 +73,7 @@ Map.prototype.removeUnitsInCell = function(x, y) {
     }
 }
 
-Map.prototype.transformToWater = function(x, y) {
+World.prototype.transformToWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var oldShape = this.cells[x][y].shape;
     var oldShapeIndex = this.container.getChildIndex(oldShape);
@@ -86,25 +86,32 @@ Map.prototype.transformToWater = function(x, y) {
     this.container.addChildAt(newCell.shape, oldShapeIndex);
     this.cells[x][y] = newCell;
 
-    var map = this;
+    var world = this;
     createjs.Tween.get(oldShape)
         .to({alpha : 0}, 1000)
-        .call(function() { map.removeUnitsInCell(x, y); });
+        .call(function() { world.removeUnitsInCell(x, y); });
 }
 
-Map.prototype.cellIsValid = function(x, y) {
+World.prototype.cellIsValid = function(x, y) {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
 }
 
-Map.prototype.cellIsWater = function (x, y) {
+World.prototype.cellIsWater = function (x, y) {
     return this.cells[x][y].type == "W";
 }
 
-Map.prototype.cellIsLand = function (x, y) {
+World.prototype.cellIsLand = function (x, y) {
     return this.cells[x][y].type == "G";
 }
 
-Map.prototype.cellIsBorder = function (x, y) {
+World.prototype.cellIsBorder = function (x, y) {
+    var dirs = [
+        { x: 1, y: 0 },
+        { x: 0, y: 1 },
+        { x: -1, y: 0 },
+        { x: 0, y: -1 }
+    ];
+
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
         var ny = y + DIRS[d].y;
@@ -174,21 +181,21 @@ function isometricToCartesian(isoX, isoY) {
     return new Point(cX, cY);
 }
 
-function simpleMap() {
-    var map = new Map(10, 10);
-    map.container.x = 400;
-    map.container.y = 300;
-    return map;
+function simpleWorld() {
+    var world = new World(10, 10);
+    world.container.x = 400;
+    world.container.y = 300;
+    return world;
 }
 
-function getBorderCells(map) {
+function getBorderCells(world) {
     var borderCells = [];
     
-    var center = {x: (map.width - 1) / 2, y: (map.height - 1) / 2};
+    var center = {x: (world.width - 1) / 2, y: (world.height - 1) / 2};
     
-    for (var x = 0; x < map.width; ++x) {
-        for (var y = 0; y < map.height; ++y) {
-            if (map.cellIsLand(x, y) && map.cellIsBorder(x, y) && !map.cellIsCutVertex(x, y)) {
+    for (var x = 0; x < world.width; ++x) {
+        for (var y = 0; y < world.height; ++y) {
+            if (world.cellIsLand(x, y) && world.cellIsBorder(x, y) && !world.cellIsCutVertex(x, y)) {
                 var dist = Math.abs(x - center.x) + Math.abs(y - center.y);
                 borderCells.push({x: x, y: y, dist: dist})
             }
@@ -197,8 +204,8 @@ function getBorderCells(map) {
     return borderCells;
 }
 
-function pickRandomBorderCell(map) {
-    var borderCells = getBorderCells(map);
+function pickRandomBorderCell(world) {
+    var borderCells = getBorderCells(world);
     if (borderCells.length == 0) {
         return null;
     }

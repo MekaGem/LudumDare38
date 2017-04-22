@@ -1,15 +1,19 @@
 var stage;
-var center;
+var stageWidth;
+var stageHeight;
+var stageCenter;
 var camera;
 
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
 
 function resize() {
-    stage.canvas.width = window.innerWidth;
-    stage.canvas.height = window.innerHeight;
-    center = new Point(stage.canvas.width / 2, stage.canvas.height / 2);
-    console.log("Resize to: " + stage.canvas.width + ":" + stage.canvas.height);
+    stageWidth = window.innerWidth;
+    stageHeight = window.innerHeight;
+    stage.canvas.width = stageWidth;
+    stage.canvas.height = stageHeight;
+    stageCenter = new Point(stageWidth / 2, stageHeight / 2);
+    console.log("Resize to: " + stageWidth + ":" + stageHeight);
 }
 
 function init() {
@@ -45,7 +49,7 @@ function initGame() {
     circle.y = 100;
     stage.addChild(circle);
 
-    var map = new Map(100, 50);
+    var map = new Map(30, 30);
     var world = new World(10, 10, 10, 10);
     var game = {
         "map": map,
@@ -76,8 +80,7 @@ function initGame() {
     }
 
     map.addWorld(world);
-    camera = world.getCenter();
-    console.log("Camera at " + camera.x + ":" + camera.y);
+    camera = new Point(0, 0);
 
     stage.addChild(map.container);
 
@@ -189,11 +192,28 @@ function gameLoop(game) {
             camera.y += CAMERA_MOVEMENT_SPEED * seconds;
         }
 
-        game.map.container.x = center.x;
-        game.map.container.y = center.y;
+        // Camera bounds
+        var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
+        var xDiff = worldBoundingBoxHalfWidth - stageCenter.x;
+        var minCameraX = Math.min(-xDiff, 0);
+        var maxCameraX = Math.max(xDiff, 0);
 
-        game.map.container.regX = camera.x;
-        game.map.container.regY = camera.y;
+        var worldBoundingBoxHalfHeight = (game.world.width + game.world.height) / 4. * CELL_SIZE + 100;
+        var yDiff = worldBoundingBoxHalfHeight - stageCenter.y;
+        var minCameraY = Math.min(-yDiff, 0);
+        var maxCameraY = Math.max(yDiff, 0);
+
+        camera.x = Math.max(minCameraX, camera.x);
+        camera.x = Math.min(maxCameraX, camera.x);
+        camera.y = Math.max(minCameraY, camera.y);
+        camera.y = Math.min(maxCameraY, camera.y);
+
+        game.map.container.x = stageCenter.x;
+        game.map.container.y = stageCenter.y;
+
+        var worldCenter = game.world.getCenter();
+        game.map.container.regX = worldCenter.x + camera.x;
+        game.map.container.regY = worldCenter.y + camera.y;
 
         updateSelectedCell(game);
 

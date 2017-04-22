@@ -1,0 +1,14 @@
+{
+    "images": [
+        "assets/tree.png",
+        "assets/rock.png"
+    ],
+    "frames": [
+        [ 0, 0, 64, 64, 0, 32, 32 ],
+        [ 0, 0, 64, 64, 1, 32, 32 ]
+    ],
+    "animations": {
+        "tree": 0,
+        "rock": 1
+    }
+}

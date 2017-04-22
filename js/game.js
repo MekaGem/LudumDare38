@@ -13,8 +13,28 @@ function resize() {
 }
 
 function init() {
-    stage = new createjs.Stage("demoCanvas");
+    loadResources(play);
+}
 
+function loadResources(callback) {
+    var queue = new createjs.LoadQueue(true);
+    var handleComplete = function() {
+        spriteSheet = queue.getResult("resources");
+        humanSpriteSheet = queue.getResult("human");
+        callback();
+    };
+    queue.on("complete", handleComplete, this);
+    queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
+}
+
+function play() {
+    var game = initGame();
+    gameLoop(game);
+}
+
+function initGame() {
+    stage = new createjs.Stage("demoCanvas");
     window.addEventListener('resize', resize);
     resize();
 
@@ -27,24 +47,17 @@ function init() {
 
     var map = new Map(100, 50);
     var world = new World(10, 10, 10, 10);
+    var game = {
+        "map": map,
+        "world": world,
+    };
+
     map.addWorld(world);
     camera = world.getCenter();
     console.log("Camera at " + camera.x + ":" + camera.y);
 
     stage.addChild(map.container);
 
-    var data = {
-        images: ["assets/tree.png", "assets/rock.png"],
-        frames: [
-            [0, 0, 64, 64, 0, 32, 32],
-            [0, 0, 64, 64, 1, 32, 32]
-        ],
-        animations: {
-            tree: 0,
-            rock: 1
-        }
-    };
-    var spriteSheet = new createjs.SpriteSheet(data);
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
             if (world.cells[x][y].type == "G") {
@@ -57,17 +70,6 @@ function init() {
         }
     }
 
-    var human = {
-        images: ["assets/human_from_internet.png"],
-        frames: {
-            width: 34, height: 57, count: 4
-        },
-        animations: {
-            walk: [0, 4]
-        }
-    };
-    var humanSpriteSheet = new createjs.SpriteSheet(human);
-
     var human = new Human(2, 3, humanSpriteSheet);
     //for testing.
     destination = new Point(2 * CELL_SIZE, 7 * CELL_SIZE);
@@ -76,7 +78,12 @@ function init() {
     human.isoDestinationY = isoDest.y;
     world.addUnit(human);
     stage.update();
+    game.human = human
 
+    return game;
+}
+
+function gameLoop(game) {
     // Setup periodic ticker.
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", tick);
@@ -109,15 +116,15 @@ function init() {
             camera.y += CAMERA_MOVEMENT_SPEED * seconds;
         }
 
-        map.container.x = center.x;
-        map.container.y = center.y;
+        game.map.container.x = center.x;
+        game.map.container.y = center.y;
 
-        map.container.regX = camera.x;
-        map.container.regY = camera.y;
+        game.map.container.regX = camera.x;
+        game.map.container.regY = camera.y;
 
         while (humanStepTimeCounter > humanStepPeriod) {
             // move human slightly.
-            world.shiftHuman(human); // shift in cartesian coordinates.
+            game.world.shiftHuman(game.human); // shift in cartesian coordinates.
             humanStepTimeCounter -= humanStepPeriod;
         }
         // Render.
@@ -125,9 +132,9 @@ function init() {
     }
 
     function step() {
-        borderCell = pickRandomBorderCell(world);
+        borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
-            world.transformToWater(borderCell.x, borderCell.y);
+            game.world.transformToWater(borderCell.x, borderCell.y);
         }
         console.log("Step!");
     }

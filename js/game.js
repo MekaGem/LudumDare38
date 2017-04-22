@@ -30,7 +30,7 @@ function init() {
     createjs.Ticker.setFPS(30);
     createjs.Ticker.addEventListener("tick", tick);
 
-    var stepPeriod = 1000; // 1 second.
+    var stepPeriod = 2000; // 2 second.
     var timePassed = 0;
 
     function tick(event) {
@@ -45,6 +45,10 @@ function init() {
     }
 
     function step() {
+        borderCell = pickRandomBorderCell(map);
+        if (borderCell) {
+            map.transformToWater(borderCell.x, borderCell.y);
+        }
         console.log("Step!");
     }
 }

@@ -49,6 +49,20 @@ Map.prototype.addUnit = function(unit) {
     console.log(unit.view);
 }
 
+Map.prototype.transformToWater = function(x, y) {
+    console.log("Transforming (" + x + ", " + y + ") to water.");
+    oldShape = this.cells[x][y].shape;
+    newCell = new Cell("W");
+    newCell.shape.x = oldShape.x;
+    newCell.shape.y = oldShape.y;
+    this.container.addChild(newCell.shape);
+    this.cells[x][y] = newCell;
+}
+
+Map.prototype.cellIsValid = function(x, y) {
+    return x >= 0 && y >= 0 && x < this.width && y < this.height;
+}
+
 Map.prototype.cellIsWater = function (x, y) {
     return this.cells[x][y].type == "W";
 }
@@ -68,7 +82,7 @@ Map.prototype.cellIsBorder = function (x, y) {
     for (var d = 0; d < 4; ++d) {
         var nx = x + dirs[d].x;
         var ny = y + dirs[d].y;
-        if (!this.cellIsWater(nx, ny)) {
+        if (!this.cellIsValid(nx, ny) || this.cellIsWater(nx, ny)) {
             return true;
         }
     }
@@ -113,6 +127,9 @@ function getBorderCells(map) {
 
 function pickRandomBorderCell(map) {
     var borderCells = getBorderCells(map);
+    if (borderCells.length == 0) {
+        return null;
+    }
     var id = getRandomInt(0, borderCells.length);
     return borderCells[id];
 }

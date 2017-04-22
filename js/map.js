@@ -137,13 +137,6 @@ World.prototype.cellIsPassable = function(x, y) {
 }
 
 World.prototype.cellIsBorder = function (x, y) {
-    var dirs = [
-        { x: 1, y: 0 },
-        { x: 0, y: 1 },
-        { x: -1, y: 0 },
-        { x: 0, y: -1 }
-    ];
-
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
         var ny = y + DIRS[d].y;

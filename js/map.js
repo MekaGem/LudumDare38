@@ -46,7 +46,16 @@ Map.prototype.addUnit = function(unit) {
     iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
     unit.view.x = iso.x;
     unit.view.y = iso.y;
-    console.log(unit.view);
+}
+
+Map.prototype.removeUnit = function(x, y) {
+    for (var i = 0; i < this.units.length; ++i) {
+        if (this.units[i].x == x && this.units[i].y == y) {
+            console.log("Removing: " + i);
+            this.container.removeChild(this.units[i].view);
+            this.units.splice(i, 1);
+        }
+    }
 }
 
 Map.prototype.transformToWater = function(x, y) {
@@ -62,10 +71,9 @@ Map.prototype.transformToWater = function(x, y) {
     this.container.addChildAt(newCell.shape, oldShapeIndex);
     this.cells[x][y] = newCell;
 
-    var container = this.container
     createjs.Tween.get(oldShape)
         .to({alpha : 0}, 1000)
-        .call(function() { container.removeChild(oldShape); });
+        .call(function() { this.removeUnit(x, y); });
 }
 
 Map.prototype.cellIsValid = function(x, y) {

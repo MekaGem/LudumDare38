@@ -95,14 +95,10 @@ function initGame() {
 
     var human = new Human(2, 3, humanSpriteSheet);
     //for testing.
-    destination = new Point(2 * CELL_SIZE, 7 * CELL_SIZE);
-    isoDest = cartesianToIsometric(destination.x, destination.y);
-    human.isoDestinationX = isoDest.x;
-    human.isoDestinationY = isoDest.y;
+    human.setFinalDestinationCell(new Point(4, 7));
     world.addUnit(human);
     stage.update();
-    game.human = human
-
+    game.human = human;
     return game;
 }
 

@@ -75,9 +75,9 @@ function World(width, height, x, y) {
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
-    
+
     var level = GenerateIsland(width, height, 10);
-    
+
     this.tilesContainer = new createjs.Container();
     for (var x = 0; x < width; ++x) {
         this.cells.push([]);
@@ -121,11 +121,11 @@ World.prototype.addUnit = function(unit) {
 }
 
 World.prototype.shiftHuman = function(human) {
-    shiftDirection = human.getShiftDirection();
-    cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
+    var shiftDirection = human.getShiftDirection(this);
+    var cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
     cartesianOrigin.x += shiftDirection.x;
     cartesianOrigin.y += shiftDirection.y;
-    isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
+    var isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
     human.view.x = isometricNewPosition.x;
     human.view.y = isometricNewPosition.y;
 }
@@ -196,7 +196,7 @@ World.prototype.cellIsCutVertex = function (x, y) {
             break;
         }
     }
-    
+
     if (!neighbor) return false;
 
     var visited = [];
@@ -205,7 +205,7 @@ World.prototype.cellIsCutVertex = function (x, y) {
     var q = [neighbor];
     while (q.length > 0) {
         var pos = q.shift();
-        
+
         for (var d = 0; d < 4; d++) {
             var npos = {x: pos.x + DIRS[d].x, y: pos.y + DIRS[d].y};
             if ((npos.y != y || npos.x != x) && this.cellIsValid(npos.x, npos.y) && !this.cellIsWater(npos.x, npos.y) && !visited[npos.x][npos.y]) {
@@ -214,7 +214,7 @@ World.prototype.cellIsCutVertex = function (x, y) {
             }
         }
     }
-    
+
     var cutVertex = false;
     for (var d = 0; d < 4; d++) {
         var nx = x + DIRS[d].x;
@@ -224,7 +224,7 @@ World.prototype.cellIsCutVertex = function (x, y) {
             break;
         }
     }
-    
+
     return cutVertex;
 }
 
@@ -251,9 +251,9 @@ function isometricToCartesian(isoX, isoY) {
 
 function getBorderCells(world) {
     var borderCells = [];
-    
+
     var center = {x: (world.width - 1) / 2, y: (world.height - 1) / 2};
-    
+
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
             if (world.cellIsLand(x, y) && world.cellIsBorder(x, y) && !world.cellIsCutVertex(x, y)) {
@@ -270,10 +270,10 @@ function pickRandomBorderCell(world) {
     if (borderCells.length == 0) {
         return null;
     }
-    
+
     borderCells.sort(function(a, b){return b.dist - a.dist});
     console.log(borderCells);
-    
+
     var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];
 }

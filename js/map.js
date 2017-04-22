@@ -7,6 +7,16 @@ var DIRS = [
     {x: 0, y: -1}  // up right (NE)
 ];
 
+function drawTile(shape) {
+    var gfx = shape.graphics;
+    gfx.moveTo(0, CELL_SIZE / 2);
+    gfx.lineTo(CELL_SIZE, CELL_SIZE);
+    gfx.lineTo(CELL_SIZE * 2, CELL_SIZE / 2);
+    gfx.lineTo(CELL_SIZE, 0);
+    gfx.lineTo(0, CELL_SIZE / 2);
+    shape.regX = CELL_SIZE;
+}
+
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
@@ -18,7 +28,7 @@ function Cell(type) {
     } else {
         gfx.beginFill("black");
     }
-    gfx.moveTo(0, CELL_SIZE / 2).lineTo(CELL_SIZE, CELL_SIZE).lineTo(CELL_SIZE * 2, CELL_SIZE / 2).lineTo(CELL_SIZE, 0);
+    drawTile(this.shape);
 }
 
 function Map(width, height) {
@@ -35,7 +45,7 @@ function Map(width, height) {
             this.cells[x].push(new Cell("W"));
             var shape = this.cells[x][y].shape;
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.x = iso.x - CELL_SIZE;
+            shape.x = iso.x;
             shape.y = iso.y;
             waterContainer.addChild(shape);
         }
@@ -44,11 +54,14 @@ function Map(width, height) {
     var sy = height * CELL_SIZE;
     waterContainer.cache(-sy, 0, sx + sy, (sx + sy) / 2.);
     this.container.addChild(waterContainer);
+
+    this.worldsContainer = new createjs.Container();
+    this.container.addChild(this.worldsContainer);
 }
 
 Map.prototype.addWorld = function(world) {
     this.worlds.push(world);
-    this.container.addChild(world.container);
+    this.worldsContainer.addChild(world.container);
     var iso = cartesianToIsometric(world.x * CELL_SIZE, world.y * CELL_SIZE);
     world.container.x = iso.x;
     world.container.y = iso.y;
@@ -65,6 +78,7 @@ function World(width, height, x, y) {
     
     var level = GenerateIsland(width, height, 10);
     
+    this.tilesContainer = new createjs.Container();
     for (var x = 0; x < width; ++x) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
@@ -75,11 +89,21 @@ function World(width, height, x, y) {
             }
             var shape = this.cells[x][y].shape;
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.x = iso.x - CELL_SIZE;
+            shape.x = iso.x;
             shape.y = iso.y;
-            this.container.addChild(shape);
+            shape.regX = CELL_SIZE;
+            this.tilesContainer.addChild(shape);
         }
     }
+    this.container.addChild(this.tilesContainer);
+
+    this.selectionContainer = new createjs.Container();
+    this.container.addChild(this.selectionContainer);
+
+    this.selectionCallback = null;
+
+    this.unitsContainer = new createjs.Container();
+    this.container.addChild(this.unitsContainer);
 }
 
 World.prototype.getCenter = function() {
@@ -90,27 +114,27 @@ World.prototype.getCenter = function() {
 
 World.prototype.addUnit = function(unit) {
     this.units.push(unit);
-    this.container.addChild(unit.view);
+    this.unitsContainer.addChild(unit.view);
     var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
     unit.view.x = iso.x;
     unit.view.y = iso.y;
 }
 
 World.prototype.shiftHuman = function(human) {
-        shiftDirection = human.getShiftDirection();
-        cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
-        cartesianOrigin.x += shiftDirection.x;
-        cartesianOrigin.y += shiftDirection.y;
-        isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
-        human.view.x = isometricNewPosition.x;
-        human.view.y = isometricNewPosition.y;
+    shiftDirection = human.getShiftDirection();
+    cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
+    cartesianOrigin.x += shiftDirection.x;
+    cartesianOrigin.y += shiftDirection.y;
+    isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
+    human.view.x = isometricNewPosition.x;
+    human.view.y = isometricNewPosition.y;
 }
 
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
         if (this.units[i].x == x && this.units[i].y == y) {
             console.log("Removing: " + i);
-            this.container.removeChild(this.units[i].view);
+            this.unitsContainer.removeChild(this.units[i].view);
             this.units.splice(i, 1);
         }
     }
@@ -119,14 +143,14 @@ World.prototype.removeUnitsInCell = function(x, y) {
 World.prototype.transformToWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var oldShape = this.cells[x][y].shape;
-    var oldShapeIndex = this.container.getChildIndex(oldShape);
+    var oldShapeIndex = this.tilesContainer.getChildIndex(oldShape);
 
     var newCell = new Cell("W");
     var newShape = newCell.shape;
     newShape.x = oldShape.x;
     newShape.y = oldShape.y;
 
-    this.container.addChildAt(newCell.shape, oldShapeIndex);
+    this.tilesContainer.addChildAt(newCell.shape, oldShapeIndex);
     this.cells[x][y] = newCell;
 
     var world = this;
@@ -202,6 +226,10 @@ World.prototype.cellIsCutVertex = function (x, y) {
     }
     
     return cutVertex;
+}
+
+World.prototype.cellIsSelectable = function(x, y) {
+    return this.cellIsValid(x, y);
 }
 
 function Point(x, y) {

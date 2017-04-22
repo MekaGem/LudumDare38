@@ -20,15 +20,15 @@ function drawTile(shape) {
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
-    gfx = this.shape.graphics;
     if (type == "W") {
-        gfx.beginFill("blue");
+        this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
-        gfx.beginFill("green");
+        this.shape = new createjs.Sprite(assets.spriteSheet, "grass");
     } else {
+        gfx = this.shape.graphics;
         gfx.beginFill("black");
+        drawTile(this.shape);
     }
-    drawTile(this.shape);
 }
 
 function Map(width, height) {

@@ -5,20 +5,20 @@ function Unit(x, y, view) {
 }
 
 Tree.prototype = Object.create(Unit.prototype);
-function Tree(x, y, spriteSheet) {
-    var view = new createjs.Sprite(spriteSheet, "tree");
+function Tree(x, y) {
+    var view = new createjs.Sprite(assets.spriteSheet, "tree");
     Unit.call(this, x, y, view);
 }
 
 Rock.prototype = Object.create(Unit.prototype);
-function Rock(x, y, spriteSheet) {
-    var view = new createjs.Sprite(spriteSheet, "rock");
+function Rock(x, y) {
+    var view = new createjs.Sprite(assets.spriteSheet, "rock");
     Unit.call(this, x, y, view);
 }
 
 Human.prototype = Object.create(Unit.prototype);
-function Human(x, y, spriteSheet) {
-    var view = new createjs.Sprite(spriteSheet, "walk");
+function Human(x, y) {
+    var view = new createjs.Sprite(assets.humanSpriteSheet, "walk");
     view.regX = 32;
     view.regY = 32;
     this.currentDestination = new Point(x, y);

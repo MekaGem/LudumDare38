@@ -91,6 +91,16 @@ World.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
+World.prototype.shiftHuman = function(human) {
+        shiftDirection = human.getShiftDirection();
+        cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
+        cartesianOrigin.x += shiftDirection.x;
+        cartesianOrigin.y += shiftDirection.y;
+        isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
+        human.view.x = isometricNewPosition.x;
+        human.view.y = isometricNewPosition.y;
+}
+
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
         if (this.units[i].x == x && this.units[i].y == y) {

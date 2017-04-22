@@ -45,7 +45,6 @@ function init() {
         }
     };
     var spriteSheet = new createjs.SpriteSheet(data);
-
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
             if (world.cells[x][y].type == "G") {
@@ -58,6 +57,24 @@ function init() {
         }
     }
 
+    var human = {
+        images: ["assets/human_from_internet.png"],
+        frames: {
+            width: 34, height: 57, count: 4
+        },
+        animations: {
+            walk: [0, 4]
+        }
+    };
+    var humanSpriteSheet = new createjs.SpriteSheet(human);
+
+    var human = new Human(2, 3, humanSpriteSheet);
+    //for testing.
+    destination = new Point(2 * CELL_SIZE, 7 * CELL_SIZE);
+    isoDest = cartesianToIsometric(destination.x, destination.y);
+    human.isoDestinationX = isoDest.x;
+    human.isoDestinationY = isoDest.y;
+    world.addUnit(human);
     stage.update();
 
     // Setup periodic ticker.
@@ -66,9 +83,11 @@ function init() {
 
     var stepPeriod = 1000; // 1 second.
     var timePassed = 0;
-
+    var humanStepPeriod = 100; // 0.1 second.
+    var humanStepTimeCounter = 0;
     function tick(event) {
         timePassed += event.delta;
+        humanStepTimeCounter += event.delta;
         while (timePassed > stepPeriod) {
             // Update game world.
             step();
@@ -96,6 +115,11 @@ function init() {
         map.container.regX = camera.x;
         map.container.regY = camera.y;
 
+        while (humanStepTimeCounter > humanStepPeriod) {
+            // move human slightly.
+            world.shiftHuman(human); // shift in cartesian coordinates.
+            humanStepTimeCounter -= humanStepPeriod;
+        }
         // Render.
         stage.update();
     }

@@ -14,6 +14,14 @@ function Cell(type) {
     gfx.moveTo(0, CELL_SIZE / 2).lineTo(CELL_SIZE, CELL_SIZE).lineTo(CELL_SIZE * 2, CELL_SIZE / 2).lineTo(CELL_SIZE, 0);
 }
 
+function isPassable(cell) {
+    if (cell.type == "G") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function Map(width, height) {
     this.width = width;
     this.height = height;

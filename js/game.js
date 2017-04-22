@@ -35,6 +35,7 @@ function play() {
 
 function initGame() {
     stage = new createjs.Stage("demoCanvas");
+
     window.addEventListener('resize', resize);
     resize();
 
@@ -43,14 +44,36 @@ function initGame() {
     circle.x = 100;
     circle.y = 100;
     stage.addChild(circle);
-    stage.update();
 
     var map = new Map(100, 50);
     var world = new World(10, 10, 10, 10);
     var game = {
         "map": map,
         "world": world,
+        "selectedCellPosition": null,
+        "selectedCellShape": new createjs.Shape(),
     };
+
+    {
+        var gfx = game.selectedCellShape.graphics;
+        gfx.setStrokeStyle(3);
+        gfx.beginStroke("white");
+        drawTile(game.selectedCellShape);
+        game.selectedCellShape.alpha = 0;
+    }
+
+    // TODO: reassign from the world to the new one when it changes
+    game.world.selectionContainer.addChild(game.selectedCellShape);
+    game.world.container.on("mousedown", function() {
+        if (game.world.selectionCallback && game.selectedCellPosition) {
+            game.world.selectionCallback(game.selectedCellPosition);
+        }
+    })
+
+    // Example
+    game.world.selectionCallback = function(cell) {
+        console.log("Clicked on cell: " + cell.x + "," + cell.y);
+    }
 
     map.addWorld(world);
     camera = world.getCenter();
@@ -116,6 +139,22 @@ StepTicker.prototype.advanceTime = function(delta) {
     }
 };
 
+function updateSelectedCell(game) {
+    var local = game.world.container.globalToLocal(stage.mouseX, stage.mouseY);
+    var cart = isometricToCartesian(local.x, local.y);
+    var cell = new Point(Math.floor(cart.x / CELL_SIZE), Math.floor(cart.y / CELL_SIZE));
+    if (game.world.cellIsSelectable(cell.x, cell.y)) {
+        game.selectedCellPosition = cell;
+        var iso = cartesianToIsometric(cell.x * CELL_SIZE, cell.y * CELL_SIZE);
+        game.selectedCellShape.x = iso.x;
+        game.selectedCellShape.y = iso.y;
+        game.selectedCellShape.alpha = 1;
+    } else {
+        game.selectedCellPosition = null;
+        game.selectedCellShape.alpha = 0;
+    }
+}
+
 function gameLoop(game) {
     // Setup periodic ticker.
     createjs.Ticker.setFPS(60);
@@ -159,6 +198,8 @@ function gameLoop(game) {
 
         game.map.container.regX = camera.x;
         game.map.container.regY = camera.y;
+
+        updateSelectedCell(game);
 
         // Render.
         stage.update();

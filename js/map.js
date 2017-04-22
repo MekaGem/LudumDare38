@@ -17,23 +17,25 @@ function Cell(type) {
 function Map(width, height) {
     this.width = width;
     this.height = height;
-    this.cells = new Array(width);
+    this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
     
     var level = GenerateIsland(width, height, 10);
     
     for (var x = 0; x < width; ++x) {
-        this.cells[x] = new Array(height);
+        this.cells.push([]);
         for (var y = 0; y < height; ++y) {
             if (level[x][y]) {
-                this.cells[x][y] = new Cell("W");
-                shape = this.cells[x][y].shape;
-                iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-                shape.x = iso.x - CELL_SIZE;
-                shape.y = iso.y;
-                this.container.addChild(shape);
+                this.cells[x].push(new Cell("G"));
+            } else {
+                this.cells[x].push(new Cell("W"));
             }
+            shape = this.cells[x][y].shape;
+            iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+            shape.x = iso.x - CELL_SIZE;
+            shape.y = iso.y;
+            this.container.addChild(shape);
         }
     }
 }

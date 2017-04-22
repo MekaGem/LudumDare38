@@ -74,8 +74,6 @@ function init() {
     isoDest = cartesianToIsometric(destination.x, destination.y);
     human.isoDestinationX = isoDest.x;
     human.isoDestinationY = isoDest.y;
-    var t = new Tree(0, 0, spriteSheet);
-    world.addUnit(t);
     world.addUnit(human);
     stage.update();
 

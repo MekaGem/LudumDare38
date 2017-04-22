@@ -17,14 +17,19 @@ function Cell(type) {
 function Map(width, height) {
     this.width = width;
     this.height = height;
-    this.cells = []
+    this.cells = [];
+    
+    var level = GenerateIsland(width, height, 10);
+    
     for (var x = 0; x < width; ++x) {
-        this.cells[x] = []
+        this.cells[x] = [];
         for (var y = 0; y < height; ++y) {
-            this.cells[x][y] = new Cell("W");
+            if (level[x][y]) {
+                this.cells[x][y] = new Cell("W");
+            }
         }
     }
-    this.cells[width / 2][height / 2] = new Cell("G");
+    //this.cells[width / 2][height / 2] = new Cell("G");
 }
 
 function Point(x, y) {
@@ -45,18 +50,20 @@ function isometricToCartesian(isoX, isoY) {
 }
 
 function simpleMap(stage) {
-    var map = new Map(10, 10);
+    var map = new Map(4, 8);
     var mapContainer = new createjs.Container();
     for (var x = 0; x < map.width; ++x) {
         for (var y = 0; y < map.height; ++y) {
-            shape = map.cells[x][y].shape;
-            iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.x = iso.x;
-            shape.y = iso.y;
-            mapContainer.addChild(shape);
+            if (map.cells[x][y]) {
+                shape = map.cells[x][y].shape;
+                iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+                shape.x = iso.x;
+                shape.y = iso.y;
+                mapContainer.addChild(shape);
+            }
         }
     }
-    mapContainer.x = 200;
+    mapContainer.x = 400;
     mapContainer.y = 300;
     stage.addChild(mapContainer);
     isometricToCartesian(0, 0);

@@ -28,6 +28,7 @@ function Map(width, height) {
     this.worlds = []
     this.container = new createjs.Container();
 
+    var waterContainer = new createjs.Container();
     for (var x = 0; x < width; ++x) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
@@ -36,9 +37,13 @@ function Map(width, height) {
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
             shape.x = iso.x - CELL_SIZE;
             shape.y = iso.y;
-            this.container.addChild(shape);
+            waterContainer.addChild(shape);
         }
     }
+    var sx = width * CELL_SIZE;
+    var sy = height * CELL_SIZE;
+    waterContainer.cache(-sy, 0, sx + sy, (sx + sy) / 2.);
+    this.container.addChild(waterContainer);
 }
 
 Map.prototype.addWorld = function(world) {

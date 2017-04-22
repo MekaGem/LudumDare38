@@ -17,14 +17,14 @@ function Cell(type) {
 function Map(width, height) {
     this.width = width;
     this.height = height;
-    this.cells = [];
+    this.cells = new Array(width);
     this.units = [];
     this.container = new createjs.Container();
     
     var level = GenerateIsland(width, height, 10);
     
     for (var x = 0; x < width; ++x) {
-        this.cells[x] = [];
+        this.cells[x] = new Array(height);
         for (var y = 0; y < height; ++y) {
             if (level[x][y]) {
                 this.cells[x][y] = new Cell("W");

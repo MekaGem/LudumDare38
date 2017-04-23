@@ -38,17 +38,29 @@ Bush.prototype = Object.create(Unit.prototype);
 function Bush(x, y) {
     var view = new createjs.Sprite(assets.spriteSheet, "bush");
     Unit.call(this, x, y, view, UNIT_BUSH);
-    this.hasBerries = false;
+    this.berriesMaxGrowth = this.generateGrowthTime();
+    this.berriesGrown = getRandomInt(0, this.berriesMaxGrowth);
 }
 
-Bush.prototype.growBerries = function() {
-    this.view.gotoAndPlay("bush_with_berries");
-    this.hasBerries = true;
+Bush.prototype.generateGrowthTime = function() {
+    return 15 + getRandomInt(0, 10);
+}
+
+Bush.prototype.hasBerries = function() {
+    return this.berriesGrown == this.berriesMaxGrowth;
 }
 
 Bush.prototype.pickBerries = function() {
     this.view.gotoAndPlay("bush");
-    this.hasBerries = false;
+    this.berriesGrown = 0;
+    this.berriesMaxGrowth = this.generateGrowthTime();
+}
+
+Bush.prototype.growBerries = function() {
+    this.berriesGrown = Math.min(this.berriesGrown + 1, this.berriesMaxGrowth);
+    if (this.hasBerries()) {
+        this.view.gotoAndPlay("bush_with_berries");
+    }
 }
 
 Human.prototype = Object.create(Unit.prototype);

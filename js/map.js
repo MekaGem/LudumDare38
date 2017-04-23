@@ -1,4 +1,6 @@
 var CELL_SIZE = 64;
+var START_CELL_LIFE = 100;
+var DEFAULT_WATER_DAMAGE = 50;
 
 var DIRS = [
     {x: 1, y: 0},  // down right (SE)
@@ -20,6 +22,8 @@ function drawTile(shape) {
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
+    this.maximumLife = START_CELL_LIFE;
+    this.life = this.maximumLife;
     if (type == "W") {
         this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
@@ -29,6 +33,15 @@ function Cell(type) {
         gfx.beginFill("black");
         drawTile(this.shape);
     }
+}
+
+Cell.prototype.getDamage = function(damage) {
+    this.life = Math.max(0, this.life - damage);
+    this.shape.alpha = this.life / this.maximumLife;
+}
+
+Cell.prototype.isAlive = function () {
+    return this.life > 0;
 }
 
 function Map(width, height) {
@@ -163,11 +176,16 @@ World.prototype.removeUnitsInCell = function(x, y) {
     }
 }
 
-World.prototype.transformToWater = function(x, y) {
+World.prototype.damageWithWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var container = this.tilesContainer;
-    var oldShape = this.cells[x][y].shape;
+    var oldCell = this.cells[x][y];
+    var oldShape = oldCell.shape;
 
+    oldCell.getDamage(DEFAULT_WATER_DAMAGE);
+    if (oldCell.isAlive()) {
+        return;
+    }
     var newCell = new Cell("W");
 
     this.cells[x][y] = newCell;

@@ -268,6 +268,7 @@ function tickOtherWorld(game) {
     } else {
         var behind = false;
         var changed = false;
+        var mergeDir = -1;
 
         if (keys[49]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 0);
@@ -287,6 +288,34 @@ function tickOtherWorld(game) {
             game.otherDrift = {x: DIRS[3].x, y: DIRS[3].y};
             changed = true;
             behind = true;
+        } else if (keys[81]) {
+            mergeDir = 0;
+        } else if (keys[87]) {
+            mergeDir = 1;
+        } else if (keys[69]) {
+            mergeDir = 2;
+        } else if (keys[82]) {
+            mergeDir = 3;
+        }
+        
+        if (mergeDir >= 0) {
+            var newWorld = new World(5, 5, 0, 0, 4);
+            
+            for (var x = 0; x < newWorld.width; ++x) {
+                for (var y = 0; y < newWorld.height; ++y) {
+                    if (newWorld.cells[x][y].type == "G") {
+                        var r = getRandomInt(0, 5);
+                        if (r == 0) {
+                            newWorld.addUnit(new Tree(x, y));
+                        } else if (r < 3) {
+                            newWorld.addUnit(new Rock(x, y));
+                        }
+                    }
+                }
+            }
+            
+            MergeIslands(game.map, game.world, newWorld, mergeDir);
+            game.omck = 60;
         }
 
         if (changed) {

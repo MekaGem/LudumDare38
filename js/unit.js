@@ -70,6 +70,7 @@ Human.prototype.updatePath = function() {
                 var previousPosition = new Point(_this.x, _this.y);
                 _this.x = _this.currentDestination.x;
                 _this.y = _this.currentDestination.y;
+                updateViewPos(_this);
                 _this.currentDestination = null;
                 _this.stepOnCellCallback(previousPosition);
                 _this.updatePath();
@@ -126,7 +127,17 @@ Golem.prototype.engageHuman = function(world, human) {
         var dPos = cartesianToIsometric(DIRS[this.dir].x * CELL_SIZE, DIRS[this.dir].y * CELL_SIZE);
         var newPos = {x: this.view.x + dPos.x, y: this.view.y + dPos.y};
         var golem = this;
-        createjs.Tween.get(this.view).to({x: newPos.x, y: newPos.y}, 1000).call(function(){golem.x = dest.x; golem.y = dest.y; golem.engageHuman(world, human);});
+        createjs.Tween.get(this.view)
+            .to({
+                x: newPos.x,
+                y: newPos.y
+            }, 1000)
+            .call(function() {
+                golem.x = dest.x;
+                golem.y = dest.y;
+                updateViewPos(golem);
+                golem.engageHuman(world, human);
+            });
     } else {
         var dir = getDirection(this, human);
 

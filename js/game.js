@@ -95,9 +95,10 @@ function initGame() {
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
             if (world.cells[x][y].type == "G") {
-                if (x % 2 == 0) {
+                var r = getRandomInt(0, 5);
+                if (r == 0) {
                     world.addUnit(new Tree(x, y));
-                } else {
+                } else if (r < 3) {
                     world.addUnit(new Rock(x, y));
                 }
             }
@@ -107,12 +108,23 @@ function initGame() {
     var human = new Human(2, 3);
     world.addUnit(human);
     game.human = human;
-    
+
     var golem = new Golem(5, 5);
     world.addUnit(golem);
     golem.engageHuman(world, human);
-    
-    game.world.selectionCallback = function(cell) {
+
+    human.stepOnCellCallback = function(previousPosition) {
+        for (var i = 0; i < world.units.length;) {
+            if (world.units[i].x == this.x && world.units[i].y == this.y && world.units[i].type == UNIT_ROCK) {
+                inventory.addItem(ITEM_STONE, 1);
+                world.removeUnitByIndex(i);
+            } else {
+                ++i
+            }
+        }
+    }
+
+    world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
         if (cell.x == golem.x && cell.y == golem.y) {
             var dir = getDirection(human, golem);
@@ -193,12 +205,6 @@ function gameLoop(game) {
         }
     }
     stepTicker.addEventListener(20, sinkRandomCell);
-
-    var addStone = function() {
-        game.inventory.addItem("stone", 1);
-        game.inventory.addItem("carrot", 7);
-    }
-    stepTicker.addEventListener(10, addStone);
 
     function tick(event) {
         stepTicker.advanceTime(event.delta);

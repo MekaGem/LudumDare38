@@ -1,6 +1,8 @@
 var INVENTORY_BAR_X = 5;
 var INVENTORY_BAR_Y = 5;
 
+var ITEM_STONE = "stones";
+
 function Inventory() {
     this.container = new createjs.Container();
 

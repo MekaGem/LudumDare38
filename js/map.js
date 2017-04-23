@@ -20,6 +20,8 @@ function drawTile(shape) {
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
+    this.maximumLife = 100;
+    this.life = this.maximumLife;
     if (type == "W") {
         this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
@@ -29,6 +31,15 @@ function Cell(type) {
         gfx.beginFill("black");
         drawTile(this.shape);
     }
+}
+
+Cell.prototype.getDamage = function(damage) {
+    this.life -= damage;
+    this.shape.alpha = this.life / this.maximumLife;
+}
+
+Cell.prototype.isAlive = function () {
+    return this.life > 0;
 }
 
 function Map(width, height) {
@@ -75,7 +86,6 @@ function World(width, height, x, y, k) {
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
-    this.sinkingCell = null;
 
     var level = GenerateIsland(width, height, k);
 
@@ -104,10 +114,6 @@ function World(width, height, x, y, k) {
 
     this.unitsContainer = new createjs.Container();
     this.container.addChild(this.unitsContainer);
-}
-
-World.prototype.setSinkingCell = function(cell) {
-    this.sinkingCell = cell;
 }
 
 World.prototype.getCenter = function() {
@@ -168,15 +174,17 @@ World.prototype.removeUnitsInCell = function(x, y) {
     }
 }
 
-World.prototype.transformToWater = function(x, y) {
+World.prototype.damageWithWater = function(x, y) {
+    var waterDamage = 20;
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var container = this.tilesContainer;
-    var oldShape = this.cells[x][y].shape;
-    if (!isShapeSunk(oldShape)) {
-        partiallySinkShape(oldShape);
-		return;
+    var oldCell = this.cells[x][y];
+    var oldShape = oldCell.shape;
+
+    oldCell.getDamage(waterDamage);
+    if (oldCell.isAlive()) {
+        return;
     }
-    this.setSinkingCell(null);
     var newCell = new Cell("W");
 
     this.cells[x][y] = newCell;
@@ -303,17 +311,4 @@ function pickRandomBorderCell(world) {
 
     var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];
-}
-
-function isShapeSunk(shape) {
-    //disappearing alpha threshold
-    const disappearingAlpha = 0.6;
-
-    return shape.alpha < disappearingAlpha;
-}
-
-function partiallySinkShape(shape) {
-    const disappearingAlphaStep = 0.1;
-
-    shape.alpha -= disappearingAlphaStep;
 }

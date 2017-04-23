@@ -153,7 +153,7 @@ function initGame() {
                 human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
                 human.dealDamage(this, tree);
                 if (!tree.isAlive()) {
-                    inventory.addItem(ITEM_TREE, 1);
+                    inventory.addItem(ITEM_WOOD, 1);
                     world.removeUnitsInCell(tree.x, tree.y);
                 }
             }

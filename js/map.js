@@ -75,6 +75,7 @@ function World(width, height, x, y, k) {
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
+    this.sinkingCell = null;
 
     var level = GenerateIsland(width, height, k);
 
@@ -103,6 +104,10 @@ function World(width, height, x, y, k) {
 
     this.unitsContainer = new createjs.Container();
     this.container.addChild(this.unitsContainer);
+}
+
+World.prototype.setSinkingCell = function(sinkingCell) {
+    this.sinkingCell = sinkingCell;
 }
 
 World.prototype.getCenter = function() {
@@ -167,7 +172,10 @@ World.prototype.transformToWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var container = this.tilesContainer;
     var oldShape = this.cells[x][y].shape;
-
+    if (!isShapeSunk(oldShape)) {
+        partiallySinkShape(oldShape);
+		return;
+    }
     var newCell = new Cell("W");
 
     this.cells[x][y] = newCell;
@@ -294,4 +302,17 @@ function pickRandomBorderCell(world) {
 
     var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];
+}
+
+function isShapeSunk(shape) {
+    //disappearing alpha threshold
+    const disappearingAlpha = 0.6;
+
+    return shape.alpha < disappearingAlpha;
+}
+
+function partiallySinkShape(shape) {
+    const disappearingAlphaStep = 0.1;
+
+    shape.alpha -= disappearingAlphaStep;
 }

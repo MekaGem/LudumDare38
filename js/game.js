@@ -175,13 +175,17 @@ function gameLoop(game) {
 
     stepTicker = new StepTicker(100);
 
-    var sinkRandomCell = function() {
-        borderCell = pickRandomBorderCell(game.world);
+    var sinkCell = function() {
+        var borderCell = game.world.sinkingCell;
+        if (!borderCell) {
+            borderCell = pickRandomBorderCell(game.world);
+        }
         if (borderCell) {
+            game.world.setSinkingCell(borderCell);
             game.world.transformToWater(borderCell.x, borderCell.y);
         }
     }
-    stepTicker.addEventListener(20, sinkRandomCell);
+    stepTicker.addEventListener(20, sinkCell);
 
     var shiftHuman = function() {
         game.world.shiftHuman(game.human); // shift in cartesian coordinates.

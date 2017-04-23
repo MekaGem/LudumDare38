@@ -114,7 +114,15 @@ function initGame() {
     
     game.world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
-        human.setFinalDestinationCell(world, cell);
+        if (cell.x == golem.x && cell.y == golem.y) {
+            var dir = getDirection(human, golem);
+            if (dir >= 0) {
+                human.dir = dir;
+                human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
+            }
+        } else {
+            human.setFinalDestinationCell(world, cell);
+        }
     }
 
     stage.addChild(inventory.container);

@@ -14,17 +14,17 @@ function Inventory() {
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "rock"),
+            view: new createjs.Sprite(assets.spriteSheet, "stone"),
         },
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "bush_with_berries"),
+            view: new createjs.Sprite(assets.spriteSheet, "berries"),
         },
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "tree"),
+            view: new createjs.Sprite(assets.spriteSheet, "log"),
         },
     ];
     this.updateText();
@@ -32,18 +32,6 @@ function Inventory() {
     var x = INVENTORY_BAR_X;
     for (var i = 0; i < ITEM_TYPES; ++i) {
         var item = this.items[i];
-
-        // TODO: use custom icons here
-        if (i == ITEM_STONES.index) {
-            item.view.regX = -22;
-            item.view.regY = 12.5 - 20;
-        } else if (i == ITEM_BERRIES.index) {
-            item.view.regX = -17;
-            item.view.regY = 22 - 20;
-        } else if (i == ITEM_WOOD.index) {
-            item.view.regX = -27.5;
-            item.view.regY = -32;
-        }
 
         item.view.x = x;
         x += item.view.getBounds().width + INVENTORY_SPACING;

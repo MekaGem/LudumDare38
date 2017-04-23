@@ -35,7 +35,7 @@ function Map(width, height) {
     this.width = width;
     this.height = height;
     this.cells = [];
-    this.worlds = []
+    this.worlds = [];
     this.container = new createjs.Container();
 
     var waterContainer = new createjs.Container();
@@ -127,7 +127,7 @@ World.prototype.shiftHuman = function(human) {
     var isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
     human.view.x = isometricNewPosition.x;
     human.view.y = isometricNewPosition.y;
-    
+
     for (var dir = 0; dir < 4; dir++) {
         if (Math.sign(shiftDirection.x) == Math.sign(DIRS[dir].x) && Math.sign(shiftDirection.y) == Math.sign(DIRS[dir].y)) {
             var newAnim = human.view.currentAnimation;

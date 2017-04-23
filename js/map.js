@@ -136,9 +136,18 @@ World.prototype.addUnit = function(unit) {
 }
 
 World.prototype.removeUnitByIndex = function(index) {
-    console.log("Removing: " + index);
+    //console.log("Removing: " + index);
     this.unitsContainer.removeChild(this.units[index].view);
     this.units.splice(index, 1);
+}
+
+World.prototype.removeUnit = function(unit) {
+    for (var i = 0; i < this.units.length; i++) {
+        if (this.units[i] == unit) {
+            this.removeUnitByIndex(i);
+            break;
+        }
+    }
 }
 
 World.prototype.removeUnitsInCell = function(x, y) {
@@ -152,7 +161,7 @@ World.prototype.removeUnitsInCell = function(x, y) {
 }
 
 World.prototype.damageWithWater = function(x, y) {
-    console.log("Transforming (" + x + ", " + y + ") to water.");
+    //console.log("Transforming (" + x + ", " + y + ") to water.");
     var container = this.tilesContainer;
     var oldCell = this.cells[x][y];
     var oldShape = oldCell.shape;
@@ -164,8 +173,8 @@ World.prototype.damageWithWater = function(x, y) {
     this.cells[x][y] = new Cell("W");
 
     var world = this;
-    createjs.Tween.get(oldShape)
-        .call(function() { world.removeUnitsInCell(x, y); container.removeChild(oldShape); });
+    world.removeUnitsInCell(x, y);
+    container.removeChild(oldShape);
 }
 
 World.prototype.cellIsValid = function(x, y) {
@@ -182,7 +191,7 @@ World.prototype.cellIsLand = function(x, y) {
 
 World.prototype.cellIsPassable = function(x, y) {
     if (!this.cellIsValid(x, y) || this.cellIsWater(x, y)) return false;
-    return !this.cellContainsUnit(x, y, UNIT_TREE);
+    return !this.cellContainsUnit(x, y, UNIT_TREE) && !this.cellContainsUnit(x, y, UNIT_GOLEM);
 }
 
 World.prototype.getUnitFromCell = function(x, y) {
@@ -195,8 +204,17 @@ World.prototype.getUnitFromCell = function(x, y) {
 }
 
 World.prototype.cellContainsUnit = function (x, y, unitType) {
-    var unit = this.getUnitFromCell(x, y);
-    return (unit != null && unit.type == unitType) ? true : false;
+    var unit = this.getUnitFromCellByType(x, y, unitType);
+    return (unit != null) ? true : false;
+}
+
+World.prototype.getUnitFromCellByType = function(x, y, unitType) {
+    for (var i = 0; i < this.units.length; ++i) {
+        if (this.units[i].x == x && this.units[i].y == y && this.units[i].type == unitType) {
+            return this.units[i];
+        }
+    }
+    return null;
 }
 
 World.prototype.cellIsBorder = function(x, y) {

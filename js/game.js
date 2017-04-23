@@ -171,25 +171,36 @@ function initGame() {
 
     world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
-        if (cell.x == golem.x && cell.y == golem.y) {
-            var dir = getDirection(human, golem);
+        if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
+            var dir = getDirection(human, cell);
             if (dir >= 0) {
+                var golem = world.getUnitFromCellByType(cell.x, cell.y, UNIT_GOLEM);
                 human.dir = dir;
-                human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
+                human.gotoDirAnim("attack", true);
+                human.dealDamage(this, golem);
+                if (!golem.isAlive()) {
+                    tweenAdded();
+                    createjs.Tween.get(golem.view)
+                        .to({alpha: 0}, 1000)
+                        .call(function() {
+                            world.removeUnit(golem);
+                            tweenRemoved();
+                        });
+                }
             }
         } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_TREE)) {
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
                 human.dir = dir;
-                human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
+                human.gotoDirAnim("attack", true);
                 human.dealDamage(this, tree);
                 if (!tree.isAlive()) {
                     inventory.addItem(ITEM_WOOD, 1);
                     world.removeUnitsInCell(tree.x, tree.y);
                 }
             }
-        } else {
+        } else if (!tweenController.shouldStop) {
             human.setFinalDestinationCell(world, cell);
         }
     }
@@ -376,13 +387,17 @@ function tickOtherWorld(game) {
                             newWorld.addUnit(new Tree(x, y));
                         } else if (r < 3) {
                             newWorld.addUnit(new Rock(x, y));
+                        } else if (r == 3) {
+                            newWorld.addUnit(new Golem(x, y));
                         }
                     }
                 }
             }
-
-            MergeIslands(game.map, game.world, newWorld, mergeDir);
-            game.omck = 60;
+            
+            stopTweens(function() {
+                MergeIslands(game.map, game.world, newWorld, mergeDir);
+            });
+            game.omck = 300;
         }
 
         if (changed) {

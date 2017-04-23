@@ -176,9 +176,9 @@ function gameLoop(game) {
     stepTicker = new StepTicker(100);
 
     var sinkRandomCell = function() {
-        borderCell = pickRandomBorderCell(game.world);
+        var borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
-            game.world.transformToWater(borderCell.x, borderCell.y);
+            game.world.damageWithWater(borderCell.x, borderCell.y);
         }
     }
     stepTicker.addEventListener(20, sinkRandomCell);
@@ -190,7 +190,7 @@ function gameLoop(game) {
 
     function tick(event) {
         stepTicker.advanceTime(event.delta);
-        seconds = event.delta / 1000.;
+        var seconds = event.delta / 1000.;
 
         // Move camera.
         if (stage.mouseX < CAMERA_MOVEMENT_BORDER) {

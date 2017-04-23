@@ -203,10 +203,8 @@ function gameLoop(game) {
         var minCameraY = Math.min(-yDiff, 0);
         var maxCameraY = Math.max(yDiff, 0);
 
-        camera.x = Math.max(minCameraX, camera.x);
-        camera.x = Math.min(maxCameraX, camera.x);
-        camera.y = Math.max(minCameraY, camera.y);
-        camera.y = Math.min(maxCameraY, camera.y);
+        camera.x = clamp(camera.x, minCameraX, maxCameraX);
+        camera.y = clamp(camera.y, minCameraY, maxCameraY);
 
         game.map.container.x = stageCenter.x;
         game.map.container.y = stageCenter.y;

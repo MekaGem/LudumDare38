@@ -3,6 +3,7 @@ var INVENTORY_BAR_Y = 5;
 
 var ITEM_STONES = "stones";
 var ITEM_BERRIES = "berries";
+var ITEM_TREE = "tree"
 
 function Inventory() {
     this.container = new createjs.Container();

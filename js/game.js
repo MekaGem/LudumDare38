@@ -145,6 +145,18 @@ function initGame() {
                 human.dir = dir;
                 human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
             }
+        } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_TREE)) {
+            var tree = world.getUnitFromCell(cell.x, cell.y);
+            var dir = getDirection(human, tree);
+            if (dir >= 0) {
+                human.dir = dir;
+                human.view.gotoAndPlay("attack_" + DIR_SUFFIX[human.dir]);
+                human.dealDamage(this, tree);
+                if (!tree.isAlive()) {
+                    inventory.addItem(ITEM_TREE, 1);
+                    world.removeUnitsInCell(tree.x, tree.y);
+                }
+            }
         } else {
             human.setFinalDestinationCell(world, cell);
         }

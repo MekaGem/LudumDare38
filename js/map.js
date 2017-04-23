@@ -132,6 +132,7 @@ World.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
+<<<<<<< HEAD
 World.prototype.shiftHuman = function(human) {
     var shiftDirection = human.getShiftDirection(this);
     var cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
@@ -186,9 +187,8 @@ World.prototype.damageWithWater = function(x, y) {
     if (oldCell.isAlive()) {
         return;
     }
-    var newCell = new Cell("W");
-
-    this.cells[x][y] = newCell;
+    var oldShape = this.cells[x][y].shape;
+    this.cells[x][y] = new Cell("W");
 
     var world = this;
     createjs.Tween.get(oldShape)
@@ -200,11 +200,11 @@ World.prototype.cellIsValid = function(x, y) {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
 }
 
-World.prototype.cellIsWater = function (x, y) {
+World.prototype.cellIsWater = function(x, y) {
     return this.cells[x][y].type == "W";
 }
 
-World.prototype.cellIsLand = function (x, y) {
+World.prototype.cellIsLand = function(x, y) {
     return this.cells[x][y].type == "G";
 }
 
@@ -212,7 +212,7 @@ World.prototype.cellIsPassable = function(x, y) {
     return this.cellIsValid(x, y) && this.cells[x][y].type == "G";
 }
 
-World.prototype.cellIsBorder = function (x, y) {
+World.prototype.cellIsBorder = function(x, y) {
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
         var ny = y + DIRS[d].y;
@@ -223,7 +223,7 @@ World.prototype.cellIsBorder = function (x, y) {
     return false;
 }
 
-World.prototype.cellIsCutVertex = function (x, y) {
+World.prototype.cellIsCutVertex = function(x, y) {
     var neighbor;
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
@@ -272,6 +272,10 @@ World.prototype.cellIsSelectable = function(x, y) {
 function Point(x, y) {
     this.x = x;
     this.y = y;
+}
+
+Point.prototype.toString = function() {
+    return "(" + this.x + ", " + this.y + ")";
 }
 
 function cartesianToIsometric(cX, cY) {

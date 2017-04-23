@@ -100,6 +100,12 @@ function initGame() {
                     world.addUnit(new Tree(x, y));
                 } else if (r < 3) {
                     world.addUnit(new Rock(x, y));
+                } else if (r < 4) {
+                    var bush = new Bush(x, y);
+                    if (getRandomInt(0, 2) == 0) {
+                        bush.growBerries();
+                    }
+                    world.addUnit(bush);
                 }
             }
         }
@@ -115,9 +121,16 @@ function initGame() {
 
     human.stepOnCellCallback = function(previousPosition) {
         for (var i = 0; i < world.units.length;) {
-            if (world.units[i].x == this.x && world.units[i].y == this.y && world.units[i].type == UNIT_ROCK) {
-                inventory.addItem(ITEM_STONE, 1);
-                world.removeUnitByIndex(i);
+            if (world.units[i].x == this.x && world.units[i].y == this.y) {
+                if (world.units[i].type == UNIT_ROCK) {
+                    inventory.addItem(ITEM_STONES, 1);
+                    world.removeUnitByIndex(i);
+                } else if (world.units[i].type == UNIT_BUSH && world.units[i].hasBerries) {
+                    inventory.addItem(ITEM_BERRIES, 1);
+                    world.units[i].pickBerries();
+                } else {
+                    ++i;
+                }
             } else {
                 ++i
             }

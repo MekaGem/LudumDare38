@@ -1,14 +1,13 @@
 var INVENTORY_BAR_X = 5;
 var INVENTORY_BAR_Y = 5;
 
-var ITEM_STONE = "stone";
+var ITEM_STONES = "stones";
+var ITEM_BERRIES = "berries";
 
 function Inventory() {
     this.container = new createjs.Container();
 
-    this.items = {
-        stone: 0
-    };
+    this.items = {};
 
     this.items_text = new createjs.Text("", "20px Arial", "#ff7700");
     this.updateText();

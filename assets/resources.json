@@ -14,8 +14,8 @@
     "animations": {
         "grass": 0,
         "water": 1,
-        "bush": 2,
-        "bush_with_berries": 3,
+        "bush_with_berries": 2,
+        "bush": 3,
         "rock": 4,
         "tree": 5
     }

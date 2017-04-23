@@ -9,6 +9,13 @@ var DIRS = [
     {x: 0, y: -1}  // up right (NE)
 ];
 
+var DIR_SUFFIX = [
+    "se",
+    "sw",
+    "nw",
+    "ne"
+];
+
 function drawTile(shape) {
     var gfx = shape.graphics;
     gfx.moveTo(0, CELL_SIZE / 2);
@@ -131,40 +138,6 @@ World.prototype.addUnit = function(unit) {
     unit.view.x = iso.x;
     unit.view.y = iso.y;
 }
-
-// World.prototype.shiftHuman = function(human) {
-//     var shiftDirection = human.getShiftDirection(this);
-//     var cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
-//     cartesianOrigin.x += shiftDirection.x;
-//     cartesianOrigin.y += shiftDirection.y;
-//     var isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
-//     human.view.x = isometricNewPosition.x;
-//     human.view.y = isometricNewPosition.y;
-
-//     for (var dir = 0; dir < 4; dir++) {
-//         if (Math.sign(shiftDirection.x) == Math.sign(DIRS[dir].x) && Math.sign(shiftDirection.y) == Math.sign(DIRS[dir].y)) {
-//             var newAnim = human.view.currentAnimation;
-//             switch (dir) {
-//             case 0:
-//                 newAnim = "walk_se";
-//                 break;
-//             case 1:
-//                 newAnim = "walk_sw";
-//                 break;
-//             case 2:
-//                 newAnim = "walk_nw";
-//                 break;
-//             case 3:
-//                 newAnim = "walk_ne";
-//                 break;
-//             }
-//             if (newAnim != human.view.currentAnimation) {
-//                 human.view.gotoAndPlay(newAnim);
-//             }
-//             break;
-//         }
-//     }
-// }
 
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {

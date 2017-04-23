@@ -35,13 +35,15 @@ function loadResources(callback) {
     var handleComplete = function() {
         assets = {
             spriteSheet: queue.getResult("resources"),
-            humanSpriteSheet: queue.getResult("human")
+            humanSpriteSheet: queue.getResult("human"),
+            golemSpriteSheet: queue.getResult("golem")
         }
         callback();
     };
     queue.on("complete", handleComplete, this);
     queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
 }
 
 function play() {
@@ -106,6 +108,10 @@ function initGame() {
     var human = new Human(2, 3);
     world.addUnit(human);
     game.human = human;
+    
+    var golem = new Golem(5, 5);
+    world.addUnit(golem);
+    golem.engageHuman(world, human);
 
     game.world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);

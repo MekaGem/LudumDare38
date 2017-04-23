@@ -77,7 +77,7 @@ Human.prototype.updatePath = function() {
         var viewDestinationX = this.view.x + iso.x;
         var viewDestinationY = this.view.y + iso.y;
 
-        this.tween.play(new createjs.Tween(this.view)
+        createjs.Tween.get(this.view)
             .to({
                 x: viewDestinationX,
                 y: viewDestinationY
@@ -88,8 +88,7 @@ Human.prototype.updatePath = function() {
                 _this.y = _this.currentDestination.y;
                 _this.currentDestination = null;
                 _this.updatePath();
-            })
-        );
+            });
     } else {
         this.finalDestination = null;
     }

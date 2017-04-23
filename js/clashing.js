@@ -110,3 +110,128 @@ function ClashIslands(myIsland, theirIsland, clashDir) {
         break;
     }
 }
+
+function MergeIslands(map, myIsland, theirIsland, clashDir) {
+    var theirOff = ClashIslands(myIsland, theirIsland, clashDir);
+    
+    var myBBox = GetBBox(myIsland);
+    var theirBBox = GetBBox(theirIsland);
+    
+    console.log(theirOff, myBBox, theirBBox);
+    
+    var myOff = {};
+    var width;
+    var height;
+    switch (clashDir) {
+    case 0: // right
+        myOff.x = myBBox.l;
+        width = (theirOff.x + theirBBox.r) - myBBox.l + 1;
+        theirOff.x = myOff.x - theirOff.x;
+        
+        var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
+        var bot = Math.max(myBBox.b, theirBBox.b + theirOff.y);
+        myOff.y = top;
+        height = bot - top + 1;
+        theirOff.y = top - theirOff.y;
+        break;
+    case 1: // down
+        myOff.y = myBBox.t;
+        height = (theirOff.y + theirBBox.b) - myBBox.t + 1;
+        theirOff.y = myOff.y - theirOff.y;
+        
+        var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
+        var right = Math.max(myBBox.r, theirBBox.r + theirOff.x);
+        myOff.x = left;
+        width = right - left + 1;
+        theirOff.x = left - theirOff.x;
+        break;
+    case 2: // left
+        myOff.x = myBBox.l + theirOff.x;
+        width = (-theirOff.x + myBBox.r) - theirBBox.l + 1;
+        theirOff.x = theirBBox.l;
+        
+        var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
+        var bot = Math.max(myBBox.b, theirBBox.b + theirOff.y);
+        myOff.y = top;
+        height = bot - top + 1;
+        theirOff.y = top - theirOff.y;
+        break;
+    case 3: // up
+        myOff.y = myBBox.t + theirOff.y;
+        height = (-theirOff.y + myBBox.b) - theirBBox.t + 1;
+        theirOff.y = theirBBox.t;
+        
+        var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
+        var right = Math.max(myBBox.r, theirBBox.r + theirOff.x);
+        myOff.x = left;
+        width = right - left + 1;
+        theirOff.x = left - theirOff.x;
+        break;
+    }
+    
+    console.log(myOff, theirOff);
+    
+    var cells = [];
+    var tilesContainer = new createjs.Container();
+    var willMove = [];
+    
+    for (var x = 0; x < width; ++x) {
+        cells.push([]);
+        for (var y = 0; y < height; ++y) {
+            if (myIsland.cellIsValid(x + myOff.x, y + myOff.y) && myIsland.cellIsLand(x + myOff.x, y + myOff.y)) {
+                cells[x].push(myIsland.cells[x + myOff.x][y + myOff.y]);
+                var shape = cells[x][y].shape;
+                var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+                shape.x = iso.x;
+                shape.y = iso.y;
+                tilesContainer.addChild(shape);
+            } else if (theirIsland.cellIsValid(x + theirOff.x, y + theirOff.y) && theirIsland.cellIsLand(x + theirOff.x, y + theirOff.y)) {
+                cells[x].push(theirIsland.cells[x + theirOff.x][y + theirOff.y]);
+                var shape = cells[x][y].shape;
+                var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+                shape.x = iso.x;
+                shape.y = iso.y;
+                tilesContainer.addChild(shape);
+                willMove.push(shape);
+            } else {
+                cells[x].push(new Cell("W"));
+            }
+        }
+    }
+    myIsland.container.addChildAt(tilesContainer, myIsland.container.getChildIndex(myIsland.tilesContainer));
+    myIsland.container.removeChild(myIsland.tilesContainer);
+    myIsland.tilesContainer = tilesContainer;
+    myIsland.cells = cells;
+    myIsland.width = width;
+    myIsland.height = height;
+    
+    myIsland.x = Math.round((map.width - width) / 2);
+    myIsland.y = Math.round((map.height - height) / 2);
+    updateContainerPos(myIsland);
+    
+    for (var i = 0; i < myIsland.units.length; ++i) {
+        var unit = myIsland.units[i];
+        unit.x -= myOff.x;
+        unit.y -= myOff.y;
+        updateViewPos(unit);
+    }
+    for (var i = 0; i < theirIsland.units.length; ++i) {
+        var unit = theirIsland.units[i];
+        unit.x -= theirOff.x;
+        unit.y -= theirOff.y;
+        myIsland.addUnit(unit);
+        willMove.push(unit.view);
+    }
+    
+    var visualOffset = cartesianToIsometric(DIRS[clashDir].x * 10 * CELL_SIZE, DIRS[clashDir].y * 10 * CELL_SIZE);
+    for (var i = 0; i < willMove.length; ++i) {
+        willMove[i].x += visualOffset.x;
+        willMove[i].y += visualOffset.y;
+        
+        createjs.Tween.get(willMove[i])
+            .to({
+                x: willMove[i].x - visualOffset.x,
+                y: willMove[i].y - visualOffset.y
+            }, 5000);
+    }
+}

@@ -82,9 +82,7 @@ function Map(width, height) {
 Map.prototype.addWorld = function(world) {
     this.worlds.push(world);
     this.worldsContainer.addChild(world.container);
-    var iso = cartesianToIsometric(world.x * CELL_SIZE, world.y * CELL_SIZE);
-    world.container.x = iso.x;
-    world.container.y = iso.y;
+    updateContainerPos(world);
 }
 
 function World(width, height, x, y, k) {
@@ -134,9 +132,7 @@ World.prototype.getCenter = function() {
 World.prototype.addUnit = function(unit) {
     this.units.push(unit);
     this.unitsContainer.addChild(unit.view);
-    var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
-    unit.view.x = iso.x;
-    unit.view.y = iso.y;
+    updateViewPos(unit);
 }
 
 World.prototype.removeUnitByIndex = function(index) {
@@ -279,6 +275,20 @@ function isometricToCartesian(isoX, isoY) {
     var cX = (2 * isoY + isoX) / 2;
     var cY = (2 * isoY - isoX) / 2;
     return new Point(cX, cY);
+}
+
+// Object with container
+function updateContainerPos(object) {
+    var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
+    object.container.x = iso.x;
+    object.container.y = iso.y;
+}
+
+// Object with view
+function updateViewPos(object) {
+    var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
+    object.view.x = iso.x;
+    object.view.y = iso.y;
 }
 
 function getBorderCells(world) {

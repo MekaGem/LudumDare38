@@ -26,9 +26,6 @@ function Rock(x, y) {
 Human.prototype = Object.create(Unit.prototype);
 function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "idle_se");
-    var bounds = view.getBounds();
-    view.regX = bounds.width / 2;
-    view.regY = bounds.height - CELL_SIZE / 2;
     Unit.call(this, x, y, view, UNIT_HUMAN);
 
     this.dir = 0;

@@ -3,6 +3,7 @@ var stageWidth;
 var stageHeight;
 var stageCenter;
 var camera;
+var assets;
 
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
@@ -32,8 +33,10 @@ function init() {
 function loadResources(callback) {
     var queue = new createjs.LoadQueue(true);
     var handleComplete = function() {
-        spriteSheet = queue.getResult("resources");
-        humanSpriteSheet = queue.getResult("human");
+        assets = {
+            spriteSheet: queue.getResult("resources"),
+            humanSpriteSheet: queue.getResult("human")
+        }
         callback();
     };
     queue.on("complete", handleComplete, this);
@@ -99,15 +102,15 @@ function initGame() {
         for (var y = 0; y < world.height; ++y) {
             if (world.cells[x][y].type == "G") {
                 if (x % 2 == 0) {
-                    world.addUnit(new Tree(x, y, spriteSheet));
+                    world.addUnit(new Tree(x, y));
                 } else {
-                    world.addUnit(new Rock(x, y, spriteSheet));
+                    world.addUnit(new Rock(x, y));
                 }
             }
         }
     }
 
-    var human = new Human(2, 3, humanSpriteSheet);
+    var human = new Human(2, 3);
     //for testing.
     human.setFinalDestinationCell(new Point(4, 7));
     world.addUnit(human);

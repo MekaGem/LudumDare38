@@ -20,15 +20,15 @@ function drawTile(shape) {
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
-    gfx = this.shape.graphics;
     if (type == "W") {
-        gfx.beginFill("blue");
+        this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
-        gfx.beginFill("green");
+        this.shape = new createjs.Sprite(assets.spriteSheet, "grass");
     } else {
+        gfx = this.shape.graphics;
         gfx.beginFill("black");
+        drawTile(this.shape);
     }
-    drawTile(this.shape);
 }
 
 function Map(width, height) {
@@ -84,12 +84,10 @@ function World(width, height, x, y, k) {
         for (var y = 0; y < height; ++y) {
             if (level[x][y]) {
                 this.cells[x].push(new Cell("G"));
-                
                 var shape = this.cells[x][y].shape;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
                 shape.x = iso.x;
                 shape.y = iso.y;
-                shape.regX = CELL_SIZE;
                 this.tilesContainer.addChild(shape);
             } else {
                 this.cells[x].push(new Cell("W"));

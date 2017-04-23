@@ -32,6 +32,8 @@ function Inventory() {
     var x = INVENTORY_BAR_X;
     for (var i = 0; i < ITEM_TYPES; ++i) {
         var item = this.items[i];
+
+        // TODO: use custom icons here
         if (i == ITEM_STONES.index) {
             item.view.regX = -22;
             item.view.regY = 12.5 - 20;
@@ -62,6 +64,6 @@ Inventory.prototype.updateText = function() {
 }
 
 Inventory.prototype.addItem = function(type, amount) {
-    this.items[type.index] += amount;
+    this.items[type.index].amount += amount;
     this.updateText();
 }

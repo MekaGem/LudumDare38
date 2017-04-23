@@ -107,10 +107,8 @@ Human.prototype.setFinalDestinationCell = function(world, cell) {
     }
 
     this.path = path;
-    if (!this.  finalDestination) {
-        this.finalDestination = cell;
+    this.finalDestination = cell;
+    if (!this.currentDestination) {
         this.updatePath();
-    } else {
-        this.finalDestination = cell;
     }
 }

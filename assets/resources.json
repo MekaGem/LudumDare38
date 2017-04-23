@@ -1,14 +1,19 @@
 {
     "images": [
         "assets/tree.png",
-        "assets/rock.png"
+        "assets/rock.png",
+        "assets/atlas.png"
     ],
     "frames": [
         [ 0, 0, 64, 64, 0, 32, 32 ],
-        [ 0, 0, 64, 64, 1, 32, 32 ]
+        [ 0, 0, 64, 64, 1, 32, 32 ],
+        [ 0, 0, 128, 64, 2, 64, 0 ],
+        [ 0, 64, 128, 64, 2, 64, 0 ]
     ],
     "animations": {
         "tree": 0,
-        "rock": 1
+        "rock": 1,
+        "grass": 2,
+        "water": 3
     }
 }

@@ -175,13 +175,13 @@ function gameLoop(game) {
 
     stepTicker = new StepTicker(100);
 
-    var sinkCell = function() {
+    var sinkRandomCell = function() {
         var borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
         }
     }
-    stepTicker.addEventListener(20, sinkCell);
+    stepTicker.addEventListener(20, sinkRandomCell);
 
     var shiftHuman = function() {
         game.world.shiftHuman(game.human); // shift in cartesian coordinates.

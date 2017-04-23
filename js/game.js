@@ -151,7 +151,7 @@ function initGame() {
     world.addUnit(golem);
     golem.engageHuman(world, human);
 
-    human.stepOnCellCallback = function(previousPosition) {
+    human.stepOnCellCallback = function() {
         for (var i = 0; i < world.units.length;) {
             if (world.units[i].x == this.x && world.units[i].y == this.y) {
                 if (world.units[i].type == UNIT_ROCK) {

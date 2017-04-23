@@ -105,6 +105,9 @@ Human.prototype.updatePath = function(world) {
         }
         this.gotoDirAnim("walk");
 
+        this.x = this.currentDestination.x;
+        this.y = this.currentDestination.y;
+
         tweenAdded();
         createjs.Tween.get(this.view)
             .to({
@@ -113,12 +116,9 @@ Human.prototype.updatePath = function(world) {
             }, 1000)
             .call(function() {
                 //console.log("Moved to " + _this.currentDestination);
-                var previousPosition = new Point(_this.x, _this.y);
-                _this.x = _this.currentDestination.x;
-                _this.y = _this.currentDestination.y;
                 updateViewPos(_this);
                 _this.currentDestination = null;
-                _this.stepOnCellCallback(previousPosition);
+                _this.stepOnCellCallback();
                 tweenRemoved(function() {
                     _this.updatePath(world);
                 }, function() {
@@ -173,6 +173,9 @@ Golem.prototype.engageHuman = function(world, human) {
         this.gotoDirAnim("walk");
         var dPos = cartesianToIsometric(DIRS[this.dir].x * CELL_SIZE, DIRS[this.dir].y * CELL_SIZE);
         var newPos = {x: this.view.x + dPos.x, y: this.view.y + dPos.y};
+        this.x = dest.x;
+        this.y = dest.y;
+        
         var golem = this;
         
         tweenAdded();
@@ -182,8 +185,6 @@ Golem.prototype.engageHuman = function(world, human) {
                 y: newPos.y
             }, 1000)
             .call(function() {
-                golem.x = dest.x;
-                golem.y = dest.y;
                 updateViewPos(golem);
                 tweenRemoved(function() {
                     golem.engageHuman(world, human);

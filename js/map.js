@@ -75,7 +75,7 @@ function World(width, height, x, y, k) {
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
-    this.sinkingCell = new Cell("W");
+    this.sinkingCell = null;
 
     var level = GenerateIsland(width, height, k);
 
@@ -176,6 +176,7 @@ World.prototype.transformToWater = function(x, y) {
         partiallySinkShape(oldShape);
 		return;
     }
+    this.setSinkingCell(null);
     var newCell = new Cell("W");
 
     this.cells[x][y] = newCell;

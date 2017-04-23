@@ -1,9 +1,12 @@
 {
     "images": [
-        "assets/human_from_internet.png"
+        "assets/human_walk.png"
     ],
-    "frames": { "width": 34, "height": 57, "count": 4 },
+    "frames": { "width": 128, "height": 128, "count": 32, "regX": 64, "regY": 64 },
     "animations": {
-        "walk": [0, 4]
+        "walk_nw": [0, 7, "walk_nw", 0.25],
+        "walk_ne": [8, 15, "walk_ne", 0.25],
+        "walk_se": [16, 23, "walk_se", 0.25],
+        "walk_sw": [24, 31, "walk_sw", 0.25]
     }
 }

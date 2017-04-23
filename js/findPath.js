@@ -1,52 +1,52 @@
-function generateHelpField(world) {
-    var help_field = new Array();
-    for (i = 0; i < world.width; ++i) {
-        help_field.push([]);
-        for (j = 0; j < world.height; ++j) {
-            help_field[i].push({
+function generateHelpField(width, height) {
+    var helpField = [];
+    for (var i = 0; i < width; ++i) {
+        helpField.push([]);
+        for (var j = 0; j < height; ++j) {
+            helpField[i].push({
                 used : false,
-                from : [-1, -1]
+                from : new Point(-1, -1)
             });
         }
     }
-    return help_field;
+    return helpField;
 }
 
-// #TODO: should be declared in some config.
-var possible_moves = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+function findPath(world, startX, startY, destinationX, destinationY) {
+    if (startX == destinationX && startY == destinationY) return null;
 
-function findPath(world, start_x, start_y, destination_x, destination_y) {
-    help_field = generateHelpField(world);
-    var answerPath = new Array();
-    var queue = new Array();
-    queue.push([start_x, start_y]);
-    help_field[start_x][start_y].used = true;
+    helpField = generateHelpField(world.width, world.height);
+    var answerPath = [];
+    var queue = [];
+
+    queue.push(new Point(startX, startY));
+    helpField[startX][startY].used = true;
     while (queue.length > 0) {
-        current = queue.shift();
-        if (current[0] === destination_x && current[1] === destination_y) {
+        var current = queue.shift();
+        if (current.x === destinationX && current.y === destinationY) {
             // we are in a destination point.
-            while(current[0] != start_x || current[1] != start_y) {
+            while (current.x != startX || current.y != startY) {
                 answerPath.push(current);
-                current = help_field[current[0]][current[1]].from;
+                current = helpField[current.x][current.y].from;
             }
-            answerPath.push(current);
+
             answerPath.reverse();
             // return all cells, that are in path to destination, starting from current.
             return answerPath;
         }
 
-        for (i = 0; i < possible_moves.length; ++i) {
-            var next_tile = [current[0] + possible_moves[i][0], current[1] + possible_moves[i][1]];
-            if (world.cellIsPassable(next_tile[0], next_tile[1]) && !help_field[next_tile[0]][next_tile[1]].used) {
-                help_field[next_tile[0]][next_tile[1]].used = true;
-                help_field[next_tile[0]][next_tile[1]].from = current;
-                queue.push(next_tile);
+        for (var i = 0; i < DIRS.length; ++i) {
+            var nextTile = new Point(current.x + DIRS[i].x, current.y + DIRS[i].y);
+            if (world.cellIsPassable(nextTile.x, nextTile.y) && !helpField[nextTile.x][nextTile.y].used) {
+                helpField[nextTile.x][nextTile.y].used = true;
+                helpField[nextTile.x][nextTile.y].from = current;
+                queue.push(nextTile);
             }
         }
     }
 
     // no path found.
-    return answerPath;
+    return null;
 }
 
 function testFillWorldWithGrass(width, height) {

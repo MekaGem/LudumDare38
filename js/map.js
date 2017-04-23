@@ -1,10 +1,19 @@
 var CELL_SIZE = 64;
+var START_CELL_HP = 100;
+var DEFAULT_WATER_DAMAGE = 50;
 
 var DIRS = [
     {x: 1, y: 0},  // down right (SE)
     {x: 0, y: 1},  // down left (SW)
     {x: -1, y: 0}, // up left (NW)
     {x: 0, y: -1}  // up right (NE)
+];
+
+var DIR_SUFFIX = [
+    "se",
+    "sw",
+    "nw",
+    "ne"
 ];
 
 function drawTile(shape) {
@@ -20,6 +29,8 @@ function drawTile(shape) {
 function Cell(type) {
     this.type = type;
     this.shape = new createjs.Shape();
+    this.maximumHp = START_CELL_HP;
+    this.hp = this.maximumHp;
     if (type == "W") {
         this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
@@ -29,6 +40,15 @@ function Cell(type) {
         gfx.beginFill("black");
         drawTile(this.shape);
     }
+}
+
+Cell.prototype.takeDamage = function(damage) {
+    this.hp = Math.max(0, this.hp - damage);
+    this.shape.alpha = this.hp / this.maximumHp;
+}
+
+Cell.prototype.isAlive = function () {
+    return this.hp > 0;
 }
 
 function Map(width, height) {
@@ -119,64 +139,6 @@ World.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
-World.prototype.shiftHuman = function(human) {
-    var shiftDirection = human.getShiftDirection(this);
-    var cartesianOrigin = isometricToCartesian(human.view.x, human.view.y);
-    cartesianOrigin.x += shiftDirection.x;
-    cartesianOrigin.y += shiftDirection.y;
-    var isometricNewPosition = cartesianToIsometric(cartesianOrigin.x, cartesianOrigin.y);
-    human.view.x = isometricNewPosition.x;
-    human.view.y = isometricNewPosition.y;
-
-    var found = false;
-    for (var dir = 0; dir < 4; dir++) {
-        if (Math.sign(shiftDirection.x) == Math.sign(DIRS[dir].x) && Math.sign(shiftDirection.y) == Math.sign(DIRS[dir].y)) {
-            var newAnim = human.view.currentAnimation;
-            switch (dir) {
-            case 0:
-                newAnim = "walk_se";
-                break;
-            case 1:
-                newAnim = "walk_sw";
-                break;
-            case 2:
-                newAnim = "walk_nw";
-                break;
-            case 3:
-                newAnim = "walk_ne";
-                break;
-            }
-            if (newAnim != human.view.currentAnimation) {
-                human.view.gotoAndPlay(newAnim);
-            }
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        var newAnim;
-        switch (human.view.currentAnimation) {
-        case "walk_se":
-            newAnim = "idle_se";
-            break;
-        case "walk_sw":
-            newAnim = "idle_sw";
-            break;
-        case "walk_nw":
-            newAnim = "idle_nw";
-            break;
-        case "walk_ne":
-            newAnim = "idle_ne";
-            break;
-        default:
-            newAnim = human.view.currentAnimation;
-        }
-        if (newAnim != human.view.currentAnimation) {
-            human.view.gotoAndPlay(newAnim);
-        }
-    }
-}
-
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
         if (this.units[i].x == x && this.units[i].y == y) {
@@ -187,14 +149,18 @@ World.prototype.removeUnitsInCell = function(x, y) {
     }
 }
 
-World.prototype.transformToWater = function(x, y) {
+World.prototype.damageWithWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
     var container = this.tilesContainer;
+    var oldCell = this.cells[x][y];
+    var oldShape = oldCell.shape;
+
+    oldCell.takeDamage(DEFAULT_WATER_DAMAGE);
+    if (oldCell.isAlive()) {
+        return;
+    }
     var oldShape = this.cells[x][y].shape;
-
-    var newCell = new Cell("W");
-
-    this.cells[x][y] = newCell;
+    this.cells[x][y] = new Cell("W");
 
     var world = this;
     createjs.Tween.get(oldShape)
@@ -206,11 +172,11 @@ World.prototype.cellIsValid = function(x, y) {
     return x >= 0 && y >= 0 && x < this.width && y < this.height;
 }
 
-World.prototype.cellIsWater = function (x, y) {
+World.prototype.cellIsWater = function(x, y) {
     return this.cells[x][y].type == "W";
 }
 
-World.prototype.cellIsLand = function (x, y) {
+World.prototype.cellIsLand = function(x, y) {
     return this.cells[x][y].type == "G";
 }
 
@@ -218,7 +184,7 @@ World.prototype.cellIsPassable = function(x, y) {
     return this.cellIsValid(x, y) && this.cells[x][y].type == "G";
 }
 
-World.prototype.cellIsBorder = function (x, y) {
+World.prototype.cellIsBorder = function(x, y) {
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
         var ny = y + DIRS[d].y;
@@ -229,7 +195,7 @@ World.prototype.cellIsBorder = function (x, y) {
     return false;
 }
 
-World.prototype.cellIsCutVertex = function (x, y) {
+World.prototype.cellIsCutVertex = function(x, y) {
     var neighbor;
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
@@ -278,6 +244,10 @@ World.prototype.cellIsSelectable = function(x, y) {
 function Point(x, y) {
     this.x = x;
     this.y = y;
+}
+
+Point.prototype.toString = function() {
+    return "(" + this.x + ", " + this.y + ")";
 }
 
 function cartesianToIsometric(cX, cY) {

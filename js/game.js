@@ -7,6 +7,15 @@ var camera;
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
 
+var keys = {};
+
+document.onkeydown = function(e) {
+	keys[e.keyCode] = true;
+};
+document.onkeyup = function(e) {
+	delete keys[e.keyCode];
+};
+
 function resize() {
     stageWidth = window.innerWidth;
     stageHeight = window.innerHeight;
@@ -50,7 +59,7 @@ function initGame() {
     stage.addChild(circle);
 
     var map = new Map(30, 30);
-    var world = new World(10, 10, 10, 10);
+    var world = new World(10, 10, 10, 10, 10);
     var game = {
         "map": map,
         "world": world,
@@ -81,6 +90,8 @@ function initGame() {
 
     map.addWorld(world);
     camera = new Point(0, 0);
+    
+    addOtherWorld(game);
 
     stage.addChild(map.container);
 
@@ -191,6 +202,19 @@ function gameLoop(game) {
         if (stage.mouseY > stage.canvas.height - CAMERA_MOVEMENT_BORDER) {
             camera.y += CAMERA_MOVEMENT_SPEED * seconds;
         }
+        
+        tickOtherWorld(game);
+
+        // Camera bounds
+        var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
+        var xDiff = worldBoundingBoxHalfWidth - stageCenter.x;
+        var minCameraX = Math.min(-xDiff, 0);
+        var maxCameraX = Math.max(xDiff, 0);
+
+        var worldBoundingBoxHalfHeight = (game.world.width + game.world.height) / 4. * CELL_SIZE + 100;
+        var yDiff = worldBoundingBoxHalfHeight - stageCenter.y;
+        var minCameraY = Math.min(-yDiff, 0);
+        var maxCameraY = Math.max(yDiff, 0);
 
         // Camera bounds
         var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
@@ -218,4 +242,62 @@ function gameLoop(game) {
         // Render.
         stage.update();
     }
+}
+
+function addOtherWorld(game) {
+    game.otherWorld = new World(5, 5, 0, 0, 4);
+    game.otherOff = {x: -10, y: -10};
+    game.omck = 0;
+    game.otherDrift = {x: 0, y: 0};
+    game.map.addWorld(game.otherWorld);
+}
+
+function tickOtherWorld(game) {
+    if (game.omck > 0) {
+        game.omck--;
+    } else {
+        var behind = false;
+        var changed = false;
+        
+        if (keys[49]) {
+            game.otherOff = ClashIslands(game.world, game.otherWorld, 0);
+            game.otherDrift = {x: DIRS[0].x, y: DIRS[0].y};
+            changed = true;
+        } else if (keys[50]) {
+            game.otherOff = ClashIslands(game.world, game.otherWorld, 1);
+            game.otherDrift = {x: DIRS[1].x, y: DIRS[1].y};
+            changed = true;
+        } else if (keys[51]) {
+            game.otherOff = ClashIslands(game.world, game.otherWorld, 2);
+            game.otherDrift = {x: DIRS[2].x, y: DIRS[2].y};
+            changed = true;
+            behind = true;
+        } else if (keys[52]) {
+            game.otherOff = ClashIslands(game.world, game.otherWorld, 3);
+            game.otherDrift = {x: DIRS[3].x, y: DIRS[3].y};
+            changed = true;
+            behind = true;
+        }
+        
+        if (changed) {
+            game.omck = 60;
+            
+            game.map.container.removeChild(game.otherWorld.container);
+            if (behind) {
+                game.map.container.addChildAt(game.otherWorld.container, game.map.container.getChildIndex(game.world.container));
+            } else {
+                game.map.container.addChild(game.otherWorld.container);
+            }
+            
+            game.otherWorld.x = game.world.x + game.otherOff.x;
+            game.otherWorld.y = game.world.y + game.otherOff.y;
+        }
+    }
+    
+    game.otherDrift.x *= 0.95;
+    game.otherDrift.y *= 0.95;
+    
+    var iso = cartesianToIsometric((game.otherWorld.x + game.otherDrift.x) * CELL_SIZE, (game.otherWorld.y + game.otherDrift.y) * CELL_SIZE);
+    game.otherWorld.container.x = iso.x;
+    game.otherWorld.container.y = iso.y;
 }

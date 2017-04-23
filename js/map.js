@@ -67,7 +67,7 @@ Map.prototype.addWorld = function(world) {
     world.container.y = iso.y;
 }
 
-function World(width, height, x, y) {
+function World(width, height, x, y, k) {
     this.width = width;
     this.height = height;
     this.x = x;
@@ -76,7 +76,7 @@ function World(width, height, x, y) {
     this.units = [];
     this.container = new createjs.Container();
 
-    var level = GenerateIsland(width, height, 10);
+    var level = GenerateIsland(width, height, k);
 
     this.tilesContainer = new createjs.Container();
     for (var x = 0; x < width; ++x) {
@@ -84,15 +84,16 @@ function World(width, height, x, y) {
         for (var y = 0; y < height; ++y) {
             if (level[x][y]) {
                 this.cells[x].push(new Cell("G"));
+                
+                var shape = this.cells[x][y].shape;
+                var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+                shape.x = iso.x;
+                shape.y = iso.y;
+                shape.regX = CELL_SIZE;
+                this.tilesContainer.addChild(shape);
             } else {
                 this.cells[x].push(new Cell("W"));
             }
-            var shape = this.cells[x][y].shape;
-            var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.x = iso.x;
-            shape.y = iso.y;
-            shape.regX = CELL_SIZE;
-            this.tilesContainer.addChild(shape);
         }
     }
     this.container.addChild(this.tilesContainer);
@@ -142,21 +143,17 @@ World.prototype.removeUnitsInCell = function(x, y) {
 
 World.prototype.transformToWater = function(x, y) {
     console.log("Transforming (" + x + ", " + y + ") to water.");
+    var container = this.tilesContainer;
     var oldShape = this.cells[x][y].shape;
-    var oldShapeIndex = this.tilesContainer.getChildIndex(oldShape);
 
     var newCell = new Cell("W");
-    var newShape = newCell.shape;
-    newShape.x = oldShape.x;
-    newShape.y = oldShape.y;
 
-    this.tilesContainer.addChildAt(newCell.shape, oldShapeIndex);
     this.cells[x][y] = newCell;
 
     var world = this;
     createjs.Tween.get(oldShape)
         .to({alpha : 0}, 1000)
-        .call(function() { world.removeUnitsInCell(x, y); });
+        .call(function() { world.removeUnitsInCell(x, y); container.removeChild(oldShape); });
 }
 
 World.prototype.cellIsValid = function(x, y) {
@@ -272,7 +269,6 @@ function pickRandomBorderCell(world) {
     }
 
     borderCells.sort(function(a, b){return b.dist - a.dist});
-    console.log(borderCells);
 
     var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];

@@ -43,7 +43,7 @@ function Bush(x, y) {
 }
 
 Bush.prototype.generateGrowthTime = function() {
-    return 15 + getRandomInt(0, 10);
+    return 45 + getRandomInt(0, 45);
 }
 
 Bush.prototype.hasBerries = function() {

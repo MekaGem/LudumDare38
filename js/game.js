@@ -271,11 +271,12 @@ function tickOtherWorld(game) {
         if (changed) {
             game.omck = 60;
             
-            game.map.container.removeChild(game.otherWorld.container);
+            game.map.worldsContainer.removeChild(game.otherWorld.container);
             if (behind) {
-                game.map.container.addChildAt(game.otherWorld.container, game.map.container.getChildIndex(game.world.container));
+                var idx = game.map.worldsContainer.getChildIndex(game.world.container);
+                game.map.worldsContainer.addChildAt(game.otherWorld.container, idx);
             } else {
-                game.map.container.addChild(game.otherWorld.container);
+                game.map.worldsContainer.addChild(game.otherWorld.container);
             }
             
             game.otherWorld.x = game.world.x + game.otherOff.x;

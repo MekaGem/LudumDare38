@@ -8,6 +8,7 @@ function Unit(x, y, view, type) {
 // Unit types
 var UNIT_TREE = "TREE";
 var UNIT_ROCK = "ROCK";
+var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 
@@ -21,6 +22,23 @@ Rock.prototype = Object.create(Unit.prototype);
 function Rock(x, y) {
     var view = new createjs.Sprite(assets.spriteSheet, "rock");
     Unit.call(this, x, y, view, UNIT_ROCK);
+}
+
+Bush.prototype = Object.create(Unit.prototype);
+function Bush(x, y) {
+    var view = new createjs.Sprite(assets.spriteSheet, "bush");
+    Unit.call(this, x, y, view, UNIT_BUSH);
+    this.hasBerries = false;
+}
+
+Bush.prototype.growBerries = function() {
+    this.view.gotoAndPlay("bush_with_berries");
+    this.hasBerries = true;
+}
+
+Bush.prototype.pickBerries = function() {
+    this.view.gotoAndPlay("bush");
+    this.hasBerries = false;
 }
 
 Human.prototype = Object.create(Unit.prototype);

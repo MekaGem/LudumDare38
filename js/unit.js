@@ -21,6 +21,7 @@ function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "idle_se");
 
     this.dir = 0;
+
     this.currentDestination = null;
     this.finalDestination = null;
     this.path = null;
@@ -68,6 +69,57 @@ Human.prototype.updatePath = function() {
         this.finalDestination = null;
         
         this.view.gotoAndPlay("idle_" + DIR_SUFFIX[this.dir]);
+    }
+}
+
+Human.prototype.setFinalDestinationCell = function(world, cell) {
+    var path = null;
+    if (this.currentDestination) {
+        path = findPath(world, this.currentDestination.x, this.currentDestination.y, cell.x, cell.y);
+    } else {
+        path = findPath(world, this.x, this.y, cell.x, cell.y);
+    }
+
+    if (!path || path.length == 0) {
+        return;
+    }
+
+    this.path = path;
+    this.finalDestination = cell;
+    if (!this.currentDestination) {
+        this.updatePath();
+    }
+}
+
+Human.prototype.updatePath = function() {
+    if (this.path) {
+        this.currentDestination = this.path.shift();
+        // console.log("Current destination = " + this.currentDestination.x + ":" + this.currentDestination.y);
+        if (this.path.length == 0) this.path = null;
+
+        var iso = cartesianToIsometric(
+            (this.currentDestination.x - this.x) * CELL_SIZE,
+            (this.currentDestination.y - this.y) * CELL_SIZE
+        );
+
+        var _this = this;
+        var viewDestinationX = this.view.x + iso.x;
+        var viewDestinationY = this.view.y + iso.y;
+
+        createjs.Tween.get(this.view)
+            .to({
+                x: viewDestinationX,
+                y: viewDestinationY
+            }, 1000)
+            .call(function() {
+                console.log("Moved to " + _this.currentDestination);
+                _this.x = _this.currentDestination.x;
+                _this.y = _this.currentDestination.y;
+                _this.currentDestination = null;
+                _this.updatePath();
+            });
+    } else {
+        this.finalDestination = null;
     }
 }
 

@@ -60,7 +60,8 @@ function initGame() {
     var inventory = new Inventory();
 
     var map = new Map(30, 30);
-    var world = new World(10, 10, 10, 10, 10);
+    // var world = new World(10, 10, 10, 10, 10);
+    var world = new World(10, 10, 10, 10, 0);
     var game = {
         "map": map,
         "world": world,
@@ -111,7 +112,7 @@ function initGame() {
     var golem = new Golem(5, 5);
     world.addUnit(golem);
     golem.engageHuman(world, human);
-    
+
     game.world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
         human.setFinalDestinationCell(world, cell);
@@ -184,7 +185,7 @@ function gameLoop(game) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
         }
     }
-    stepTicker.addEventListener(20, sinkRandomCell);
+    // stepTicker.addEventListener(20, sinkRandomCell);
 
     var addStone = function() {
         game.inventory.addItem("stone", 1);

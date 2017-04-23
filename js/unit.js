@@ -1,31 +1,42 @@
-function Unit(x, y, view) {
+function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
     this.view = view;
+    this.type = type;
 }
+
+// Unit types
+var UNIT_TREE = "TREE";
+var UNIT_ROCK = "ROCK";
+var UNIT_HUMAN = "HUMAN";
+var UNIT_GOLEM = "GOLEM";
 
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
     var view = new createjs.Sprite(assets.spriteSheet, "tree");
-    Unit.call(this, x, y, view);
+    Unit.call(this, x, y, view, UNIT_TREE);
 }
 
 Rock.prototype = Object.create(Unit.prototype);
 function Rock(x, y) {
     var view = new createjs.Sprite(assets.spriteSheet, "rock");
-    Unit.call(this, x, y, view);
+    Unit.call(this, x, y, view, UNIT_ROCK);
 }
 
 Human.prototype = Object.create(Unit.prototype);
 function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "idle_se");
+    var bounds = view.getBounds();
+    view.regX = bounds.width / 2;
+    view.regY = bounds.height - CELL_SIZE / 2;
+    Unit.call(this, x, y, view, UNIT_HUMAN);
 
     this.dir = 0;
     this.currentDestination = null;
     this.finalDestination = null;
     this.path = null;
 
-    Unit.call(this, x, y, view);
+    this.stepOnCellCallback = null;
 }
 
 Human.prototype.updatePath = function() {
@@ -42,7 +53,7 @@ Human.prototype.updatePath = function() {
         var _this = this;
         var viewDestinationX = this.view.x + iso.x;
         var viewDestinationY = this.view.y + iso.y;
-        
+
         var dir = getDirection(this, this.currentDestination);
         if (dir >= 0 && this.dir != dir) {
             this.dir = dir;
@@ -59,14 +70,16 @@ Human.prototype.updatePath = function() {
             }, 1000)
             .call(function() {
                 console.log("Moved to " + _this.currentDestination);
+                var previousPosition = new Point(_this.x, _this.y);
                 _this.x = _this.currentDestination.x;
                 _this.y = _this.currentDestination.y;
                 _this.currentDestination = null;
+                _this.stepOnCellCallback(previousPosition);
                 _this.updatePath();
             });
     } else {
         this.finalDestination = null;
-        
+
         this.view.gotoAndPlay("idle_" + DIR_SUFFIX[this.dir]);
     }
 }
@@ -94,7 +107,7 @@ Golem.prototype = Object.create(Unit.prototype);
 function Golem(x, y) {
     var view = new createjs.Sprite(assets.golemSpriteSheet, "walk_se");
     this.dir = 0;
-    Unit.call(this, x, y, view);
+    Unit.call(this, x, y, view, UNIT_GOLEM);
 }
 
 Golem.prototype.engageHuman = function(world, human) {
@@ -102,14 +115,14 @@ Golem.prototype.engageHuman = function(world, human) {
     if (route && route.length > 1) {
         var dest = route[0];
         var dir = getDirection(this, dest);
-        
+
         console.log(dest, dir);
         if (dir >= 0 && dir != this.dir) {
             this.dir = dir;
         }
-        
+
         var newAnim = "walk_" + DIR_SUFFIX[this.dir];
-        
+
         if (newAnim != this.view.currentAnimation) {
             this.view.gotoAndPlay(newAnim);
         }
@@ -119,13 +132,13 @@ Golem.prototype.engageHuman = function(world, human) {
         createjs.Tween.get(this.view).to({x: newPos.x, y: newPos.y}, 1000).call(function(){golem.x = dest.x; golem.y = dest.y; golem.engageHuman(world, human);});
     } else {
         var dir = getDirection(this, human);
-        
+
         if (dir >= 0 && dir != this.dir) {
             this.dir = dir;
         }
-        
+
         var newAnim = "attack_" + DIR_SUFFIX[this.dir];
-        
+
         this.view.gotoAndPlay(newAnim);
         var golem = this;
         createjs.Tween.get(this.view).wait(500).call(function(){golem.engageHuman(world, human);});

@@ -139,12 +139,18 @@ World.prototype.addUnit = function(unit) {
     unit.view.y = iso.y;
 }
 
+World.prototype.removeUnitByIndex = function(index) {
+    console.log("Removing: " + index);
+    this.unitsContainer.removeChild(this.units[index].view);
+    this.units.splice(index, 1);
+}
+
 World.prototype.removeUnitsInCell = function(x, y) {
-    for (var i = 0; i < this.units.length; ++i) {
+    for (var i = 0; i < this.units.length;) {
         if (this.units[i].x == x && this.units[i].y == y) {
-            console.log("Removing: " + i);
-            this.unitsContainer.removeChild(this.units[i].view);
-            this.units.splice(i, 1);
+            this.removeUnitByIndex(i);
+        } else {
+            ++i;
         }
     }
 }
@@ -164,7 +170,6 @@ World.prototype.damageWithWater = function(x, y) {
 
     var world = this;
     createjs.Tween.get(oldShape)
-        .to({alpha : 0}, 1000)
         .call(function() { world.removeUnitsInCell(x, y); container.removeChild(oldShape); });
 }
 
@@ -181,7 +186,13 @@ World.prototype.cellIsLand = function(x, y) {
 }
 
 World.prototype.cellIsPassable = function(x, y) {
-    return this.cellIsValid(x, y) && this.cells[x][y].type == "G";
+    if (!this.cellIsValid(x, y) || this.cellIsWater(x, y)) return false;
+    for (var i = 0; i < this.units.length; ++i) {
+        if (this.units[i].x == x && this.units[i].y == y && this.units[i].type == UNIT_TREE) {
+            return false;
+        }
+    }
+    return true;
 }
 
 World.prototype.cellIsBorder = function(x, y) {

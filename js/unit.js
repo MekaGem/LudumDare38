@@ -18,9 +18,7 @@ function Rock(x, y, spriteSheet) {
 
 Human.prototype = Object.create(Unit.prototype);
 function Human(x, y, spriteSheet) {
-    var view = new createjs.Sprite(spriteSheet, "walk");
-    view.regX = 32;
-    view.regY = 32;
+    var view = new createjs.Sprite(spriteSheet, "walk_nw");
     this.currentDestination = new Point(x, y);
     this.finalDestinationCell = new Point(x, y);
     this.stepLength = 2;

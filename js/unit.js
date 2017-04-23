@@ -75,6 +75,7 @@ Human.prototype = Object.create(Unit.prototype);
 function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "idle_se");
     Unit.call(this, x, y, view, UNIT_HUMAN);
+    this.view.regY -= CELL_SIZE / 4.;
 
     this.dir = 0;
     this.currentDestination = null;

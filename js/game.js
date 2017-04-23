@@ -4,6 +4,8 @@ var stageHeight;
 var stageCenter;
 var camera;
 var assets;
+var muteSoundButton;
+var sound;
 
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
@@ -24,6 +26,8 @@ function resize() {
     stage.canvas.height = stageHeight;
     stageCenter = new Point(stageWidth / 2, stageHeight / 2);
     console.log("Resize to: " + stageWidth + ":" + stageHeight);
+
+    muteSoundButton.x = stageWidth - 32 - 20;
 }
 
 function init() {
@@ -51,8 +55,39 @@ function play() {
     gameLoop(game);
 }
 
+function initSound() {
+    createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
+    createjs.Sound.alternateExtensions = ["mp3"];
+
+    function loadHandler(event) {
+        sound = createjs.Sound.play("sound", {loop: -1});
+        sound.volume = 0.5;
+    }
+    createjs.Sound.on("fileload", loadHandler, this);
+
+    createjs.Sound.registerSound("assets/theme.mp3", "sound");
+}
+
 function initGame() {
+    initSound();
+
     stage = new createjs.Stage("demoCanvas");
+
+    muteSoundButton = new createjs.Shape();
+    muteSoundButton.graphics.beginFill("yellow").drawRect(0, 0, 32, 32);
+    muteSoundButton.y = 20;
+    muteSoundButton.muted = false;
+
+    muteSoundButton.on("mousedown", function() {
+        this.muted = !this.muted;
+        if (this.muted) {
+            muteSoundButton.graphics.clear().beginFill("black").drawRect(0, 0, 32, 32);
+            createjs.Tween.get(sound).to({volume: 0}, 500);
+        } else {
+            muteSoundButton.graphics.clear().beginFill("yellow").drawRect(0, 0, 32, 32);
+            createjs.Tween.get(sound).to({volume: 0.5}, 500);
+        }
+    });
 
     window.addEventListener('resize', resize);
     resize();
@@ -160,6 +195,7 @@ function initGame() {
     }
 
     stage.addChild(inventory.container);
+    stage.addChild(muteSoundButton);
 
     return game;
 }
@@ -328,10 +364,10 @@ function tickOtherWorld(game) {
         } else if (keys[82]) {
             mergeDir = 3;
         }
-        
+
         if (mergeDir >= 0) {
             var newWorld = new World(5, 5, 0, 0, 4);
-            
+
             for (var x = 0; x < newWorld.width; ++x) {
                 for (var y = 0; y < newWorld.height; ++y) {
                     if (newWorld.cells[x][y].type == "G") {
@@ -344,7 +380,7 @@ function tickOtherWorld(game) {
                     }
                 }
             }
-            
+
             MergeIslands(game.map, game.world, newWorld, mergeDir);
             game.omck = 60;
         }

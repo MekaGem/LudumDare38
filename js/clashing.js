@@ -58,33 +58,37 @@ function ClashIslands(myIsland, theirIsland, clashDir) {
     
     switch (clashDir) {
     case 0: // right
+        var mid = (myBBox.t + myBBox.b - (theirBBox.b + theirBBox.t)) / 2;
         for (var k = myBBox.t - theirBBox.b; k <= myBBox.b - theirBBox.t; k++) {
             var res = GetSharedCellsVertical(myIsland, theirIsland, myBBox, theirBBox, k);
-            if (res.shared > best.shared) {
+            if (res.shared > best.shared || (res.shared == best.shared && Math.abs(k - mid) < Math.abs(best.yoff - mid))) {
                 best = res;
             }
         }
         break;
     case 1: // down
+        var mid = (myBBox.l + myBBox.r - (theirBBox.l + theirBBox.r)) / 2;
         for (var k = myBBox.l - theirBBox.r; k <= myBBox.r - theirBBox.l; k++) {
             var res = GetSharedCellsHorizontal(myIsland, theirIsland, myBBox, theirBBox, k);
-            if (res.shared > best.shared) {
+            if (res.shared > best.shared || (res.shared == best.shared && Math.abs(k - mid) < Math.abs(best.xoff - mid))) {
                 best = res;
             }
         }
         break;
     case 2: // left
+        var mid = (theirBBox.t + theirBBox.b - (myBBox.b + myBBox.t)) / 2;
         for (var k = theirBBox.t - myBBox.b; k <= theirBBox.b - myBBox.t; k++) {
             var res = GetSharedCellsVertical(theirIsland, myIsland, theirBBox, myBBox, k);
-            if (res.shared > best.shared) {
+            if (res.shared > best.shared || (res.shared == best.shared && Math.abs(k - mid) < Math.abs(best.yoff - mid))) {
                 best = res;
             }
         }
         break;
     case 3: // up
+        var mid = (theirBBox.l + theirBBox.r - (myBBox.l + myBBox.r)) / 2;
         for (var k = theirBBox.l - myBBox.r; k <= theirBBox.r - myBBox.l; k++) {
             var res = GetSharedCellsHorizontal(theirIsland, myIsland, theirBBox, myBBox, k);
-            if (res.shared > best.shared) {
+            if (res.shared > best.shared || (res.shared == best.shared && Math.abs(k - mid) < Math.abs(best.xoff - mid))) {
                 best = res;
             }
         }

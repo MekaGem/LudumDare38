@@ -117,8 +117,6 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     var myBBox = GetBBox(myIsland);
     var theirBBox = GetBBox(theirIsland);
     
-    console.log(theirOff, myBBox, theirBBox);
-    
     var myOff = {};
     var width;
     var height;
@@ -169,8 +167,6 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         break;
     }
     
-    console.log(myOff, theirOff);
-    
     var cells = [];
     var tilesContainer = new createjs.Container();
     var willMove = [];
@@ -209,21 +205,34 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     myIsland.y = Math.round((map.height - height) / 2);
     updateContainerPos(myIsland);
     
+    var human;
     for (var i = 0; i < myIsland.units.length; ++i) {
         var unit = myIsland.units[i];
         unit.x -= myOff.x;
         unit.y -= myOff.y;
         updateViewPos(unit);
+        if (unit.type == UNIT_HUMAN) {
+            human = unit;
+            if (unit.finalDestination) {
+                unit.finalDestination.x -= myOff.x;
+                unit.finalDestination.y -= myOff.y;
+            }
+        }
     }
+    var newGolems = [];
     for (var i = 0; i < theirIsland.units.length; ++i) {
         var unit = theirIsland.units[i];
         unit.x -= theirOff.x;
         unit.y -= theirOff.y;
         myIsland.addUnit(unit);
         willMove.push(unit.view);
+        if (unit.type == UNIT_GOLEM) {
+            newGolems.push(unit);
+        }
     }
     
     var visualOffset = cartesianToIsometric(DIRS[clashDir].x * 10 * CELL_SIZE, DIRS[clashDir].y * 10 * CELL_SIZE);
+    var clashDuration = 5000;
     for (var i = 0; i < willMove.length; ++i) {
         willMove[i].x += visualOffset.x;
         willMove[i].y += visualOffset.y;
@@ -232,6 +241,15 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
             .to({
                 x: willMove[i].x - visualOffset.x,
                 y: willMove[i].y - visualOffset.y
-            }, 5000);
+            }, clashDuration);
     }
+    
+    createjs.Tween.get(null).wait(clashDuration + 100).call(function() {
+        resumeTweens();
+        if (human) {
+            for (var i = 0; i < newGolems.length; i++) {
+                newGolems[i].engageHuman(myIsland, human);
+            }
+        }
+    });
 }

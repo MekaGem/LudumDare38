@@ -56,7 +56,8 @@ function initGame() {
     resize();
 
     var map = new Map(30, 30);
-    var world = new World(10, 10, 10, 10, 10);
+    // var world = new World(10, 10, 10, 10, 10);
+    var world = new World(10, 10, 10, 10, 0);
     var game = {
         "map": map,
         "world": world,
@@ -80,11 +81,6 @@ function initGame() {
         }
     })
 
-    // Example
-    game.world.selectionCallback = function(cell) {
-        console.log("Clicked on cell: " + cell.x + "," + cell.y);
-    }
-
     map.addWorld(world);
     camera = new Point(0, 0);
 
@@ -105,10 +101,13 @@ function initGame() {
     }
 
     var human = new Human(2, 3);
-    //for testing.
-    // human.setFinalDestinationCell(new Point(4, 7));
     world.addUnit(human);
-    stage.update();
+
+    game.world.selectionCallback = function(cell) {
+        console.log("Clicked on cell: " + cell.x + "," + cell.y);
+        human.setFinalDestinationCell(world, cell);
+    }
+
     game.human = human;
     return game;
 }
@@ -175,12 +174,7 @@ function gameLoop(game) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
         }
     }
-    stepTicker.addEventListener(20, sinkRandomCell);
-
-    var shiftHuman = function() {
-        game.world.shiftHuman(game.human); // shift in cartesian coordinates.
-    }
-    stepTicker.addEventListener(1, shiftHuman);
+    // stepTicker.addEventListener(20, sinkRandomCell);
 
     function tick(event) {
         stepTicker.advanceTime(event.delta);

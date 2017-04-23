@@ -23,9 +23,10 @@ function Human(x, y) {
     view.regX = bounds.width / 2;
     view.regY = bounds.height - CELL_SIZE / 2;
 
-    this.currentDestination = new Point(x, y);
-    this.finalDestinationCell = new Point(x, y);
-    this.stepLength = 2;
+    this.currentDestination = null;
+    this.finalDestination = null;
+    this.path = null;
+
     Unit.call(this, x, y, view);
 }
 
@@ -49,8 +50,8 @@ Human.prototype.getShiftDirection = function(world) {
         var route = findPath(world,
             currentCell.x,
             currentCell.y,
-            this.finalDestinationCell.x,
-            this.finalDestinationCell.y);
+            this.finalDestination.x,
+            this.finalDestination.y);
         if (route.length > 1) {
             // there is still some distance to go.
             this.currentDestination = new Point(route[1][0], route[1][1]);
@@ -61,6 +62,56 @@ Human.prototype.getShiftDirection = function(world) {
     return answer;
 }
 
-Human.prototype.setFinalDestinationCell = function(cell) {
-    this.finalDestinationCell = cell;
+Human.prototype.updatePath = function() {
+    if (this.path) {
+        this.currentDestination = this.path.shift();
+        // console.log("Current destination = " + this.currentDestination.x + ":" + this.currentDestination.y);
+        if (this.path.length == 0) this.path = null;
+
+        var iso = cartesianToIsometric(
+            (this.currentDestination.x - this.x) * CELL_SIZE,
+            (this.currentDestination.y - this.y) * CELL_SIZE
+        );
+
+        var _this = this;
+        var viewDestinationX = this.view.x + iso.x;
+        var viewDestinationY = this.view.y + iso.y;
+
+        this.tween.play(new createjs.Tween(this.view)
+            .to({
+                x: viewDestinationX,
+                y: viewDestinationY
+            }, 1000)
+            .call(function() {
+                console.log("Moved to " + _this.currentDestination);
+                _this.x = _this.currentDestination.x;
+                _this.y = _this.currentDestination.y;
+                _this.currentDestination = null;
+                _this.updatePath();
+            })
+        );
+    } else {
+        this.finalDestination = null;
+    }
+}
+
+Human.prototype.setFinalDestinationCell = function(world, cell) {
+    var path = null;
+    if (this.currentDestination) {
+        path = findPath(world, this.currentDestination.x, this.currentDestination.y, cell.x, cell.y);
+    } else {
+        path = findPath(world, this.x, this.y, cell.x, cell.y);
+    }
+
+    if (!path || path.length == 0) {
+        return;
+    }
+
+    this.path = path;
+    if (!this.  finalDestination) {
+        this.finalDestination = cell;
+        this.updatePath();
+    } else {
+        this.finalDestination = cell;
+    }
 }

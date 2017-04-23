@@ -1,5 +1,7 @@
 var stage;
-var center;
+var stageWidth;
+var stageHeight;
+var stageCenter;
 var camera;
 
 var CAMERA_MOVEMENT_BORDER = 80;
@@ -15,10 +17,12 @@ document.onkeyup = function(e) {
 };
 
 function resize() {
-    stage.canvas.width = window.innerWidth;
-    stage.canvas.height = window.innerHeight;
-    center = new Point(stage.canvas.width / 2, stage.canvas.height / 2);
-    console.log("Resize to: " + stage.canvas.width + ":" + stage.canvas.height);
+    stageWidth = window.innerWidth;
+    stageHeight = window.innerHeight;
+    stage.canvas.width = stageWidth;
+    stage.canvas.height = stageHeight;
+    stageCenter = new Point(stageWidth / 2, stageHeight / 2);
+    console.log("Resize to: " + stageWidth + ":" + stageHeight);
 }
 
 function init() {
@@ -44,6 +48,7 @@ function play() {
 
 function initGame() {
     stage = new createjs.Stage("demoCanvas");
+
     window.addEventListener('resize', resize);
     resize();
 
@@ -52,18 +57,39 @@ function initGame() {
     circle.x = 100;
     circle.y = 100;
     stage.addChild(circle);
-    stage.update();
 
-    var map = new Map(100, 50);
+    var map = new Map(30, 30);
     var world = new World(10, 10, 10, 10, 10);
     var game = {
         "map": map,
         "world": world,
+        "selectedCellPosition": null,
+        "selectedCellShape": new createjs.Shape(),
     };
 
+    {
+        var gfx = game.selectedCellShape.graphics;
+        gfx.setStrokeStyle(3);
+        gfx.beginStroke("white");
+        drawTile(game.selectedCellShape);
+        game.selectedCellShape.alpha = 0;
+    }
+
+    // TODO: reassign from the world to the new one when it changes
+    game.world.selectionContainer.addChild(game.selectedCellShape);
+    game.world.container.on("mousedown", function() {
+        if (game.world.selectionCallback && game.selectedCellPosition) {
+            game.world.selectionCallback(game.selectedCellPosition);
+        }
+    })
+
+    // Example
+    game.world.selectionCallback = function(cell) {
+        console.log("Clicked on cell: " + cell.x + "," + cell.y);
+    }
+
     map.addWorld(world);
-    camera = world.getCenter();
-    console.log("Camera at " + camera.x + ":" + camera.y);
+    camera = new Point(0, 0);
     
     addOtherWorld(game);
 
@@ -83,14 +109,10 @@ function initGame() {
 
     var human = new Human(2, 3, humanSpriteSheet);
     //for testing.
-    destination = new Point(2 * CELL_SIZE, 7 * CELL_SIZE);
-    isoDest = cartesianToIsometric(destination.x, destination.y);
-    human.isoDestinationX = isoDest.x;
-    human.isoDestinationY = isoDest.y;
+    human.setFinalDestinationCell(new Point(4, 7));
     world.addUnit(human);
     stage.update();
-    game.human = human
-
+    game.human = human;
     return game;
 }
 
@@ -126,6 +148,22 @@ StepTicker.prototype.advanceTime = function(delta) {
         this.timePassed -= this.stepPeriod;
     }
 };
+
+function updateSelectedCell(game) {
+    var local = game.world.container.globalToLocal(stage.mouseX, stage.mouseY);
+    var cart = isometricToCartesian(local.x, local.y);
+    var cell = new Point(Math.floor(cart.x / CELL_SIZE), Math.floor(cart.y / CELL_SIZE));
+    if (game.world.cellIsSelectable(cell.x, cell.y)) {
+        game.selectedCellPosition = cell;
+        var iso = cartesianToIsometric(cell.x * CELL_SIZE, cell.y * CELL_SIZE);
+        game.selectedCellShape.x = iso.x;
+        game.selectedCellShape.y = iso.y;
+        game.selectedCellShape.alpha = 1;
+    } else {
+        game.selectedCellPosition = null;
+        game.selectedCellShape.alpha = 0;
+    }
+}
 
 function gameLoop(game) {
     // Setup periodic ticker.
@@ -167,11 +205,28 @@ function gameLoop(game) {
         
         tickOtherWorld(game);
 
-        game.map.container.x = center.x;
-        game.map.container.y = center.y;
+        // Camera bounds
+        var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
+        var xDiff = worldBoundingBoxHalfWidth - stageCenter.x;
+        var minCameraX = Math.min(-xDiff, 0);
+        var maxCameraX = Math.max(xDiff, 0);
 
-        game.map.container.regX = camera.x;
-        game.map.container.regY = camera.y;
+        var worldBoundingBoxHalfHeight = (game.world.width + game.world.height) / 4. * CELL_SIZE + 100;
+        var yDiff = worldBoundingBoxHalfHeight - stageCenter.y;
+        var minCameraY = Math.min(-yDiff, 0);
+        var maxCameraY = Math.max(yDiff, 0);
+
+        camera.x = clamp(camera.x, minCameraX, maxCameraX);
+        camera.y = clamp(camera.y, minCameraY, maxCameraY);
+
+        game.map.container.x = stageCenter.x;
+        game.map.container.y = stageCenter.y;
+
+        var worldCenter = game.world.getCenter();
+        game.map.container.regX = worldCenter.x + camera.x;
+        game.map.container.regY = worldCenter.y + camera.y;
+
+        updateSelectedCell(game);
 
         // Render.
         stage.update();

@@ -165,7 +165,6 @@ World.prototype.damageWithWater = function(x, y) {
     if (oldCell.isAlive()) {
         return;
     }
-    var oldShape = this.cells[x][y].shape;
     this.cells[x][y] = new Cell("W");
 
     var world = this;
@@ -187,12 +186,21 @@ World.prototype.cellIsLand = function(x, y) {
 
 World.prototype.cellIsPassable = function(x, y) {
     if (!this.cellIsValid(x, y) || this.cellIsWater(x, y)) return false;
+    return !this.cellContainsUnit(x, y, UNIT_TREE);
+}
+
+World.prototype.getUnitFromCell = function(x, y) {
     for (var i = 0; i < this.units.length; ++i) {
-        if (this.units[i].x == x && this.units[i].y == y && this.units[i].type == UNIT_TREE) {
-            return false;
+        if (this.units[i].x == x && this.units[i].y == y) {
+            return this.units[i];
         }
     }
-    return true;
+    return null;
+}
+
+World.prototype.cellContainsUnit = function (x, y, unitType) {
+    var unit = this.getUnitFromCell(x, y);
+    return (unit != null && unit.type == unitType) ? true : false;
 }
 
 World.prototype.cellIsBorder = function(x, y) {

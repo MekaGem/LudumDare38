@@ -1,3 +1,4 @@
+TREE_MAX_HP = 200;
 function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
@@ -14,8 +15,17 @@ var UNIT_GOLEM = "GOLEM";
 
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
+    this.hp = TREE_MAX_HP;
     var view = new createjs.Sprite(assets.spriteSheet, "tree");
     Unit.call(this, x, y, view, UNIT_TREE);
+}
+
+Tree.prototype.takeDamage = function(damage) {
+    this.hp = Math.max(0, this.hp - damage);
+}
+
+Tree.prototype.isAlive = function () {
+    return this.hp > 0;
 }
 
 Rock.prototype = Object.create(Unit.prototype);
@@ -50,7 +60,7 @@ function Human(x, y) {
     this.currentDestination = null;
     this.finalDestination = null;
     this.path = null;
-
+    this.treeDamage = 50;
     this.stepOnCellCallback = null;
 }
 
@@ -116,6 +126,14 @@ Human.prototype.setFinalDestinationCell = function(world, cell) {
     if (!this.currentDestination) {
         this.updatePath();
     }
+}
+
+Human.prototype.dealDamage = function(world, unit) {
+    if (unit.type == UNIT_TREE) {
+        unit.takeDamage(this.treeDamage);
+        return true;
+    }
+    return false;
 }
 
 Golem.prototype = Object.create(Unit.prototype);

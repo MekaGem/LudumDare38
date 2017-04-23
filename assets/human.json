@@ -4,6 +4,10 @@
     ],
     "frames": { "width": 128, "height": 128, "count": 32, "regX": 64, "regY": 64 },
     "animations": {
+        "idle_nw": 0,
+        "idle_ne": 8,
+        "idle_se": 16,
+        "idle_sw": 24,
         "walk_nw": [0, 7, "walk_nw", 0.25],
         "walk_ne": [8, 15, "walk_ne", 0.25],
         "walk_se": [16, 23, "walk_se", 0.25],

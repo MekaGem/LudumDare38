@@ -128,6 +128,7 @@ World.prototype.shiftHuman = function(human) {
     human.view.x = isometricNewPosition.x;
     human.view.y = isometricNewPosition.y;
 
+    var found = false;
     for (var dir = 0; dir < 4; dir++) {
         if (Math.sign(shiftDirection.x) == Math.sign(DIRS[dir].x) && Math.sign(shiftDirection.y) == Math.sign(DIRS[dir].y)) {
             var newAnim = human.view.currentAnimation;
@@ -148,7 +149,30 @@ World.prototype.shiftHuman = function(human) {
             if (newAnim != human.view.currentAnimation) {
                 human.view.gotoAndPlay(newAnim);
             }
+            found = true;
             break;
+        }
+    }
+    if (!found) {
+        var newAnim;
+        switch (human.view.currentAnimation) {
+        case "walk_se":
+            newAnim = "idle_se";
+            break;
+        case "walk_sw":
+            newAnim = "idle_sw";
+            break;
+        case "walk_nw":
+            newAnim = "idle_nw";
+            break;
+        case "walk_ne":
+            newAnim = "idle_ne";
+            break;
+        default:
+            newAnim = human.view.currentAnimation;
+        }
+        if (newAnim != human.view.currentAnimation) {
+            human.view.gotoAndPlay(newAnim);
         }
     }
 }

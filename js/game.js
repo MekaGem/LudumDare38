@@ -55,12 +55,6 @@ function initGame() {
     window.addEventListener('resize', resize);
     resize();
 
-    var circle = new createjs.Shape();
-    circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, 50);
-    circle.x = 100;
-    circle.y = 100;
-    stage.addChild(circle);
-
     var map = new Map(30, 30);
     var world = new World(10, 10, 10, 10, 10);
     var game = {
@@ -93,7 +87,7 @@ function initGame() {
 
     map.addWorld(world);
     camera = new Point(0, 0);
-    
+
     addOtherWorld(game);
 
     stage.addChild(map.container);
@@ -112,7 +106,7 @@ function initGame() {
 
     var human = new Human(2, 3);
     //for testing.
-    human.setFinalDestinationCell(new Point(4, 7));
+    // human.setFinalDestinationCell(new Point(4, 7));
     world.addUnit(human);
     stage.update();
     game.human = human;
@@ -205,7 +199,7 @@ function gameLoop(game) {
         if (stage.mouseY > stage.canvas.height - CAMERA_MOVEMENT_BORDER) {
             camera.y += CAMERA_MOVEMENT_SPEED * seconds;
         }
-        
+
         tickOtherWorld(game);
 
         // Camera bounds
@@ -250,7 +244,7 @@ function tickOtherWorld(game) {
     } else {
         var behind = false;
         var changed = false;
-        
+
         if (keys[49]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 0);
             game.otherDrift = {x: DIRS[0].x, y: DIRS[0].y};
@@ -270,10 +264,10 @@ function tickOtherWorld(game) {
             changed = true;
             behind = true;
         }
-        
+
         if (changed) {
             game.omck = 60;
-            
+
             game.map.worldsContainer.removeChild(game.otherWorld.container);
             if (behind) {
                 var idx = game.map.worldsContainer.getChildIndex(game.world.container);
@@ -281,15 +275,15 @@ function tickOtherWorld(game) {
             } else {
                 game.map.worldsContainer.addChild(game.otherWorld.container);
             }
-            
+
             game.otherWorld.x = game.world.x + game.otherOff.x;
             game.otherWorld.y = game.world.y + game.otherOff.y;
         }
     }
-    
+
     game.otherDrift.x *= 0.95;
     game.otherDrift.y *= 0.95;
-    
+
     var iso = cartesianToIsometric((game.otherWorld.x + game.otherDrift.x) * CELL_SIZE, (game.otherWorld.y + game.otherDrift.y) * CELL_SIZE);
     game.otherWorld.container.x = iso.x;
     game.otherWorld.container.y = iso.y;

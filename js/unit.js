@@ -19,6 +19,10 @@ function Rock(x, y) {
 Human.prototype = Object.create(Unit.prototype);
 function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "walk_nw");
+    var bounds = view.getBounds();
+    view.regX = bounds.width / 2;
+    view.regY = bounds.height - CELL_SIZE / 2;
+
     this.currentDestination = new Point(x, y);
     this.finalDestinationCell = new Point(x, y);
     this.stepLength = 2;

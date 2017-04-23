@@ -106,8 +106,8 @@ function World(width, height, x, y, k) {
     this.container.addChild(this.unitsContainer);
 }
 
-World.prototype.setSinkingCell = function(sinkingCell) {
-    this.sinkingCell = sinkingCell;
+World.prototype.setSinkingCell = function(сell) {
+    this.sinkingCell = cell;
 }
 
 World.prototype.getCenter = function() {

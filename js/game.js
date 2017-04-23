@@ -216,17 +216,6 @@ function gameLoop(game) {
         var minCameraY = Math.min(-yDiff, 0);
         var maxCameraY = Math.max(yDiff, 0);
 
-        // Camera bounds
-        var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
-        var xDiff = worldBoundingBoxHalfWidth - stageCenter.x;
-        var minCameraX = Math.min(-xDiff, 0);
-        var maxCameraX = Math.max(xDiff, 0);
-
-        var worldBoundingBoxHalfHeight = (game.world.width + game.world.height) / 4. * CELL_SIZE + 100;
-        var yDiff = worldBoundingBoxHalfHeight - stageCenter.y;
-        var minCameraY = Math.min(-yDiff, 0);
-        var maxCameraY = Math.max(yDiff, 0);
-
         camera.x = clamp(camera.x, minCameraX, maxCameraX);
         camera.y = clamp(camera.y, minCameraY, maxCameraY);
 

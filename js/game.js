@@ -55,6 +55,8 @@ function initGame() {
     window.addEventListener('resize', resize);
     resize();
 
+    var inventory = new Inventory();
+
     var map = new Map(30, 30);
     // var world = new World(10, 10, 10, 10, 10);
     var world = new World(10, 10, 10, 10, 0);
@@ -63,6 +65,7 @@ function initGame() {
         "world": world,
         "selectedCellPosition": null,
         "selectedCellShape": new createjs.Shape(),
+        "inventory": inventory,
     };
 
     {
@@ -102,13 +105,15 @@ function initGame() {
 
     var human = new Human(2, 3);
     world.addUnit(human);
+    game.human = human;
 
     game.world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
         human.setFinalDestinationCell(world, cell);
     }
 
-    game.human = human;
+    stage.addChild(inventory.container);
+
     return game;
 }
 
@@ -175,6 +180,12 @@ function gameLoop(game) {
         }
     }
     // stepTicker.addEventListener(20, sinkRandomCell);
+
+    var addStone = function() {
+        game.inventory.addItem("stone", 1);
+        game.inventory.addItem("carrot", 7);
+    }
+    stepTicker.addEventListener(10, addStone);
 
     function tick(event) {
         stepTicker.advanceTime(event.delta);

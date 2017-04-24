@@ -18,6 +18,7 @@ function loadResources(callback) {
             healthSpriteSheet: queue.getResult("health"),
             buttonSpriteSheet: queue.getResult("button")
         }
+        assets.heartFill = createjs.SpriteSheetUtils.extractFrame(assets.healthSpriteSheet, 1);
         assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
         callback();
     };

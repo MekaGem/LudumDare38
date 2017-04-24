@@ -119,15 +119,33 @@ Bush.prototype.growBerries = function() {
 
 function HealthStatus(hp) {
     this.view = new createjs.Container();
+    this.fill = new createjs.Bitmap(assets.heartFill);
     this.heart = new createjs.Sprite(assets.healthSpriteSheet, "heart");
     this.hpText = new createjs.Text(hp, "20px Arial", "#ff7700");
     this.hpText.x += this.heart.getBounds().width + INVENTORY_SPACING;
+
+    var bounds = this.heart.getBounds();
+
+    this.fill.sourceRect = {
+        x: 0,
+        y: 0,
+        width: bounds.width,
+        height: 0
+    };
+
     this.view.addChild(this.hpText);
     this.view.addChild(this.heart);
+    this.view.addChild(this.fill);
 }
 
 HealthStatus.prototype.updateHP = function(hp) {
     this.hpText.text = hp;
+
+    var bounds = this.heart.getBounds();
+    createjs.Tween.get(this.fill.sourceRect)
+        .to({
+            height: bounds.height * (1 - hp / HUMAN_MAX_HP)
+        }, 100);
 }
 
 Human.prototype = Object.create(Unit.prototype);
@@ -315,18 +333,18 @@ function ProgressBar() {
     this.currentTween = null;
     this.bg = new createjs.Sprite(assets.statusBarsSpriteSheet, "background");
     this.fill = new createjs.Bitmap(assets.progressBarFill);
-    
+
     var bounds = this.bg.getBounds();
     this.fill.regX = -bounds.x;
     this.fill.regY = -bounds.y;
-    
+
     this.fill.sourceRect = {
         x: 0,
         y: 0,
         width: 0,
         height: bounds.height
     };
-    
+
     console.log(this, this.bg.getBounds());
 }
 

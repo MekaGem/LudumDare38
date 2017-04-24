@@ -5,7 +5,6 @@ var stageHeight;
 var stageCenter;
 var camera;
 var assets;
-var soundContainer;
 var sound;
 var loadingText;
 var topBar;
@@ -35,7 +34,9 @@ function resize(width, height) {
     stageCenter = new Point(stageWidth / 2, stageHeight / 2);
     console.log("Resize to: " + stageWidth + ":" + stageHeight);
 
-    soundContainer.x = stageWidth - 32 - 20;
+    if (topBar) {
+        topBar.rightContainer.x = stageWidth - topBar.rightX;
+    }
 }
 
 function init() {
@@ -85,7 +86,7 @@ function getFortTile() {
 function initGame() {
     initSound();
 
-    soundContainer = new createjs.Container();
+    var soundContainer = new createjs.Container();
     var soundOnButton = new createjs.Sprite(assets.buttonSpriteSheet, "sound_on");
     var soundOffButton = new createjs.Sprite(assets.buttonSpriteSheet, "sound_off");
     soundOffButton.alpha = 0;
@@ -105,6 +106,12 @@ function initGame() {
             soundOffButton.alpha = 0;
             createjs.Tween.get(sound).to({volume: SOUND_VOLUME}, 500);
         }
+    });
+
+    var restartButton = new createjs.Sprite(assets.buttonSpriteSheet, "restart");
+    restartButton.on("mousedown", function() {
+        console.log("Restart game.");
+        location.reload();
     });
 
     // window.addEventListener('resize', resize);
@@ -284,6 +291,7 @@ function initGame() {
 
     topBar.addItem(human.healthStatus.view, ALIGN_LEFT);
     topBar.addItem(inventory.container, ALIGN_LEFT);
+    topBar.addItem(restartButton, ALIGN_RIGHT);
     topBar.addItem(soundContainer, ALIGN_RIGHT);
 
     gameContainer.addChild(topBar.container);

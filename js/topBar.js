@@ -2,21 +2,33 @@ var TOP_BAR_X = 20;
 var TOP_BAR_Y = 20;
 var ALIGN_LEFT = "left";
 var ALIGN_RIGHT = "right";
-var SPACING = 30;
+var SPACING = 30
+var RIGHT_SPACING = 10;
 
 function TopBar() {
     this.container = new createjs.Container();
-    this.x = 0;
-    this.container.y = TOP_BAR_Y
+    this.container.y = TOP_BAR_Y;
+
+    this.leftContainer = new createjs.Container();
+    this.rightContainer = new createjs.Container();
+
+    this.leftX = 0;
+    this.rightX = 0;
+
+    this.container.addChild(this.leftContainer);
+    this.container.addChild(this.rightContainer);
 }
 
 TopBar.prototype.addItem = function(item, alignment) {
+    var bounds = item.getBounds();
     if (alignment == ALIGN_LEFT) {
-        var bounds = item.getBounds();
-        item.x += this.x + TOP_BAR_X;
-        topBar.container.addChild(item);
-        this.x += bounds.width + SPACING;
+        item.x += this.leftX + TOP_BAR_X;
+        this.leftContainer.addChild(item);
+        this.leftX += bounds.width + SPACING;
     } else if (alignment == ALIGN_RIGHT) {
-        topBar.container.addChild(item);
+        item.x += this.rightX;
+        this.rightX += bounds.width + RIGHT_SPACING;
+        this.rightContainer.addChild(item);
+        this.rightContainer.x = stageWidth - this.rightX;
     }
 }

@@ -70,6 +70,21 @@ function initSound() {
     createjs.Sound.registerSound("assets/theme.mp3", "sound");
 }
 
+function getSelectedCellTile() {
+    var shape = new createjs.Shape()
+    var gfx = shape.graphics;
+    gfx.setStrokeStyle(3);
+    gfx.beginStroke("white");
+    drawTile(shape);
+    shape.alpha = 1;
+    return shape;
+}
+
+function getFortTile() {
+    var fort = new Fort(0, 0);
+    return fort.view;
+}
+
 function initGame() {
     initSound();
 
@@ -102,17 +117,12 @@ function initGame() {
         "map": map,
         "world": world,
         "selectedCellPosition": null,
-        "selectedCellShape": new createjs.Shape(),
+        "selectedCellShape": new createjs.Container(),
         "inventory": inventory,
     };
 
-    {
-        var gfx = game.selectedCellShape.graphics;
-        gfx.setStrokeStyle(3);
-        gfx.beginStroke("white");
-        drawTile(game.selectedCellShape);
-        game.selectedCellShape.alpha = 0;
-    }
+    game.selectedCellShape.alpha = 1;
+    game.selectedCellShape.addChild(getSelectedCellTile());
 
     // TODO: reassign from the world to the new one when it changes
     game.world.selectionContainer.addChild(game.selectedCellShape);
@@ -174,7 +184,18 @@ function initGame() {
     world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
         human.stopContinuousAction(world);
-        if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
+
+        console.log(game.selectedBuildTool);
+        if (game.selectedBuildTool) {
+            console.log("Trying to build");
+            building = new game.selectedBuildTool.type(cell.x, cell.y);
+            if (tryCreateBuilding(world, inventory, building)) {
+                console.log("Created building.");
+                changeBuildTool(game, null);
+            } else {
+                console.log("Can't create building here.");
+            }
+        } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
             var dir = getDirection(human, cell);
             if (dir >= 0) {
                 var golem = world.getUnitFromCellByType(cell.x, cell.y, UNIT_GOLEM);
@@ -274,6 +295,36 @@ function updateSelectedCell(game) {
     }
 }
 
+function changeBuildTool(game, newBuildTool) {
+    if (game.selectedBuildTool !== newBuildTool) {
+        game.selectedBuildTool = newBuildTool;
+        game.buildToolChanged = true;
+    }
+}
+
+function updateSelectedBuildTool(game) {
+    if (keys[KEY_F]) {
+        changeBuildTool(game, BUILDING_FORT);
+    }
+    if (keys[KEY_ESC]) {
+        changeBuildTool(game, null);
+    }
+
+    if (!game.buildToolChanged) {
+        return;
+    }
+    game.buildToolChanged = false;
+
+    // TODO: Store all tiles inside and just change alpha values.
+    game.selectedCellShape.removeAllChildren();
+    if (!game.selectedBuildTool) {
+        game.selectedCellShape.addChild(getSelectedCellTile());
+    } else if (game.selectedBuildTool === BUILDING_FORT) {
+        console.log("Building Fort");
+        game.selectedCellShape.addChild(getFortTile());
+    }
+}
+
 function gameLoop(game) {
     // Setup periodic ticker.
     createjs.Ticker.setFPS(60);
@@ -343,6 +394,7 @@ function gameLoop(game) {
         
         game.world.unitsContainer.sortChildren(compareUnitViews);
 
+        updateSelectedBuildTool(game);
         updateSelectedCell(game);
 
         // Render.

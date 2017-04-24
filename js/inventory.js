@@ -51,7 +51,31 @@ Inventory.prototype.updateText = function() {
     }
 }
 
-Inventory.prototype.addItem = function(type, amount) {
-    this.items[type.index].amount += amount;
+Inventory.prototype.changeItemAmount = function(type, delta) {
+    this.items[type.index].amount += delta;
     this.updateText();
+}
+
+Inventory.prototype.addItem = function(type, amount) {
+    this.changeItemAmount(type, amount);
+}
+
+Inventory.prototype.hasEnoughResources = function(requirements) {
+    console.log(this.items);
+    for (var i = 0; i < requirements.length; ++i) {
+        var type = requirements[i][0];
+        var amount = requirements[i][1];
+        if (this.items[type.index].amount < amount) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Inventory.prototype.takeResources = function(requirements) {
+    for (var i = 0; i < requirements.length; ++i) {
+        var type = requirements[i][0];
+        var amount = requirements[i][1];
+        this.changeItemAmount(type, -amount);
+    }
 }

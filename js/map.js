@@ -1,10 +1,11 @@
 var CELL_SIZE = 64;
 var START_CELL_HP = 100;
-var DEFAULT_WATER_DAMAGE = 50;
+var DEFAULT_WATER_DAMAGE = 20;
 var CELL_TYPE_WATER = "W";
 var CELL_TYPE_GRASS = "G";
 var FORT_HP = 50;
-var FORT_PROTECTION = 25;
+var FORT_PROTECTION = 10;
+var FORT_HP_BOOST = 20;
 
 var DIRS = [
     {x: 1, y: 0},  // down right (SE)
@@ -75,18 +76,29 @@ Cell.prototype.isAlive = function () {
 
 Cell.prototype.fortify = function(world) {
     this.fortHP = FORT_HP;
+    this.hp = Math.min(this.hp + FORT_HP_BOOST, this.maximumHp);
     this.updateAlpha();
     this.view.gotoAndPlay("kamushki_border");
 }
 
 function Map(width, height) {
+    this.container = new createjs.Container();
+
+    this.waterContainer = null;
+    this.updateWater(width, height);
+
+    this.worlds = [];
+    this.worldsContainer = new createjs.Container();
+    this.container.addChild(this.worldsContainer);
+}
+
+Map.prototype.updateWater = function(width, height) {
+    this.container.removeChild(this.waterContainer);
+
     this.width = width;
     this.height = height;
     this.cells = [];
-    this.worlds = [];
-    this.container = new createjs.Container();
-
-    var waterContainer = new createjs.Container();
+    this.waterContainer = new createjs.Container();
     for (var x = 0; x < width; ++x) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
@@ -95,16 +107,13 @@ function Map(width, height) {
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
             view.x = iso.x;
             view.y = iso.y;
-            waterContainer.addChild(view);
+            this.waterContainer.addChild(view);
         }
     }
     var sx = width * CELL_SIZE;
     var sy = height * CELL_SIZE;
-    waterContainer.cache(-sy, 0, sx + sy, (sx + sy) / 2.);
-    this.container.addChild(waterContainer);
-
-    this.worldsContainer = new createjs.Container();
-    this.container.addChild(this.worldsContainer);
+    this.waterContainer.cache(-sy, 0, sx + sy, (sx + sy) / 2.);
+    this.container.addChildAt(this.waterContainer, 0);
 }
 
 Map.prototype.addWorld = function(world) {

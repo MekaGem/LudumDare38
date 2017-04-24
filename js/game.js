@@ -17,6 +17,14 @@ var CAMERA_MOVEMENT_SPEED = 500;
 var MAX_WIDTH = 1000;
 var MAX_HEIGHT = 700;
 
+var NEW_ISLAND_TICKS = 600;
+var NEW_ISLAND_MIN_SIZE = 5;
+var NEW_ISLAND_MAX_SIZE = 7;
+var NEW_ISLAND_MIN_REMOVED = 5;
+var NEW_ISLAND_MAX_REMOVED = 10;
+var NEW_ISLAND_MAX_GOLEMS = 3;
+var DAMAGE_WITH_WATER_TICKS = 5;
+
 var keys = {};
 
 document.onkeydown = function(e) {
@@ -383,7 +391,7 @@ function gameLoop(game) {
 
     var stepTicker = new StepTicker(100);
 
-    stepTicker.addEventListener(20, function() {
+    stepTicker.addEventListener(DAMAGE_WITH_WATER_TICKS, function() {
         var borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
@@ -404,7 +412,7 @@ function gameLoop(game) {
         game.human.takeDamage(1);
     });
 
-    stepTicker.addEventListener(10, function() {
+    stepTicker.addEventListener(1, function() {
         if (isGameEnded(game)) {
             stopTweens(function() {
                 endGame(game);
@@ -412,19 +420,31 @@ function gameLoop(game) {
         }
     });
 
-    stepTicker.addEventListener(100, function() {
-        var newWorld = new World(5, 5, 0, 0, 4);
+    stepTicker.addEventListener(NEW_ISLAND_TICKS, function() {
+        var newWorld = new World(
+            getRandomInt(NEW_ISLAND_MIN_SIZE, NEW_ISLAND_MAX_SIZE + 1),
+            getRandomInt(NEW_ISLAND_MIN_SIZE, NEW_ISLAND_MAX_SIZE + 1),
+            0,
+            0,
+            getRandomInt(NEW_ISLAND_MIN_REMOVED, NEW_ISLAND_MAX_REMOVED + 1)
+        );
 
+        var golemsCreated = 0;
         for (var x = 0; x < newWorld.width; ++x) {
             for (var y = 0; y < newWorld.height; ++y) {
                 if (newWorld.cells[x][y].type == "G") {
-                    var r = getRandomInt(0, 5);
-                    if (r == 0) {
+                    var r = getRandomInt(0, 12);
+                    if (r < 2) {
                         newWorld.addUnit(new Tree(x, y));
-                    } else if (r < 3) {
+                    } else if (r < 4) {
                         newWorld.addUnit(new Rock(x, y));
-                    } else if (r == 3) {
-                        newWorld.addUnit(new Golem(x, y));
+                    } else if (r < 6) {
+                        newWorld.addUnit(new Rock(x, y));
+                    } else if (r < 7){
+                        if (golemsCreated < NEW_ISLAND_MAX_GOLEMS) {
+                            golemsCreated += 1;
+                            newWorld.addUnit(new Golem(x, y));
+                        }
                     }
                 }
             }

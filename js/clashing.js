@@ -215,6 +215,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     myIsland.width = width;
     myIsland.height = height;
 
+    map.updateWater(width + 20, height + 20);
     myIsland.x = Math.round((map.width - width) / 2);
     myIsland.y = Math.round((map.height - height) / 2);
     updateContainerPos(myIsland);

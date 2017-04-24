@@ -206,7 +206,6 @@ function initGame() {
 
     world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
-        human.stopContinuousAction(world);
 
         console.log(game.selectedBuildTool);
         if (game.selectedBuildTool) {
@@ -214,6 +213,7 @@ function initGame() {
             building = new game.selectedBuildTool.type(cell.x, cell.y, world);
             if (tryCreateBuilding(world, inventory, building)) {
                 console.log("Created building.");
+                human.stopContinuousAction(world);
                 changeBuildTool(game, null);
             } else {
                 console.log("Can't create building here.");
@@ -221,6 +221,7 @@ function initGame() {
         } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
             var dir = getDirection(human, cell);
             if (dir >= 0) {
+                human.stopContinuousAction(world);
                 var golem = world.getUnitFromCellByType(cell.x, cell.y, UNIT_GOLEM);
                 human.dir = dir;
                 human.gotoDirAnim("attack", true);
@@ -239,6 +240,8 @@ function initGame() {
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
+                if (human.hasActionAtDir(dir)) return game;
+
                 console.log("cutting tree at [" + cell.x + ", " +  cell.y + "]");
                 human.dir = dir;
 
@@ -263,6 +266,8 @@ function initGame() {
         } else if (world.cellIsWaterNearLand(cell.x, cell.y)) {
             var dir = getDirection(human, cell);
             if (dir >= 0) {
+                if (human.hasActionAtDir(dir)) return game;
+
                 console.log("fishing at [" + cell.x + ", " + cell.y + "]");
                 human.dir = dir;
                 var continuousActionLoopPeriod = 400;
@@ -275,12 +280,14 @@ function initGame() {
                     human.stopContinuousAction(world);
                 }
 
-                human.startContinuousAction(world,
+                human.startContinuousAction(
+                    world.container,
                     human.fishingTime,
                     continuousActionLoopPeriod,
                     continuousActionCallback);
             }
         } else if (!tweenController.shouldStop) {
+            human.stopContinuousAction(world);
             human.setFinalDestinationCell(world, cell);
         }
     }

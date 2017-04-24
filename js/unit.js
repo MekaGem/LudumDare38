@@ -122,6 +122,7 @@ function Human(x, y) {
     this.fishingTime = FISHING_TIME;
     this.stepOnCellCallback = null;
     this.progressBar = null;
+    this.oldDir = null;
 }
 
 Human.prototype.updatePath = function(world) {
@@ -190,8 +191,14 @@ Human.prototype.dealDamage = function(world, unit) {
     return false;
 }
 
+Human.prototype.hasActionAtDir = function(dir) {
+    return dir == this.oldDir;
+}
+
 Human.prototype.startContinuousAction = function(container, actionTime, callbackLoopPeriod, callback) {
     this.stopContinuousAction(container);
+
+    this.oldDir = this.dir;
 
     this.progressBar = new ProgressBar();
     this.progressBar.turnOn(this.container, this.waitingCallback, actionTime);
@@ -209,6 +216,7 @@ Human.prototype.stopContinuousAction = function() {
     if (this.progressBar) {
         this.progressBar.turnOff();
     }
+    this.oldDir = null;
 }
 
 Golem.prototype = Object.create(Unit.prototype);

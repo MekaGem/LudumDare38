@@ -1,5 +1,6 @@
 TREE_MAX_HP = 200;
 GOLEM_MAX_HP = 100;
+
 function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
@@ -8,7 +9,10 @@ function Unit(x, y, view, type) {
     this.type = type;
 }
 
-Unit.prototype.gotoDirAnim = function(anim, refresh = false) {
+Unit.prototype.gotoDirAnim = function(anim, refresh) {
+    if (typeof refresh === 'undefined') {
+        refresh = false;
+    }
     var newAnim = anim + "_" + DIR_SUFFIX[this.dir];
     if (refresh || this.view.currentAnimation != newAnim) {
         this.view.gotoAndPlay(newAnim);
@@ -91,9 +95,10 @@ function Human(x, y) {
     this.dir = 0;
     this.currentDestination = null;
     this.finalDestination = null;
-    this.treeDamage = 50;
+    this.treeCuttingTime = 3000; // 3 seconds.
     this.golemDamage = 20;
     this.stepOnCellCallback = null;
+    this.waitingBar = null;
 }
 
 Human.prototype.updatePath = function(world) {
@@ -160,6 +165,30 @@ Human.prototype.dealDamage = function(world, unit) {
         return true;
     }
     return false;
+}
+
+Human.prototype.startContinuousAction = function (world, actionTime, callbackLoopPeriod, callback) {
+    if (this.continuousActionTween) {
+        this.continuousActionTween.setPaused(true);
+    }
+    this.waitingBar = new WaitingBar(this.x, this.y);
+    this.waitingBar.turnOn(world, this, actionTime);
+
+    callback();
+    this.continuousActionTween = createjs.Tween.get(this.view,{loop:true})
+        .wait(callbackLoopPeriod)
+        .call(function() {
+            callback();
+        });
+}
+
+Human.prototype.stopContinuousAction = function (world) {
+    if (this.continuousActionTween) {
+        this.continuousActionTween.setPaused(true);
+    }
+    if (this.waitingBar) {
+        this.waitingBar.turnOff(world);
+    }
 }
 
 Golem.prototype = Object.create(Unit.prototype);
@@ -230,6 +259,7 @@ WaitingBar.prototype = Object.create(Unit.prototype);
 function WaitingBar(x, y) {
     this.currentTween = null;
     var view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
+    view.alpha = 0.0;
     Unit.call(this, x, y, view, UNIT_WAITING_BAR);
 }
 
@@ -248,7 +278,8 @@ WaitingBar.prototype.turnOn = function(world, unit, waitingTime) {
 
 WaitingBar.prototype.turnOff = function (world) {
     if (this.currentTween) {
-        this.currentTween.stop();
+        console.log("Ended previous continuous action.");
+        this.currentTween.setPaused(true);
         world.removeUnit(this);
     }
     this.currentTween = null;

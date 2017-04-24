@@ -173,6 +173,7 @@ function initGame() {
 
     world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
+        human.stopContinuousAction(world);
         if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
             var dir = getDirection(human, cell);
             if (dir >= 0) {
@@ -191,20 +192,27 @@ function initGame() {
                 }
             }
         } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_TREE)) {
+            console.log("cutting tree at [" + cell.x + ", " +  cell.y + "]");
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
-                if (tree.waitingBar) {
-                    tree.waitingBar.turnOff(world);
-                }
-                tree.waitingCallback = function() {
-                    human.dir = dir;
+                human.dir = dir;
+
+                var continuousActionLoopPeriod = 400;
+                var continuousActionCallback = function() {
                     human.gotoDirAnim("attack", true);
+                }
+
+                human.waitingCallback = function() {
                     inventory.addItem(ITEM_WOOD, 1);
                     world.removeUnitsInCell(tree.x, tree.y);
+                    human.stopContinuousAction(world);
                 }
-                tree.waitingBar = new WaitingBar(tree.x, tree.y);
-                tree.waitingBar.turnOn(world, tree, 2000);
+
+                human.startContinuousAction(world,
+                    human.treeCuttingTime,
+                    continuousActionLoopPeriod,
+                    continuousActionCallback);
             }
         } else if (!tweenController.shouldStop) {
             human.setFinalDestinationCell(world, cell);

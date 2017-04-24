@@ -366,31 +366,31 @@ function tickOtherWorld(game) {
         var changed = false;
         var mergeDir = -1;
 
-        if (keys[49]) {
+        if (keys[KEY_1]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 0);
             game.otherDrift = {x: DIRS[0].x, y: DIRS[0].y};
             changed = true;
-        } else if (keys[50]) {
+        } else if (keys[KEY_2]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 1);
             game.otherDrift = {x: DIRS[1].x, y: DIRS[1].y};
             changed = true;
-        } else if (keys[51]) {
+        } else if (keys[KEY_3]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 2);
             game.otherDrift = {x: DIRS[2].x, y: DIRS[2].y};
             changed = true;
             behind = true;
-        } else if (keys[52]) {
+        } else if (keys[KEY_4]) {
             game.otherOff = ClashIslands(game.world, game.otherWorld, 3);
             game.otherDrift = {x: DIRS[3].x, y: DIRS[3].y};
             changed = true;
             behind = true;
-        } else if (keys[81]) {
+        } else if (keys[KEY_Q]) {
             mergeDir = 0;
-        } else if (keys[87]) {
+        } else if (keys[KEY_W]) {
             mergeDir = 1;
-        } else if (keys[69]) {
+        } else if (keys[KEY_E]) {
             mergeDir = 2;
-        } else if (keys[82]) {
+        } else if (keys[KEY_R]) {
             mergeDir = 3;
         }
 

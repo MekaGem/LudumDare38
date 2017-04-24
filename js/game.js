@@ -325,6 +325,8 @@ function gameLoop(game) {
         game.map.container.regX = worldCenter.x + camera.x;
         game.map.container.regY = worldCenter.y + camera.y;
         
+        if (!tweenController.shouldStop) game.world.shakeTiles();
+        
         game.world.unitsContainer.sortChildren(compareUnitViews);
 
         updateSelectedCell(game);

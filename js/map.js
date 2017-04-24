@@ -31,6 +31,8 @@ function Cell(type) {
     this.shape = new createjs.Shape();
     this.maximumHp = START_CELL_HP;
     this.hp = this.maximumHp;
+    this.vel = 0;
+    this.offset = 0;
     if (type == "W") {
         this.shape = new createjs.Sprite(assets.spriteSheet, "water");
     } else if (type == "G") {
@@ -272,6 +274,26 @@ World.prototype.cellIsCutVertex = function(x, y) {
 
 World.prototype.cellIsSelectable = function(x, y) {
     return this.cellIsValid(x, y);
+}
+
+var MAX_TILE_OFFSET = 3;
+var MAX_TILE_VEL = 0.1;
+var TILE_VEL_D = 0.01;
+World.prototype.shakeTiles = function() {
+    for (var x = 0; x < this.width; x++) {
+        for (var y = 0; y < this.height; y++) {
+            if (!this.cellIsLand(x, y)) continue;
+            
+            var cell = this.cells[x][y];
+            var shape = cell.shape;
+            cell.vel += (Math.random() * 2 - 1) * TILE_VEL_D;
+            cell.vel = clamp(cell.vel, -MAX_TILE_VEL, MAX_TILE_VEL);
+            cell.offset += cell.vel;
+            cell.offset = clamp(cell.offset, -MAX_TILE_OFFSET, MAX_TILE_OFFSET);
+            var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+            shape.y = iso.y + cell.offset;
+        }
+    }
 }
 
 function Point(x, y) {

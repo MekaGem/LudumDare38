@@ -38,7 +38,7 @@ var UNIT_ROCK = "ROCK";
 var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
-var UNIT_WAITING_BAR = "WAITING_BAR";
+var UNIT_PROGRESS_BAR = "PROGRESS_BAR";
 
 function compareUnitViews(a, b) {
     if (a.y != b.y) return a.y - b.y;
@@ -101,12 +101,12 @@ function Human(x, y) {
     this.treeCuttingTime = 3000; // 3 seconds.
     this.golemDamage = 20;
     this.stepOnCellCallback = null;
-    this.waitingBar = null;
+    this.progressBar = null;
 }
 
 Human.prototype.updatePath = function(world) {
     var path = findPath(world, this.x, this.y, this.finalDestination.x, this.finalDestination.y);
-    
+
     if (path && path.length > 0) {
         this.currentDestination = path.shift();
 
@@ -173,8 +173,8 @@ Human.prototype.dealDamage = function(world, unit) {
 Human.prototype.startContinuousAction = function (world, actionTime, callbackLoopPeriod, callback) {
     this.stopContinuousAction(world);
 
-    this.waitingBar = new WaitingBar(this.x, this.y);
-    this.waitingBar.turnOn(world, this, actionTime);
+    this.progressBar = new ProgressBar(this.x, this.y);
+    this.progressBar.turnOn(world, this, actionTime);
 
     callback();
     this.continuousActionTween = createjs.Tween.get(this.view,{loop:true})
@@ -188,8 +188,8 @@ Human.prototype.stopContinuousAction = function (world) {
     if (this.continuousActionTween) {
         this.continuousActionTween.setPaused(true);
     }
-    if (this.waitingBar) {
-        this.waitingBar.turnOff(world);
+    if (this.progressBar) {
+        this.progressBar.turnOff(world);
     }
 }
 
@@ -203,7 +203,7 @@ function Golem(x, y) {
 
 Golem.prototype.engageHuman = function(world, human) {
     if (!this.isAlive()) return;
-    
+
     var route = findPath(world, this.x, this.y, human.x, human.y);
     if (route && route.length > 1) {
         var dest = route[0];
@@ -218,9 +218,9 @@ Golem.prototype.engageHuman = function(world, human) {
         var newPos = {x: this.view.x + dPos.x, y: this.view.y + dPos.y};
         this.x = dest.x;
         this.y = dest.y;
-        
+
         var golem = this;
-        
+
         tweenAdded();
         createjs.Tween.get(this.view)
             .to({
@@ -244,7 +244,7 @@ Golem.prototype.engageHuman = function(world, human) {
         } else {
             this.gotoDirAnim("idle");
         }
-        
+
         var golem = this;
         tweenAdded();
         createjs.Tween.get(this.view).wait(500).call(function() {
@@ -257,15 +257,15 @@ Golem.prototype.engageHuman = function(world, human) {
     }
 }
 
-WaitingBar.prototype = Object.create(Unit.prototype);
-function WaitingBar(x, y) {
+ProgressBar.prototype = Object.create(Unit.prototype);
+function ProgressBar(x, y) {
     this.currentTween = null;
     var view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
     view.alpha = 0.0;
-    Unit.call(this, x, y, view, UNIT_WAITING_BAR);
+    Unit.call(this, x, y, view, UNIT_PROGRESS_BAR);
 }
 
-WaitingBar.prototype.turnOn = function(world, unit, waitingTime) {
+ProgressBar.prototype.turnOn = function(world, unit, waitingTime) {
     var _this = this;
     this.currentTween = createjs.Tween.get(this.view)
         .to({
@@ -278,7 +278,7 @@ WaitingBar.prototype.turnOn = function(world, unit, waitingTime) {
     world.addUnit(this);
 }
 
-WaitingBar.prototype.turnOff = function (world) {
+ProgressBar.prototype.turnOff = function (world) {
     if (this.currentTween) {
         console.log("Ended previous continuous action.");
         this.currentTween.setPaused(true);

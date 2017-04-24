@@ -271,11 +271,8 @@ function initGame() {
 
 function updateSelectedCell(game) {
     var local = game.world.container.globalToLocal(stage.mouseX, stage.mouseY);
-    console.log("isometric local mouse coordinates: x = " + local.x + ", y = " + local.y);
     var cart = isometricToCartesian(local.x, local.y);
-    console.log("cartesian local mouse coordinates: x = " + cart.x + ", y = " + cart.y);
     var cell = new Point(Math.floor(cart.x / CELL_SIZE), Math.floor(cart.y / CELL_SIZE));
-    console.log("cell coordinates: x = " + cell.x + ", y = " + cell.y);
     if (game.world.cellIsSelectable(cell.x, cell.y)) {
         game.selectedCellPosition = cell;
         var iso = cartesianToIsometric(cell.x * CELL_SIZE, cell.y * CELL_SIZE);
@@ -329,7 +326,6 @@ function gameLoop(game) {
         var borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
-            game.world.updateBorderWater();
         }
     });
 

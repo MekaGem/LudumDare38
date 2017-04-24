@@ -168,7 +168,9 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     }
     
     var cells = [];
+    var units = [];
     var tilesContainer = new createjs.Container();
+    var unitsContainer = new createjs.Container();
     var willMove = [];
     
     for (var x = 0; x < width; ++x) {
@@ -210,7 +212,6 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         var unit = myIsland.units[i];
         unit.x -= myOff.x;
         unit.y -= myOff.y;
-        updateViewPos(unit);
         if (unit.type == UNIT_HUMAN) {
             human = unit;
             if (unit.finalDestination) {
@@ -218,18 +219,29 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
                 unit.finalDestination.y -= myOff.y;
             }
         }
+        units.push(unit);
     }
     var newGolems = [];
     for (var i = 0; i < theirIsland.units.length; ++i) {
         var unit = theirIsland.units[i];
         unit.x -= theirOff.x;
         unit.y -= theirOff.y;
-        myIsland.addUnit(unit);
         willMove.push(unit.view);
         if (unit.type == UNIT_GOLEM) {
             newGolems.push(unit);
         }
+        units.push(unit);
     }
+    
+    units.sort(compareUnits);
+    for (var i = 0; i < units.length; ++i) {
+        updateViewPos(units[i]);
+        unitsContainer.addChild(units[i].view);
+    }
+    myIsland.units = units;
+    myIsland.container.addChildAt(unitsContainer, myIsland.container.getChildIndex(myIsland.unitsContainer));
+    myIsland.container.removeChild(myIsland.unitsContainer);
+    myIsland.unitsContainer = unitsContainer;
     
     var visualOffset = cartesianToIsometric(DIRS[clashDir].x * 10 * CELL_SIZE, DIRS[clashDir].y * 10 * CELL_SIZE);
     var clashDuration = 5000;

@@ -9,10 +9,15 @@ function Unit(x, y, view, type) {
     this.type = type;
 }
 
-Unit.prototype.gotoDirAnim = function(anim, refresh) {
-    if (typeof refresh === 'undefined') {
-        refresh = false;
+function withDefaultValue(v, default_) {
+    if (typeof v === 'undefined') {
+        v = default_;
     }
+    return v;
+}
+
+Unit.prototype.gotoDirAnim = function(anim, refresh) {
+    refresh = withDefaultValue(refresh, false);
     var newAnim = anim + "_" + DIR_SUFFIX[this.dir];
     if (refresh || this.view.currentAnimation != newAnim) {
         this.view.gotoAndPlay(newAnim);

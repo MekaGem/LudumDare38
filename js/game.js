@@ -70,20 +70,23 @@ function initSound() {
     createjs.Sound.registerSound("assets/theme.ogg", "sound");
 }
 
+var SELECTED_CELL_TILE = null;
 function getSelectedCellTile() {
+    if (SELECTED_CELL_TILE) return SELECTED_CELL_TILE;
     var shape = new createjs.Shape()
     var gfx = shape.graphics;
     gfx.setStrokeStyle(3);
     gfx.beginStroke("white");
     drawTile(shape);
     shape.alpha = 1;
+    SELECTED_CELL_TILE = shape;
     return shape;
 }
 
 function getFortTile() {
-    var fort = new Fort(0, 0);
-    fort.view.alpha = 0.5;
-    return fort.view;
+    var fort = new createjs.Sprite(assets.resourcesSpriteSheet, "kamushki");
+    fort.alpha = 0.5;
+    return fort;
 }
 
 function initGame() {
@@ -145,12 +148,12 @@ function initGame() {
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
             if (world.cells[x][y].type == CELL_TYPE_GRASS) {
-                var r = getRandomInt(0, 5);
+                var r = getRandomInt(0, 7);
                 if (r == 0) {
                     world.addUnit(new Tree(x, y));
-                } else if (r < 3) {
+                } else if (r == 1) {
                     world.addUnit(new Rock(x, y));
-                } else if (r < 4) {
+                } else if (r == 2) {
                     var bush = new Bush(x, y);
                     world.addUnit(bush);
                 }
@@ -233,7 +236,8 @@ function initGame() {
                     human.stopContinuousAction(world);
                 }
 
-                human.startContinuousAction(world,
+                human.startContinuousAction(
+                    world.container,
                     human.treeCuttingTime,
                     continuousActionLoopPeriod,
                     continuousActionCallback);
@@ -329,11 +333,14 @@ function gameLoop(game) {
         }
     });
 
+    // Update Units (bushes, buildings, e.t.c)
     stepTicker.addEventListener(10, function() {
         var units = game.world.units;
         for (var i = 0; i < units.length; ++i) {
             if (units[i].type == UNIT_BUSH) {
                 units[i].growBerries();
+            } else if (units[i].buildTick) {
+                units[i].buildTick(game.world);
             }
         }
     });
@@ -389,9 +396,9 @@ function gameLoop(game) {
         var worldCenter = game.world.getCenter();
         game.map.container.regX = worldCenter.x + camera.x;
         game.map.container.regY = worldCenter.y + camera.y;
-        
+
         if (!tweenController.shouldStop) game.world.shakeTiles();
-        
+
         game.world.unitsContainer.sortChildren(compareUnitViews);
 
         updateSelectedBuildTool(game);
@@ -463,7 +470,7 @@ function tickOtherWorld(game) {
                     }
                 }
             }
-            
+
             stopTweens(function() {
                 MergeIslands(game.map, game.world, newWorld, mergeDir);
             });

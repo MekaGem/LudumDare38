@@ -2,7 +2,8 @@
     "images": [
         "assets/atlas.png",
         "assets/atlas2.png",
-        "assets/inventory.png"
+        "assets/inventory.png",
+        "assets/kamushki.png"
     ],
     "frames": [
         [ 0, 0, 128, 96, 0, 64, 0 ],
@@ -14,7 +15,10 @@
 
         [ 0, 0, 18, 17, 2, 0, 0 ],
         [ 0, 17, 25, 16, 2, 0, 0 ],
-        [ 25, 0, 26, 21, 2, 0, 0 ]
+        [ 25, 0, 26, 21, 2, 0, 0 ],
+
+        [ 0, 0, 128, 90, 3, 64, 0 ],
+        [ 0, 90, 128, 64, 3, 64, 0 ]
     ],
     "animations": {
         "grass": 0,
@@ -23,8 +27,12 @@
         "bush": 3,
         "rock": 4,
         "tree": 5,
+
         "food": 6,
         "stone": 7,
-        "log": 8
+        "log": 8,
+
+        "kamushki_border": 9,
+        "kamushki": 10
     }
 }

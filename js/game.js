@@ -121,6 +121,7 @@ function initGame() {
         "selectedCellShape": new createjs.Container(),
         "inventory": inventory,
         "finished": false,
+        "timePassed": 0,
     };
 
     game.selectedCellShape.alpha = 1;
@@ -330,6 +331,7 @@ function gameLoop(game) {
             stepTicker.advanceTime(event.delta);
         }
         var seconds = event.delta / 1000.;
+        game.timePassed += seconds;
 
         // Move camera.
         if (stage.mouseX < CAMERA_MOVEMENT_BORDER) {

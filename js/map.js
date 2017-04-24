@@ -52,17 +52,21 @@ function Cell(type) {
     this.container.addChild(this.view);
 }
 
+Cell.prototype.updateAlpha = function() {
+    this.container.alpha = Math.min(this.maximumHp, this.hp + this.fortHP) / this.maximumHp;
+}
+
 Cell.prototype.takeDamage = function(damage) {
     if (this.fortHP > 0) {
-        var fortDamage = Math.min(Math.min(FORT_PROTECTION, damage), this.fort);
+        var fortDamage = Math.min(Math.min(FORT_PROTECTION, damage), this.fortHP);
         this.fortHP -= fortDamage;
-        if (this.fort == 0) {
+        if (this.fortHP == 0) {
             this.view.gotoAndPlay("grass");
         }
         damage -= fortDamage;
     }
     this.hp = Math.max(0, this.hp - damage);
-    this.container.alpha = Math.min(this.maximumHp, this.hp + this.fortHP) / this.maximumHp;
+    this.updateAlpha();
 }
 
 Cell.prototype.isAlive = function () {
@@ -71,6 +75,7 @@ Cell.prototype.isAlive = function () {
 
 Cell.prototype.fortify = function(world) {
     this.fortHP = FORT_HP;
+    this.updateAlpha();
     this.view.gotoAndPlay("kamushki_border");
 }
 

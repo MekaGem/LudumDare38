@@ -130,7 +130,7 @@ World.prototype.getCenter = function() {
 }
 
 World.prototype.addUnit = function(unit) {
-    this.units.push(unit) - 1;
+    this.units.push(unit);
     this.unitsContainer.addChild(unit.view);
     updateViewPos(unit);
 }

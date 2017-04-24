@@ -180,14 +180,14 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
                 var shape = cells[x][y].shape;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
                 shape.x = iso.x;
-                shape.y = iso.y;
+                shape.y = iso.y + cells[x][y].offset;
                 tilesContainer.addChild(shape);
             } else if (theirIsland.cellIsValid(x + theirOff.x, y + theirOff.y) && theirIsland.cellIsLand(x + theirOff.x, y + theirOff.y)) {
                 cells[x].push(theirIsland.cells[x + theirOff.x][y + theirOff.y]);
                 var shape = cells[x][y].shape;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
                 shape.x = iso.x;
-                shape.y = iso.y;
+                shape.y = iso.y + cells[x][y].offset;
                 tilesContainer.addChild(shape);
                 willMove.push(shape);
             } else {

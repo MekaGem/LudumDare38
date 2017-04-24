@@ -133,7 +133,7 @@ Human.prototype.updatePath = function(world) {
             .to({
                 x: viewDestinationX,
                 y: viewDestinationY
-            }, 1000)
+            }, 800)
             .call(function() {
                 //console.log("Moved to " + _this.currentDestination);
                 updateViewPos(_this);

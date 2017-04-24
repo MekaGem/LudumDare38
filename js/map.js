@@ -212,7 +212,7 @@ World.prototype.cellIsValid = function(x, y) {
 
 World.prototype.cellIsWater = function(x, y) {
     if (!this.cellIsValid(x, y)) {
-        return false;
+        return true;
     }
     return this.cells[x][y].type == CELL_TYPE_WATER;
 }
@@ -267,9 +267,6 @@ World.prototype.cellIsBorder = function(x, y) {
 }
 
 World.prototype.cellIsWaterNearLand = function (x, y) {
-    if (!this.cellIsValid(x, y)) {
-        return true; //cell outside of the world is still water.
-    }
     if (!this.cellIsWater(x, y)) {
         return false;
     }

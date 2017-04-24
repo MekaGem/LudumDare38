@@ -15,7 +15,7 @@ function generateHelpField(width, height) {
 function findPath(world, startX, startY, destinationX, destinationY) {
     if (startX == destinationX && startY == destinationY) return null;
 
-    helpField = generateHelpField(world.width, world.height);
+    var helpField = generateHelpField(world.width, world.height);
     var answerPath = [];
     var queue = [];
 

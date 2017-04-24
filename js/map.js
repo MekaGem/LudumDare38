@@ -1,6 +1,10 @@
 var CELL_SIZE = 64;
 var START_CELL_HP = 100;
 var DEFAULT_WATER_DAMAGE = 50;
+var CELL_TYPE_WATER = "W";
+var CELL_TYPE_GRASS = "G";
+var FORT_HP = 50;
+var FORT_PROTECTION = 25;
 
 var DIRS = [
     {x: 1, y: 0},  // down right (SE)
@@ -28,29 +32,51 @@ function drawTile(shape) {
 
 function Cell(type) {
     this.type = type;
-    this.shape = new createjs.Shape();
     this.maximumHp = START_CELL_HP;
     this.hp = this.maximumHp;
+    this.fortHP = 0;
     this.vel = 0;
     this.offset = 0;
-    if (type == "W") {
-        this.shape = new createjs.Sprite(assets.resourcesSpriteSheet, "water");
-    } else if (type == "G") {
-        this.shape = new createjs.Sprite(assets.resourcesSpriteSheet, "grass");
+    this.container = new createjs.Container();
+
+    this.view = new createjs.Shape();
+    if (type == CELL_TYPE_WATER) {
+        this.view = new createjs.Sprite(assets.resourcesSpriteSheet, "water");
+    } else if (type == CELL_TYPE_GRASS) {
+        this.view = new createjs.Sprite(assets.resourcesSpriteSheet, "grass");
     } else {
-        var gfx = this.shape.graphics;
+        var gfx = this.view.graphics;
         gfx.beginFill("black");
-        drawTile(this.shape);
+        drawTile(this.view);
     }
+    this.container.addChild(this.view);
+}
+
+Cell.prototype.updateAlpha = function() {
+    this.container.alpha = Math.min(this.maximumHp, this.hp + this.fortHP) / this.maximumHp;
 }
 
 Cell.prototype.takeDamage = function(damage) {
+    if (this.fortHP > 0) {
+        var fortDamage = Math.min(Math.min(FORT_PROTECTION, damage), this.fortHP);
+        this.fortHP -= fortDamage;
+        if (this.fortHP == 0) {
+            this.view.gotoAndPlay("grass");
+        }
+        damage -= fortDamage;
+    }
     this.hp = Math.max(0, this.hp - damage);
-    this.shape.alpha = this.hp / this.maximumHp;
+    this.updateAlpha();
 }
 
 Cell.prototype.isAlive = function () {
     return this.hp > 0;
+}
+
+Cell.prototype.fortify = function(world) {
+    this.fortHP = FORT_HP;
+    this.updateAlpha();
+    this.view.gotoAndPlay("kamushki_border");
 }
 
 function Map(width, height) {
@@ -64,12 +90,12 @@ function Map(width, height) {
     for (var x = 0; x < width; ++x) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
-            this.cells[x].push(new Cell("W"));
-            var shape = this.cells[x][y].shape;
+            this.cells[x].push(new Cell(CELL_TYPE_WATER));
+            var view = this.cells[x][y].container;
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.x = iso.x;
-            shape.y = iso.y;
-            waterContainer.addChild(shape);
+            view.x = iso.x;
+            view.y = iso.y;
+            waterContainer.addChild(view);
         }
     }
     var sx = width * CELL_SIZE;
@@ -103,14 +129,14 @@ function World(width, height, x, y, k) {
         this.cells.push([]);
         for (var y = 0; y < height; ++y) {
             if (level[x][y]) {
-                this.cells[x].push(new Cell("G"));
-                var shape = this.cells[x][y].shape;
+                this.cells[x].push(new Cell(CELL_TYPE_GRASS));
+                var view = this.cells[x][y].container;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-                shape.x = iso.x;
-                shape.y = iso.y;
-                this.tilesContainer.addChild(shape);
+                view.x = iso.x;
+                view.y = iso.y;
+                this.tilesContainer.addChild(view);
             } else {
-                this.cells[x].push(new Cell("W"));
+                this.cells[x].push(new Cell(CELL_TYPE_WATER));
             }
         }
     }
@@ -125,6 +151,13 @@ function World(width, height, x, y, k) {
     this.selectionCallback = null;
 }
 
+World.prototype.addShapeToTilesContainer = function(shape, x, y) {
+    var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
+    shape.x = iso.x;
+    shape.y = iso.y;
+    this.tilesContainer.addChild(shape);
+}
+
 World.prototype.getCenter = function() {
     var x = (this.x + this.width / 2.) * CELL_SIZE;
     var y = (this.y + this.height / 2.) * CELL_SIZE;
@@ -133,13 +166,20 @@ World.prototype.getCenter = function() {
 
 World.prototype.addUnit = function(unit) {
     this.units.push(unit);
-    this.unitsContainer.addChild(unit.view);
-    updateViewPos(unit);
+    this.unitsContainer.addChild(unit.container);
+    updateContainerPos(unit);
 }
 
 World.prototype.removeUnitByIndex = function(index) {
-    //console.log("Removing: " + index);
-    this.unitsContainer.removeChild(this.units[index].view);
+    var unit = this.units[index];
+    if (unit.wasTaken) {
+        var _this = this;
+        createjs.Tween.get(this.units[index].container).to({alpha: 0}, 200).call(function() {
+            _this.unitsContainer.removeChild(unit.container);
+        });
+    } else {
+        this.unitsContainer.removeChild(unit.container);
+    }
     this.units[index].hp = 0;
     this.units.splice(index, 1);
 }
@@ -177,7 +217,6 @@ World.prototype.removeUnit = function(unit) {
 
 World.prototype.damageWithWater = function(x, y) {
     //console.log("Transforming (" + x + ", " + y + ") to water.");
-    var container = this.tilesContainer;
     var oldCell = this.cells[x][y];
     var oldShape = oldCell.shape;
 
@@ -185,11 +224,10 @@ World.prototype.damageWithWater = function(x, y) {
     if (oldCell.isAlive()) {
         return;
     }
-    this.cells[x][y] = new Cell("W");
 
-    var world = this;
-    world.removeUnitsInCell(x, y);
-    container.removeChild(oldShape);
+    this.cells[x][y] = new Cell(CELL_TYPE_WATER);
+    this.removeUnitsInCell(x, y);
+    this.tilesContainer.removeChild(oldShape);
 }
 
 World.prototype.cellIsValid = function(x, y) {
@@ -197,11 +235,17 @@ World.prototype.cellIsValid = function(x, y) {
 }
 
 World.prototype.cellIsWater = function(x, y) {
-    return this.cells[x][y].type == "W";
+    if (!this.cellIsValid(x, y)) {
+        return true;
+    }
+    return this.cells[x][y].type == CELL_TYPE_WATER;
 }
 
 World.prototype.cellIsLand = function(x, y) {
-    return this.cells[x][y].type == "G";
+    if (!this.cellIsValid(x, y)) {
+        return false;
+    }
+    return this.cells[x][y].type == CELL_TYPE_GRASS;
 }
 
 World.prototype.cellIsPassable = function(x, y) {
@@ -233,6 +277,9 @@ World.prototype.getUnitFromCellByType = function(x, y, unitType) {
 }
 
 World.prototype.cellIsBorder = function(x, y) {
+    if (!this.cellIsValid(x, y)) {
+        return false;
+    }
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
         var ny = y + DIRS[d].y;
@@ -243,7 +290,24 @@ World.prototype.cellIsBorder = function(x, y) {
     return false;
 }
 
+World.prototype.cellIsWaterNearLand = function (x, y) {
+    if (!this.cellIsWater(x, y)) {
+        return false;
+    }
+    for (var d = 0; d < 4; ++d) {
+        var nx = x + DIRS[d].x;
+        var ny = y + DIRS[d].y;
+        if (this.cellIsLand(nx, ny)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 World.prototype.cellIsCutVertex = function(x, y) {
+    if (!this.cellIsValid(x, y)) {
+        return false;
+    }
     var neighbor;
     for (var d = 0; d < 4; ++d) {
         var nx = x + DIRS[d].x;
@@ -286,7 +350,7 @@ World.prototype.cellIsCutVertex = function(x, y) {
 }
 
 World.prototype.cellIsSelectable = function(x, y) {
-    return this.cellIsValid(x, y);
+    return this.cellIsWaterNearLand(x, y) || this.cellIsLand(x, y);
 }
 
 var MAX_TILE_OFFSET = 3;
@@ -298,23 +362,23 @@ World.prototype.shakeTiles = function() {
             if (!this.cellIsLand(x, y)) continue;
 
             var cell = this.cells[x][y];
-            var shape = cell.shape;
+            var view = cell.container;
             cell.vel += (Math.random() * 2 - 1) * TILE_VEL_D;
             cell.vel = clamp(cell.vel, -MAX_TILE_VEL, MAX_TILE_VEL);
             cell.offset += cell.vel;
             cell.offset = clamp(cell.offset, -MAX_TILE_OFFSET, MAX_TILE_OFFSET);
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-            shape.y = iso.y + cell.offset;
+            view.y = iso.y + cell.offset;
         }
     }
-    
+
     for (var i = 0; i < this.units.length; i++) {
         var unit = this.units[i];
         if (!this.cellIsValid(unit.x, unit.y)) continue;
         if (!unitIsStatic(unit.type)) continue;
-        
+
         var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
-        unit.view.y = iso.y + this.cells[unit.x][unit.y].offset;
+        unit.container.y = iso.y + this.cells[unit.x][unit.y].offset;
     }
 }
 
@@ -344,13 +408,6 @@ function updateContainerPos(object) {
     var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
     object.container.x = iso.x;
     object.container.y = iso.y;
-}
-
-// Object with view
-function updateViewPos(object) {
-    var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
-    object.view.x = iso.x;
-    object.view.y = iso.y;
 }
 
 function getBorderCells(world) {

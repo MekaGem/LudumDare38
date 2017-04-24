@@ -13,7 +13,7 @@ function GetBBox(island) {
             }
         }
     }
-    
+
     return {l: l, r: r, t: t, b: b};
 }
 
@@ -54,9 +54,9 @@ function GetSharedCellsHorizontal(top, bottom, tbb, bbb, offset) {
 function ClashIslands(myIsland, theirIsland, clashDir) {
     var myBBox = GetBBox(myIsland);
     var theirBBox = GetBBox(theirIsland);
-    
+
     var best = {shared: 0};
-    
+
     switch (clashDir) {
     case 0: // right
         var mid = (myBBox.t + myBBox.b - (theirBBox.b + theirBBox.t)) / 2;
@@ -95,7 +95,7 @@ function ClashIslands(myIsland, theirIsland, clashDir) {
         }
         break;
     }
-    
+
     switch (clashDir) {
     case 0: // right
         return {x: myBBox.r - theirBBox.l + 1 - best.xoff, y: best.yoff};
@@ -114,10 +114,10 @@ function ClashIslands(myIsland, theirIsland, clashDir) {
 
 function MergeIslands(map, myIsland, theirIsland, clashDir) {
     var theirOff = ClashIslands(myIsland, theirIsland, clashDir);
-    
+
     var myBBox = GetBBox(myIsland);
     var theirBBox = GetBBox(theirIsland);
-    
+
     var myOff = {};
     var width;
     var height;
@@ -126,7 +126,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         myOff.x = myBBox.l;
         width = (theirOff.x + theirBBox.r) - myBBox.l + 1;
         theirOff.x = myOff.x - theirOff.x;
-        
+
         var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
         var bot = Math.max(myBBox.b, theirBBox.b + theirOff.y);
         myOff.y = top;
@@ -137,7 +137,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         myOff.y = myBBox.t;
         height = (theirOff.y + theirBBox.b) - myBBox.t + 1;
         theirOff.y = myOff.y - theirOff.y;
-        
+
         var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
         var right = Math.max(myBBox.r, theirBBox.r + theirOff.x);
         myOff.x = left;
@@ -148,7 +148,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         myOff.x = theirOff.x + theirBBox.l;
         width = (myBBox.r - theirOff.x) - theirBBox.l + 1;
         theirOff.x = theirBBox.l;
-        
+
         var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
         var bot = Math.max(myBBox.b, theirBBox.b + theirOff.y);
         myOff.y = top;
@@ -159,7 +159,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         myOff.y = theirOff.y + theirBBox.t;
         height = (myBBox.b - theirOff.y) - theirBBox.t + 1;
         theirOff.y = theirBBox.t;
-        
+
         var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
         var right = Math.max(myBBox.r, theirBBox.r + theirOff.x);
         myOff.x = left;
@@ -167,7 +167,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.x = left - theirOff.x;
         break;
     }
-    
+
     { // water around the island
         myOff.x -= 1;
         myOff.y -= 1;
@@ -176,31 +176,31 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         width += 2;
         height += 2;
     }
-    
+
     var cells = [];
     var tilesContainer = new createjs.Container();
     var willMove = [];
-    
+
     for (var x = 0; x < width; ++x) {
         cells.push([]);
         for (var y = 0; y < height; ++y) {
             if (myIsland.cellIsValid(x + myOff.x, y + myOff.y) && myIsland.cellIsLand(x + myOff.x, y + myOff.y)) {
                 cells[x].push(myIsland.cells[x + myOff.x][y + myOff.y]);
-                var shape = cells[x][y].shape;
+                var container = cells[x][y].container;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-                shape.x = iso.x;
-                shape.y = iso.y + cells[x][y].offset;
-                tilesContainer.addChild(shape);
+                container.x = iso.x;
+                container.y = iso.y + cells[x][y].offset;
+                tilesContainer.addChild(container);
             } else if (theirIsland.cellIsValid(x + theirOff.x, y + theirOff.y) && theirIsland.cellIsLand(x + theirOff.x, y + theirOff.y)) {
                 cells[x].push(theirIsland.cells[x + theirOff.x][y + theirOff.y]);
-                var shape = cells[x][y].shape;
+                var container = cells[x][y].container;
                 var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-                shape.x = iso.x;
-                shape.y = iso.y + cells[x][y].offset;
-                tilesContainer.addChild(shape);
-                willMove.push(shape);
+                container.x = iso.x;
+                container.y = iso.y + cells[x][y].offset;
+                tilesContainer.addChild(container);
+                willMove.push(container);
             } else {
-                cells[x].push(new Cell("W"));
+                cells[x].push(new Cell(CELL_TYPE_WATER));
             }
         }
     }
@@ -210,19 +210,19 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     myIsland.cells = cells;
     myIsland.width = width;
     myIsland.height = height;
-    
+
     myIsland.x = Math.round((map.width - width) / 2);
     myIsland.y = Math.round((map.height - height) / 2);
     updateContainerPos(myIsland);
-    
+
     var human;
     for (var i = 0; i < myIsland.units.length; ++i) {
         var unit = myIsland.units[i];
         unit.x -= myOff.x;
         unit.y -= myOff.y;
-        updateViewPos(unit);
+        updateContainerPos(unit);
         if (myIsland.cellIsValid(unit.x, unit.y)) {
-            unit.view.y += myIsland.cells[unit.x][unit.y].offset;
+            unit.container.y += myIsland.cells[unit.x][unit.y].offset;
         }
         if (unit.type == UNIT_HUMAN) {
             human = unit;
@@ -239,27 +239,27 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         unit.y -= theirOff.y;
         myIsland.addUnit(unit);
         if (myIsland.cellIsValid(unit.x, unit.y)) {
-            unit.view.y += myIsland.cells[unit.x][unit.y].offset;
+            unit.container.y += myIsland.cells[unit.x][unit.y].offset;
         }
-        willMove.push(unit.view);
+        willMove.push(unit.container);
         if (unit.type == UNIT_GOLEM) {
             newGolems.push(unit);
         }
     }
-    
+
     var visualOffset = cartesianToIsometric(DIRS[clashDir].x * 10 * CELL_SIZE, DIRS[clashDir].y * 10 * CELL_SIZE);
     var clashDuration = 1000;
     for (var i = 0; i < willMove.length; ++i) {
         willMove[i].x += visualOffset.x;
         willMove[i].y += visualOffset.y;
-        
+
         createjs.Tween.get(willMove[i])
             .to({
                 x: willMove[i].x - visualOffset.x,
                 y: willMove[i].y - visualOffset.y
             }, clashDuration);
     }
-    
+
     createjs.Tween.get(null).wait(clashDuration + 100).call(function() {
         resumeTweens();
         if (human) {

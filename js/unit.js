@@ -2,13 +2,16 @@ var TREE_MAX_HP = 200;
 var GOLEM_MAX_HP = 100;
 var HUMAN_MAX_HP = 100;
 var TREE_CUTTING_TIME = 3000; // 3 seconds.
+var FISHING_TIME = 6000; // 6 seconds.
 var HUMAN_GOLEM_DAMATE = 20;
 
 function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
+    this.container = new createjs.Container();
+    this.container.addChild(view);
+    this.container.unit = this;
     this.view = view;
-    this.view.unit = this;
     this.type = type;
 }
 
@@ -51,9 +54,7 @@ function unitIsStatic(unitType) {
            unitType == UNIT_FORT;
 }
 
-function compareUnitViews(a, b) {
-    if (a.unit.type == UNIT_FORT && b.unit.type != UNIT_FORT) return -1;
-    if (a.unit.type != UNIT_FORT && b.unit.type == UNIT_FORT) return 1;
+function compareUnitContainers(a, b) {
     if (a.y != b.y) return a.y - b.y;
     if (a.unit.type != b.unit.type) {
         if (a.unit.type == UNIT_BUSH) return 1;
@@ -118,6 +119,7 @@ function Human(x, y) {
     this.finalDestination = null;
     this.treeCuttingTime = TREE_CUTTING_TIME; // 3 seconds.
     this.golemDamage = HUMAN_GOLEM_DAMATE;
+    this.fishingTime = FISHING_TIME;
     this.stepOnCellCallback = null;
     this.progressBar = null;
 }
@@ -134,8 +136,8 @@ Human.prototype.updatePath = function(world) {
         );
 
         var _this = this;
-        var viewDestinationX = this.view.x + iso.x;
-        var viewDestinationY = this.view.y + iso.y;
+        var viewDestinationX = this.container.x + iso.x;
+        var viewDestinationY = this.container.y + iso.y;
 
         var dir = getDirection(this, this.currentDestination);
         if (dir >= 0 && this.dir != dir) {
@@ -147,14 +149,14 @@ Human.prototype.updatePath = function(world) {
         this.y = this.currentDestination.y;
 
         tweenAdded();
-        createjs.Tween.get(this.view)
+        createjs.Tween.get(this.container)
             .to({
                 x: viewDestinationX,
                 y: viewDestinationY
             }, 800)
             .call(function() {
                 //console.log("Moved to " + _this.currentDestination);
-                updateViewPos(_this);
+                updateContainerPos(_this);
                 _this.currentDestination = null;
                 _this.stepOnCellCallback();
                 tweenRemoved(function() {
@@ -188,26 +190,24 @@ Human.prototype.dealDamage = function(world, unit) {
     return false;
 }
 
-Human.prototype.startContinuousAction = function (world, actionTime, callbackLoopPeriod, callback) {
-    this.stopContinuousAction(world);
+Human.prototype.startContinuousAction = function(container, actionTime, callbackLoopPeriod, callback) {
+    this.stopContinuousAction(container);
 
-    this.progressBar = new ProgressBar(this.x, this.y);
-    this.progressBar.turnOn(world, this, actionTime);
+    this.progressBar = new ProgressBar();
+    this.progressBar.turnOn(this.container, this.waitingCallback, actionTime);
 
     callback();
-    this.continuousActionTween = createjs.Tween.get(this.view,{loop:true})
+    this.continuousActionTween = createjs.Tween.get(this.container,{loop:true})
         .wait(callbackLoopPeriod)
-        .call(function() {
-            callback();
-        });
+        .call(callback);
 }
 
-Human.prototype.stopContinuousAction = function (world) {
+Human.prototype.stopContinuousAction = function() {
     if (this.continuousActionTween) {
         this.continuousActionTween.setPaused(true);
     }
     if (this.progressBar) {
-        this.progressBar.turnOff(world);
+        this.progressBar.turnOff();
     }
 }
 
@@ -233,20 +233,20 @@ Golem.prototype.engageHuman = function(world, human) {
 
         this.gotoDirAnim("walk");
         var dPos = cartesianToIsometric(DIRS[this.dir].x * CELL_SIZE, DIRS[this.dir].y * CELL_SIZE);
-        var newPos = {x: this.view.x + dPos.x, y: this.view.y + dPos.y};
+        var newPos = {x: this.container.x + dPos.x, y: this.container.y + dPos.y};
         this.x = dest.x;
         this.y = dest.y;
 
         var golem = this;
 
         tweenAdded();
-        createjs.Tween.get(this.view)
+        createjs.Tween.get(this.container)
             .to({
                 x: newPos.x,
                 y: newPos.y
             }, 1000)
             .call(function() {
-                updateViewPos(golem);
+                updateContainerPos(golem);
                 tweenRemoved(function() {
                     golem.engageHuman(world, human);
                 }, function() {
@@ -265,7 +265,7 @@ Golem.prototype.engageHuman = function(world, human) {
 
         var golem = this;
         tweenAdded();
-        createjs.Tween.get(this.view).wait(500).call(function() {
+        createjs.Tween.get(this.container).wait(500).call(function() {
             tweenRemoved(function() {
                 golem.engageHuman(world, human);
             }, function() {
@@ -275,32 +275,30 @@ Golem.prototype.engageHuman = function(world, human) {
     }
 }
 
-ProgressBar.prototype = Object.create(Unit.prototype);
-function ProgressBar(x, y) {
+function ProgressBar() {
     this.currentTween = null;
-    var view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
-    view.alpha = 0.0;
-    Unit.call(this, x, y, view, UNIT_PROGRESS_BAR);
+    this.view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
 }
 
-ProgressBar.prototype.turnOn = function(world, unit, waitingTime) {
+ProgressBar.prototype.turnOn = function(container, onCompleteCallback, waitingTime) {
+    this.view.alpha = 0.1;
+    container.addChild(this.view);
+
     var _this = this;
     this.currentTween = createjs.Tween.get(this.view)
         .to({
             alpha: 1.0
         }, waitingTime)
-        .call(function() {
-            unit.waitingCallback();
-            world.removeUnit(_this);
-        });
-    world.addUnit(this);
+        .call(onCompleteCallback);
+
+    this._container = container;
 }
 
-ProgressBar.prototype.turnOff = function (world) {
+ProgressBar.prototype.turnOff = function() {
     if (this.currentTween) {
         console.log("Ended previous continuous action.");
         this.currentTween.setPaused(true);
-        world.removeUnit(this);
     }
+    this._container.removeChild(this.view);
     this.currentTween = null;
 }

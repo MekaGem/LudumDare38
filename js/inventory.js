@@ -3,7 +3,7 @@ var INVENTORY_BAR_Y = 20;
 var INVENTORY_SPACING = 20;
 
 var ITEM_STONES = {name: "stones", index: 0};
-var ITEM_BERRIES = {name: "berries", index: 1};
+var ITEM_FOOD = {name: "food", index: 1};
 var ITEM_WOOD = {name: "wood", index: 2};
 var ITEM_TYPES = 3;
 
@@ -19,7 +19,7 @@ function Inventory() {
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.resourcesSpriteSheet, "berries"),
+            view: new createjs.Sprite(assets.resourcesSpriteSheet, "food"),
         },
         {
             amount: 0,

@@ -3,7 +3,7 @@ var INVENTORY_BAR_Y = 20;
 var INVENTORY_SPACING = 20;
 
 var ITEM_STONES = {name: "stones", index: 0};
-var ITEM_FOOD = {name: "berries", index: 1};
+var ITEM_FOOD = {name: "food", index: 1};
 var ITEM_WOOD = {name: "wood", index: 2};
 var ITEM_TYPES = 3;
 

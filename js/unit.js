@@ -4,6 +4,7 @@ function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
     this.view = view;
+    this.view.unit = this;
     this.type = type;
 }
 
@@ -29,16 +30,11 @@ var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 
-function compareUnits(a, b) {
-    if (a.type != b.type) {
-        if (a.type == UNIT_GOLEM) return 1;
-        if (b.type == UNIT_GOLEM) return -1;
-        if (a.type == UNIT_HUMAN) return 1;
-        if (b.type == UNIT_HUMAN) return -1;
-    }
-    
-    if (a.x == b.x) return a.y - b.y;
-    return a.x - b.x;
+function compareUnitViews(a, b) {
+    if (a.y != b.y) return a.y - b.y;
+    if (a.unit.type == UNIT_BUSH) return 1;
+    if (b.unit.type == UNIT_BUSH) return -1;
+    return 0;
 }
 
 Tree.prototype = Object.create(Unit.prototype);

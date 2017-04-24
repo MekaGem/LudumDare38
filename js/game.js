@@ -324,6 +324,8 @@ function gameLoop(game) {
         var worldCenter = game.world.getCenter();
         game.map.container.regX = worldCenter.x + camera.x;
         game.map.container.regY = worldCenter.y + camera.y;
+        
+        game.world.unitsContainer.sortChildren(compareUnitViews);
 
         updateSelectedCell(game);
 

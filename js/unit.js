@@ -52,8 +52,12 @@ function compareUnitViews(a, b) {
     if (a.unit.type == UNIT_FORT && b.unit.type != UNIT_FORT) return -1;
     if (a.unit.type != UNIT_FORT && b.unit.type == UNIT_FORT) return 1;
     if (a.y != b.y) return a.y - b.y;
-    if (a.unit.type == UNIT_BUSH) return 1;
-    if (b.unit.type == UNIT_BUSH) return -1;
+    if (a.unit.type != b.unit.type) {
+        if (a.unit.type == UNIT_BUSH) return 1;
+        if (b.unit.type == UNIT_BUSH) return -1;
+        if (a.unit.type == UNIT_GOLEM) return 1;
+        if (b.unit.type == UNIT_GOLEM) return -1;
+    }
     return 0;
 }
 

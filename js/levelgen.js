@@ -5,6 +5,7 @@ function GenerateIsland(w, h, k) {
         island[x] = [];
         for (var y = 0; y < h; y++) {
             island[x][y] = true;
+            if (x == 0 || y == 0 || x == w - 1 || y == h - 1) island[x][y] = false;
         }
     }
     

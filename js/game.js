@@ -63,7 +63,7 @@ function initSound() {
 
     function loadHandler(event) {
         sound = createjs.Sound.play("sound", {loop: -1});
-        sound.volume = 0.5;
+        sound.volume = 0.01;
     }
     createjs.Sound.on("fileload", loadHandler, this);
 
@@ -246,39 +246,6 @@ function initGame() {
 
     return game;
 }
-
-function StepTicker(period) {
-    this.stepPeriod = period;
-    this.timePassed = 0;
-    this.listeners = [];
-}
-
-StepTicker.prototype.addEventListener = function(period, callback) {
-    this.listeners.push({
-        currentTick: 0,
-        period: period,
-        callback: callback
-    });
-};
-
-StepTicker.prototype.tick = function() {
-    for (var i = 0; i < this.listeners.length; ++i) {
-        var l = this.listeners[i];
-        ++l.currentTick;
-        while (l.currentTick >= l.period) {
-            l.callback();
-            l.currentTick -= l.period;
-        }
-    }
-};
-
-StepTicker.prototype.advanceTime = function(delta) {
-    this.timePassed += delta;
-    while (this.timePassed > this.stepPeriod) {
-        this.tick();
-        this.timePassed -= this.stepPeriod;
-    }
-};
 
 function updateSelectedCell(game) {
     var local = game.world.container.globalToLocal(stage.mouseX, stage.mouseY);

@@ -145,8 +145,8 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.x = left - theirOff.x;
         break;
     case 2: // left
-        myOff.x = myBBox.l + theirOff.x;
-        width = (-theirOff.x + myBBox.r) - theirBBox.l + 1;
+        myOff.x = theirOff.x + theirBBox.l;
+        width = (myBBox.r - theirOff.x) - theirBBox.l + 1;
         theirOff.x = theirBBox.l;
         
         var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
@@ -156,8 +156,8 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.y = top - theirOff.y;
         break;
     case 3: // up
-        myOff.y = myBBox.t + theirOff.y;
-        height = (-theirOff.y + myBBox.b) - theirBBox.t + 1;
+        myOff.y = theirOff.y + theirBBox.t;
+        height = (myBBox.b - theirOff.y) - theirBBox.t + 1;
         theirOff.y = theirBBox.t;
         
         var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
@@ -166,6 +166,15 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         width = right - left + 1;
         theirOff.x = left - theirOff.x;
         break;
+    }
+    
+    { // water around the island
+        myOff.x -= 1;
+        myOff.y -= 1;
+        theirOff.x -= 1;
+        theirOff.y -= 1;
+        width += 2;
+        height += 2;
     }
     
     var cells = [];

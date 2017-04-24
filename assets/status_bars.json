@@ -1,9 +1,11 @@
 {
   "images": [
-    "assets/waiting.png"
+    "assets/progress_bar.png",
+    "assets/progress_bar_fill.png"
   ],
   "frames":[
-    [ 0, 0, 28, 19, 0, 10, 30]
+    [0, 0, 47, 14, 0, 23, 7],
+    [0, 14, 47, 14, 1, 23, 7]
   ],
   "animations": {
     "wait": 0

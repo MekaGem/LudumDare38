@@ -41,7 +41,16 @@ var UNIT_GOLEM = "GOLEM";
 var UNIT_PROGRESS_BAR = "PROGRESS_BAR";
 var UNIT_FORT = "FORT";
 
+function unitIsStatic(unitType) {
+    return unitType == UNIT_TREE ||
+           unitType == UNIT_ROCK ||
+           unitType == UNIT_BUSH ||
+           unitType == UNIT_FORT;
+}
+
 function compareUnitViews(a, b) {
+    if (a.unit.type == UNIT_FORT && b.unit.type != UNIT_FORT) return -1;
+    if (a.unit.type != UNIT_FORT && b.unit.type == UNIT_FORT) return 1;
     if (a.y != b.y) return a.y - b.y;
     if (a.unit.type == UNIT_BUSH) return 1;
     if (b.unit.type == UNIT_BUSH) return -1;

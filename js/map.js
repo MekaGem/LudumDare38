@@ -116,13 +116,13 @@ function World(width, height, x, y, k) {
     }
     this.container.addChild(this.tilesContainer);
 
+    this.unitsContainer = new createjs.Container();
+    this.container.addChild(this.unitsContainer);
+
     this.selectionContainer = new createjs.Container();
     this.container.addChild(this.selectionContainer);
 
     this.selectionCallback = null;
-
-    this.unitsContainer = new createjs.Container();
-    this.container.addChild(this.unitsContainer);
 }
 
 World.prototype.getCenter = function() {
@@ -305,6 +305,15 @@ World.prototype.shakeTiles = function() {
             var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
             shape.y = iso.y + cell.offset;
         }
+    }
+    
+    for (var i = 0; i < this.units.length; i++) {
+        var unit = this.units[i];
+        if (!this.cellIsValid(unit.x, unit.y)) continue;
+        if (!unitIsStatic(unit.type)) continue;
+        
+        var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
+        unit.view.y = iso.y + this.cells[unit.x][unit.y].offset;
     }
 }
 

@@ -212,6 +212,9 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         unit.x -= myOff.x;
         unit.y -= myOff.y;
         updateViewPos(unit);
+        if (myIsland.cellIsValid(unit.x, unit.y)) {
+            unit.view.y += myIsland.cells[unit.x][unit.y].offset;
+        }
         if (unit.type == UNIT_HUMAN) {
             human = unit;
             if (unit.finalDestination) {
@@ -226,6 +229,9 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         unit.x -= theirOff.x;
         unit.y -= theirOff.y;
         myIsland.addUnit(unit);
+        if (myIsland.cellIsValid(unit.x, unit.y)) {
+            unit.view.y += myIsland.cells[unit.x][unit.y].offset;
+        }
         willMove.push(unit.view);
         if (unit.type == UNIT_GOLEM) {
             newGolems.push(unit);

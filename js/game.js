@@ -82,6 +82,7 @@ function getSelectedCellTile() {
 
 function getFortTile() {
     var fort = new Fort(0, 0);
+    fort.view.alpha = 0.5;
     return fort.view;
 }
 

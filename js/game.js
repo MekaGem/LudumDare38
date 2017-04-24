@@ -128,7 +128,7 @@ function initGame() {
 
     // TODO: reassign from the world to the new one when it changes
     game.world.selectionContainer.addChild(game.selectedCellShape);
-    game.world.container.on("mousedown", function() {
+    stage.on("stagemousedown", function() {
         if (game.world.selectionCallback && game.selectedCellPosition) {
             game.world.selectionCallback(game.selectedCellPosition);
         }
@@ -326,7 +326,7 @@ function gameLoop(game) {
     });
 
     function tick(event) {
-        if (!game.finished) {
+        if (!game.finished && !tweenController.shouldStop) {
             stepTicker.advanceTime(event.delta);
         }
         var seconds = event.delta / 1000.;

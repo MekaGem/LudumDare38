@@ -10,6 +10,13 @@ var FOOD_HEALING_VALUE = 25;
 function Inventory() {
     this.container = new createjs.Container();
 
+    var foodSprite = new createjs.Container();
+    var berrySprite = new createjs.Sprite(assets.resourcesSpriteSheet, "berry");
+    var fishSprite = new createjs.Sprite(assets.resourcesSpriteSheet, "fish");
+    foodSprite.addChild(berrySprite);
+    fishSprite.x += berrySprite.getBounds().width + 6;
+    foodSprite.addChild(fishSprite);
+
     this.items = [
         {
             amount: 0,
@@ -19,7 +26,7 @@ function Inventory() {
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.resourcesSpriteSheet, "food"),
+            view: foodSprite,
         },
         {
             amount: 0,

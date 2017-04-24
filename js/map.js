@@ -32,11 +32,11 @@ function Cell(type) {
     this.maximumHp = START_CELL_HP;
     this.hp = this.maximumHp;
     if (type == "W") {
-        this.shape = new createjs.Sprite(assets.spriteSheet, "water");
+        this.shape = new createjs.Sprite(assets.resourcesSpriteSheet, "water");
     } else if (type == "G") {
-        this.shape = new createjs.Sprite(assets.spriteSheet, "grass");
+        this.shape = new createjs.Sprite(assets.resourcesSpriteSheet, "grass");
     } else {
-        gfx = this.shape.graphics;
+        var gfx = this.shape.graphics;
         gfx.beginFill("black");
         drawTile(this.shape);
     }
@@ -153,6 +153,18 @@ World.prototype.removeUnit = function(unit) {
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length;) {
         if (this.units[i].x == x && this.units[i].y == y) {
+            this.removeUnitByIndex(i);
+        } else {
+            ++i;
+        }
+    }
+}
+
+World.prototype.removeUnit = function(unit) {
+    for (var i = 0; i < this.units.length;) {
+        if (this.units[i].x == unit.x &&
+            this.units[i].y == unit.y &&
+            this.units[i].type == unit.type) {
             this.removeUnitByIndex(i);
         } else {
             ++i;

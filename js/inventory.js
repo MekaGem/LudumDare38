@@ -14,17 +14,17 @@ function Inventory() {
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "stone"),
+            view: new createjs.Sprite(assets.resourcesSpriteSheet, "stone"),
         },
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "berries"),
+            view: new createjs.Sprite(assets.resourcesSpriteSheet, "berries"),
         },
         {
             amount: 0,
             text: new createjs.Text("", "20px Arial", "#ff7700"),
-            view: new createjs.Sprite(assets.spriteSheet, "log"),
+            view: new createjs.Sprite(assets.resourcesSpriteSheet, "log"),
         },
     ];
     this.updateText();

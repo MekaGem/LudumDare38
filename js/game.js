@@ -38,9 +38,10 @@ function loadResources(callback) {
     var queue = new createjs.LoadQueue(true);
     var handleComplete = function() {
         assets = {
-            spriteSheet: queue.getResult("resources"),
+            resourcesSpriteSheet: queue.getResult("resources"),
             humanSpriteSheet: queue.getResult("human"),
-            golemSpriteSheet: queue.getResult("golem")
+            golemSpriteSheet: queue.getResult("golem"),
+            statusBarsSpriteSheet: queue.getResult("status_bars")
         }
         callback();
     };
@@ -48,6 +49,7 @@ function loadResources(callback) {
     queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/status_bars.json", id: "status_bars", type: createjs.AbstractLoader.SPRITESHEET});
 }
 
 function play() {
@@ -171,6 +173,7 @@ function initGame() {
 
     world.selectionCallback = function(cell) {
         console.log("Clicked on cell: " + cell.x + "," + cell.y);
+        human.stopContinuousAction(world);
         if (world.cellContainsUnit(cell.x, cell.y, UNIT_GOLEM)) {
             var dir = getDirection(human, cell);
             if (dir >= 0) {
@@ -189,16 +192,27 @@ function initGame() {
                 }
             }
         } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_TREE)) {
+            console.log("cutting tree at [" + cell.x + ", " +  cell.y + "]");
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
                 human.dir = dir;
-                human.gotoDirAnim("attack", true);
-                human.dealDamage(this, tree);
-                if (!tree.isAlive()) {
+
+                var continuousActionLoopPeriod = 400;
+                var continuousActionCallback = function() {
+                    human.gotoDirAnim("attack", true);
+                }
+
+                human.waitingCallback = function() {
                     inventory.addItem(ITEM_WOOD, 1);
                     world.removeUnitsInCell(tree.x, tree.y);
+                    human.stopContinuousAction(world);
                 }
+
+                human.startContinuousAction(world,
+                    human.treeCuttingTime,
+                    continuousActionLoopPeriod,
+                    continuousActionCallback);
             }
         } else if (!tweenController.shouldStop) {
             human.setFinalDestinationCell(world, cell);
@@ -265,7 +279,7 @@ function gameLoop(game) {
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", tick);
 
-    stepTicker = new StepTicker(100);
+    var stepTicker = new StepTicker(100);
 
     var sinkRandomCell = function() {
         var borderCell = pickRandomBorderCell(game.world);

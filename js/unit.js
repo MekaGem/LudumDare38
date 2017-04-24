@@ -1,5 +1,6 @@
 TREE_MAX_HP = 200;
 GOLEM_MAX_HP = 100;
+
 function Unit(x, y, view, type) {
     this.x = x;
     this.y = y;
@@ -8,7 +9,15 @@ function Unit(x, y, view, type) {
     this.type = type;
 }
 
-Unit.prototype.gotoDirAnim = function(anim, refresh = false) {
+function withDefaultValue(v, default_) {
+    if (typeof v === 'undefined') {
+        v = default_;
+    }
+    return v;
+}
+
+Unit.prototype.gotoDirAnim = function(anim, refresh) {
+    refresh = withDefaultValue(refresh, false);
     var newAnim = anim + "_" + DIR_SUFFIX[this.dir];
     if (refresh || this.view.currentAnimation != newAnim) {
         this.view.gotoAndPlay(newAnim);
@@ -29,6 +38,7 @@ var UNIT_ROCK = "ROCK";
 var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
+var UNIT_WAITING_BAR = "WAITING_BAR";
 
 function compareUnitViews(a, b) {
     if (a.y != b.y) return a.y - b.y;
@@ -40,19 +50,19 @@ function compareUnitViews(a, b) {
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
     this.hp = TREE_MAX_HP;
-    var view = new createjs.Sprite(assets.spriteSheet, "tree");
+    var view = new createjs.Sprite(assets.resourcesSpriteSheet, "tree");
     Unit.call(this, x, y, view, UNIT_TREE);
 }
 
 Rock.prototype = Object.create(Unit.prototype);
 function Rock(x, y) {
-    var view = new createjs.Sprite(assets.spriteSheet, "rock");
+    var view = new createjs.Sprite(assets.resourcesSpriteSheet, "rock");
     Unit.call(this, x, y, view, UNIT_ROCK);
 }
 
 Bush.prototype = Object.create(Unit.prototype);
 function Bush(x, y) {
-    var view = new createjs.Sprite(assets.spriteSheet, "bush");
+    var view = new createjs.Sprite(assets.resourcesSpriteSheet, "bush");
     Unit.call(this, x, y, view, UNIT_BUSH);
     this.berriesMaxGrowth = this.generateGrowthTime();
     this.berriesGrown = getRandomInt(0, this.berriesMaxGrowth);
@@ -88,9 +98,10 @@ function Human(x, y) {
     this.dir = 0;
     this.currentDestination = null;
     this.finalDestination = null;
-    this.treeDamage = 50;
+    this.treeCuttingTime = 3000; // 3 seconds.
     this.golemDamage = 20;
     this.stepOnCellCallback = null;
+    this.waitingBar = null;
 }
 
 Human.prototype.updatePath = function(world) {
@@ -159,6 +170,29 @@ Human.prototype.dealDamage = function(world, unit) {
     return false;
 }
 
+Human.prototype.startContinuousAction = function (world, actionTime, callbackLoopPeriod, callback) {
+    this.stopContinuousAction(world);
+
+    this.waitingBar = new WaitingBar(this.x, this.y);
+    this.waitingBar.turnOn(world, this, actionTime);
+
+    callback();
+    this.continuousActionTween = createjs.Tween.get(this.view,{loop:true})
+        .wait(callbackLoopPeriod)
+        .call(function() {
+            callback();
+        });
+}
+
+Human.prototype.stopContinuousAction = function (world) {
+    if (this.continuousActionTween) {
+        this.continuousActionTween.setPaused(true);
+    }
+    if (this.waitingBar) {
+        this.waitingBar.turnOff(world);
+    }
+}
+
 Golem.prototype = Object.create(Unit.prototype);
 function Golem(x, y) {
     var view = new createjs.Sprite(assets.golemSpriteSheet, "idle_se");
@@ -221,4 +255,34 @@ Golem.prototype.engageHuman = function(world, human) {
             });
         });
     }
+}
+
+WaitingBar.prototype = Object.create(Unit.prototype);
+function WaitingBar(x, y) {
+    this.currentTween = null;
+    var view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
+    view.alpha = 0.0;
+    Unit.call(this, x, y, view, UNIT_WAITING_BAR);
+}
+
+WaitingBar.prototype.turnOn = function(world, unit, waitingTime) {
+    var _this = this;
+    this.currentTween = createjs.Tween.get(this.view)
+        .to({
+            alpha: 1.0
+        }, waitingTime)
+        .call(function() {
+            unit.waitingCallback();
+            world.removeUnit(_this);
+        });
+    world.addUnit(this);
+}
+
+WaitingBar.prototype.turnOff = function (world) {
+    if (this.currentTween) {
+        console.log("Ended previous continuous action.");
+        this.currentTween.setPaused(true);
+        world.removeUnit(this);
+    }
+    this.currentTween = null;
 }

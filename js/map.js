@@ -171,8 +171,15 @@ World.prototype.addUnit = function(unit) {
 }
 
 World.prototype.removeUnitByIndex = function(index) {
-    //console.log("Removing: " + index);
-    this.unitsContainer.removeChild(this.units[index].container);
+    var unit = this.units[index];
+    if (unit.wasTaken) {
+        var _this = this;
+        createjs.Tween.get(this.units[index].container).to({alpha: 0}, 200).call(function() {
+            _this.unitsContainer.removeChild(unit.container);
+        });
+    } else {
+        this.unitsContainer.removeChild(unit.container);
+    }
     this.units[index].hp = 0;
     this.units.splice(index, 1);
 }

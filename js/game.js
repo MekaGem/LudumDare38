@@ -174,6 +174,7 @@ function initGame() {
             if (world.units[i].x == this.x && world.units[i].y == this.y) {
                 if (world.units[i].type == UNIT_ROCK) {
                     inventory.addItem(ITEM_STONES, 1);
+                    world.units[i].wasTaken = true;
                     world.removeUnitByIndex(i);
                 } else if (world.units[i].type == UNIT_BUSH && world.units[i].hasBerries()) {
                     inventory.addItem(ITEM_FOOD, 1);
@@ -232,6 +233,7 @@ function initGame() {
 
                 human.waitingCallback = function() {
                     inventory.addItem(ITEM_WOOD, 1);
+                    tree.wasTaken = true;
                     world.removeUnitsInCell(tree.x, tree.y);
                     human.stopContinuousAction(world);
                 }

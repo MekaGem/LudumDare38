@@ -95,6 +95,7 @@ function initGame() {
 
     soundContainer.on("mousedown", function() {
         this.muted = !this.muted;
+        createjs.Tween.removeTweens(sound);
         if (this.muted) {
             soundOnButton.alpha = 0;
             soundOffButton.alpha = 1;

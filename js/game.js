@@ -4,9 +4,10 @@ var stageHeight;
 var stageCenter;
 var camera;
 var assets;
-var muteSoundButton;
+var soundContainer;
 var sound;
 var loadingText;
+var topBar;
 
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
@@ -28,7 +29,7 @@ function resize() {
     stageCenter = new Point(stageWidth / 2, stageHeight / 2);
     console.log("Resize to: " + stageWidth + ":" + stageHeight);
 
-    muteSoundButton.x = stageWidth - 32 - 20;
+    soundContainer.x = stageWidth - 32 - 20;
 }
 
 function init() {
@@ -53,7 +54,9 @@ function loadResources(callback) {
             resourcesSpriteSheet: queue.getResult("resources"),
             humanSpriteSheet: queue.getResult("human"),
             golemSpriteSheet: queue.getResult("golem"),
-            statusBarsSpriteSheet: queue.getResult("status_bars")
+            statusBarsSpriteSheet: queue.getResult("status_bars"),
+            healthSpriteSheet: queue.getResult("health"),
+            buttonSpriteSheet: queue.getResult("button")
         }
         assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
         callback();
@@ -70,6 +73,8 @@ function loadResources(callback) {
     queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/status_bars.json", id: "status_bars", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/health.json", id: "health", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/buttons.json", id: "button", type: createjs.AbstractLoader.SPRITESHEET});
 }
 
 function play() {
@@ -112,24 +117,33 @@ function getFortTile() {
 function initGame() {
     initSound();
 
-    muteSoundButton = new createjs.Shape();
-    muteSoundButton.graphics.beginFill("yellow").drawRect(0, 0, 32, 32);
-    muteSoundButton.y = 20;
-    muteSoundButton.muted = false;
+    stage = new createjs.Stage("demoCanvas");
 
-    muteSoundButton.on("mousedown", function() {
+    soundContainer = new createjs.Container();
+    var soundOnButton = new createjs.Sprite(assets.buttonSpriteSheet, "sound_on");
+    var soundOffButton = new createjs.Sprite(assets.buttonSpriteSheet, "sound_off");
+    soundOffButton.alpha = 0;
+    soundOnButton.muted = false;
+    soundContainer.addChild(soundOnButton);
+    soundContainer.addChild(soundOffButton);
+
+    soundContainer.on("mousedown", function() {
         this.muted = !this.muted;
         if (this.muted) {
-            muteSoundButton.graphics.clear().beginFill("black").drawRect(0, 0, 32, 32);
+            soundOnButton.alpha = 0;
+            soundOffButton.alpha = 1;
             createjs.Tween.get(sound).to({volume: 0}, 500);
         } else {
-            muteSoundButton.graphics.clear().beginFill("yellow").drawRect(0, 0, 32, 32);
+            soundOnButton.alpha = 1;
+            soundOffButton.alpha = 0;
             createjs.Tween.get(sound).to({volume: 0.5}, 500);
         }
     });
 
     window.addEventListener('resize', resize);
     resize();
+
+    topBar = new TopBar();
 
     var inventory = new Inventory();
 
@@ -292,8 +306,11 @@ function initGame() {
         }
     }
 
-    stage.addChild(inventory.container);
-    stage.addChild(muteSoundButton);
+    topBar.addItem(human.healthStatus.view, ALIGN_LEFT);
+    topBar.addItem(inventory.container, ALIGN_LEFT);
+    topBar.addItem(soundContainer, ALIGN_RIGHT);
+
+    stage.addChild(topBar.container);
 
     return game;
 }
@@ -395,6 +412,10 @@ function gameLoop(game) {
                 units[i].growBerries();
             }
         }
+    });
+
+    stepTicker.addEventListener(10, function() {
+        game.human.takeDamage(1);
     });
 
     stepTicker.addEventListener(10, function() {

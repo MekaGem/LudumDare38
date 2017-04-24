@@ -1,0 +1,13 @@
+{
+    "images": [
+        "assets/heart.png"
+    ],
+    "frames": [
+        [ 0, 0, 21, 16, 10.5, 8, 0 ],
+        [ 0, 21, 21, 16, 10.5, 8, 0 ]
+    ],
+    "animations": {
+        "heart": 0,
+        "empty_heart": 1
+    }
+}

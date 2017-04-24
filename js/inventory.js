@@ -1,5 +1,4 @@
 var INVENTORY_BAR_X = 10;
-var INVENTORY_BAR_Y = 20;
 var INVENTORY_SPACING = 20;
 
 var ITEM_STONES = {name: "stones", index: 0};
@@ -36,12 +35,10 @@ function Inventory() {
 
         item.view.x = x;
         x += item.view.getBounds().width + INVENTORY_SPACING;
-        item.view.y = INVENTORY_BAR_Y;
         this.container.addChild(item.view);
 
         item.text.x = x;
         x += 3 * INVENTORY_SPACING;
-        item.text.y = INVENTORY_BAR_Y;
         this.container.addChild(item.text);
     }
 }

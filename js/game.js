@@ -178,7 +178,7 @@ function initGame() {
     game.human = human;
 
     // TODO: maybe later guys
-    // var golem = new Golem(5, 5);
+    // var golem = new Golem(6, 6);
     // world.addUnit(golem);
     // golem.engageHuman(world, human);
 

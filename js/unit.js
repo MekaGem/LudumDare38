@@ -5,6 +5,7 @@ var TREE_CUTTING_TIME = 3000; // 3 seconds.
 var FISHING_TIME = 6000; // 6 seconds.
 var HUMAN_GOLEM_DAMATE = 20;
 var HUMAN_EATING_TIME = 2000 // 2 seconds.
+var GOLEM_DAMAGE = 10;
 
 function Unit(x, y, view, type) {
     this.x = x;
@@ -312,6 +313,7 @@ Golem.prototype.engageHuman = function(world, human) {
 
         if (dir >= 0) {
             this.dir = dir;
+            human.takeDamage(GOLEM_DAMAGE);
             this.gotoDirAnim("attack", true);
         } else {
             this.gotoDirAnim("idle");

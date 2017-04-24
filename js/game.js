@@ -63,7 +63,7 @@ function initSound() {
 
     function loadHandler(event) {
         sound = createjs.Sound.play("sound", {loop: -1});
-        sound.volume = 0.5;
+        sound.volume = 0.01;
     }
     createjs.Sound.on("fileload", loadHandler, this);
 

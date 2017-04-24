@@ -123,8 +123,9 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     var height;
     switch (clashDir) {
     case 0: // right
+        var right = Math.max(myBBox.r - theirOff.x, theirBBox.r);
         myOff.x = myBBox.l;
-        width = (theirOff.x + theirBBox.r) - myBBox.l + 1;
+        width = (theirOff.x + right) - myBBox.l + 1;
         theirOff.x = myOff.x - theirOff.x;
 
         var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
@@ -134,8 +135,9 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.y = top - theirOff.y;
         break;
     case 1: // down
+        var down = Math.max(myBBox.b - theirOff.y, theirBBox.b);
         myOff.y = myBBox.t;
-        height = (theirOff.y + theirBBox.b) - myBBox.t + 1;
+        height = (theirOff.y + down) - myBBox.t + 1;
         theirOff.y = myOff.y - theirOff.y;
 
         var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
@@ -145,9 +147,10 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.x = left - theirOff.x;
         break;
     case 2: // left
-        myOff.x = theirOff.x + theirBBox.l;
-        width = (myBBox.r - theirOff.x) - theirBBox.l + 1;
-        theirOff.x = theirBBox.l;
+        var left = Math.min(myBBox.l - theirOff.x, theirBBox.l);
+        myOff.x = theirOff.x + left;
+        width = (myBBox.r - theirOff.x) - left + 1;
+        theirOff.x = left;
 
         var top = Math.min(myBBox.t, theirBBox.t + theirOff.y);
         var bot = Math.max(myBBox.b, theirBBox.b + theirOff.y);
@@ -156,9 +159,10 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
         theirOff.y = top - theirOff.y;
         break;
     case 3: // up
-        myOff.y = theirOff.y + theirBBox.t;
-        height = (myBBox.b - theirOff.y) - theirBBox.t + 1;
-        theirOff.y = theirBBox.t;
+        var top = Math.min(myBBox.t - theirOff.y, theirBBox.t)
+        myOff.y = theirOff.y + top;
+        height = (myBBox.b - theirOff.y) - top + 1;
+        theirOff.y = top;
 
         var left = Math.min(myBBox.l, theirBBox.l + theirOff.x);
         var right = Math.max(myBBox.r, theirBBox.r + theirOff.x);

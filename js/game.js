@@ -59,7 +59,7 @@ function play() {
 
 function initSound() {
     createjs.Sound.registerPlugins([createjs.WebAudioPlugin]);
-    createjs.Sound.alternateExtensions = ["mp3"];
+    createjs.Sound.alternateExtensions = ["mp3", "wav"];
 
     function loadHandler(event) {
         sound = createjs.Sound.play("sound", {loop: -1});
@@ -67,7 +67,7 @@ function initSound() {
     }
     createjs.Sound.on("fileload", loadHandler, this);
 
-    createjs.Sound.registerSound("assets/theme.mp3", "sound");
+    createjs.Sound.registerSound("assets/theme.ogg", "sound");
 }
 
 function getSelectedCellTile() {
@@ -131,7 +131,7 @@ function initGame() {
         if (game.world.selectionCallback && game.selectedCellPosition) {
             game.world.selectionCallback(game.selectedCellPosition);
         }
-    })
+    });
 
     map.addWorld(world);
     camera = new Point(0, 0);

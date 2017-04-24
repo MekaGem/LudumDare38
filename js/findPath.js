@@ -50,12 +50,12 @@ function findPath(world, startX, startY, destinationX, destinationY) {
 }
 
 function testFillWorldWithGrass(width, height) {
-    test_world = new World(width, height);
-    my_cells = new Array();
+    var test_world = new World(width, height);
+    var my_cells = new Array();
     for (var x = 0; x < test_world.width; ++x) {
         my_cells.push([]);
         for (var y = 0; y < test_world.height; ++y) {
-            my_cells[x].push(new Cell("G"));
+            my_cells[x].push(new Cell(CELL_TYPE_GRASS));
         }
     }
     test_world.cells = my_cells;
@@ -74,13 +74,13 @@ function findPathTest() {
         [0, 1, 0, 0, 0]
     */
     var world_2 = testFillWorldWithGrass(4, 5);
-    world_2.cells[0][2].type = "W";
-    world_2.cells[1][2].type = "W";
-    world_2.cells[2][0].type = "W";
-    world_2.cells[2][1].type = "W";
-    world_2.cells[2][2].type = "W";
-    world_2.cells[2][4].type = "W";
-    world_2.cells[3][1].type = "W";
+    world_2.cells[0][2].type = CELL_TYPE_WATER;
+    world_2.cells[1][2].type = CELL_TYPE_WATER;
+    world_2.cells[2][0].type = CELL_TYPE_WATER;
+    world_2.cells[2][1].type = CELL_TYPE_WATER;
+    world_2.cells[2][2].type = CELL_TYPE_WATER;
+    world_2.cells[2][4].type = CELL_TYPE_WATER;
+    world_2.cells[3][1].type = CELL_TYPE_WATER;
     var answerPath_2 = findPath(world_2, 0, 0, 3, 4);
     console.log(answerPath_2);
 
@@ -91,11 +91,11 @@ function findPathTest() {
         [0, 1, 0, 0, 0]
     */
     var world_3 = testFillWorldWithGrass(4, 5);
-    world_3.cells[0][2].type = "W";
-    world_3.cells[1][2].type = "W";
-    world_3.cells[2][0].type = "W";
-    world_3.cells[2][4].type = "W";
-    world_3.cells[3][1].type = "W";
+    world_3.cells[0][2].type = CELL_TYPE_WATER;
+    world_3.cells[1][2].type = CELL_TYPE_WATER;
+    world_3.cells[2][0].type = CELL_TYPE_WATER;
+    world_3.cells[2][4].type = CELL_TYPE_WATER;
+    world_3.cells[3][1].type = CELL_TYPE_WATER;
     var answerPath_3 = findPath(world_3, 1, 1, 3, 4);
     console.log(answerPath_3);
 

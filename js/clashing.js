@@ -200,7 +200,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
                 tilesContainer.addChild(shape);
                 willMove.push(shape);
             } else {
-                cells[x].push(new Cell("W"));
+                cells[x].push(new Cell(CELL_TYPE_WATER));
             }
         }
     }

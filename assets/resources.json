@@ -23,7 +23,7 @@
         "bush": 3,
         "rock": 4,
         "tree": 5,
-        "berries": 6,
+        "food": 6,
         "stone": 7,
         "log": 8
     }

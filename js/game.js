@@ -9,9 +9,13 @@ var sound;
 var loadingText;
 var topBar;
 
-var SOUND_VOLUME = 0.2;
+var STARTING_SOUND_VOLUME = 0.1;
+var SOUND_VOLUME = 0.5;
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
+
+var MAX_WIDTH = 1000;
+var MAX_HEIGHT = 700;
 
 var keys = {};
 
@@ -22,9 +26,9 @@ document.onkeyup = function(e) {
 	delete keys[e.keyCode];
 };
 
-function resize() {
-    stageWidth = window.innerWidth;
-    stageHeight = window.innerHeight;
+function resize(width, height) {
+    stageWidth = Math.min(window.innerWidth, MAX_WIDTH);
+    stageHeight = Math.min(window.innerHeight, MAX_HEIGHT);
     stage.canvas.width = stageWidth;
     stage.canvas.height = stageHeight;
     stageCenter = new Point(stageWidth / 2, stageHeight / 2);
@@ -89,7 +93,8 @@ function initSound() {
 
     function loadHandler(event) {
         sound = createjs.Sound.play("sound", {loop: -1});
-        sound.volume = SOUND_VOLUME;
+        sound.volume = STARTING_SOUND_VOLUME;
+        createjs.Tween.get(sound).to({volume: SOUND_VOLUME}, 10000);
     }
     createjs.Sound.on("fileload", loadHandler, this);
 
@@ -141,7 +146,7 @@ function initGame() {
         }
     });
 
-    window.addEventListener('resize', resize);
+    // window.addEventListener('resize', resize);
     resize();
 
     topBar = new TopBar();
@@ -176,8 +181,12 @@ function initGame() {
 
     stage.addChild(map.container);
 
+    var humanX = 5;
+    var humanY = 5;
+
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
+            if (x == humanX && y == humanY) continue;
             if (world.cells[x][y].type == CELL_TYPE_GRASS) {
                 var r = getRandomInt(0, 7);
                 if (r == 0) {
@@ -192,13 +201,18 @@ function initGame() {
         }
     }
 
-    var human = new Human(2, 3);
+    // KOSTILY
+    world.cells[humanX][humanY].view.gotoAndPlay("grass");
+    world.cells[humanX][humanY].type = CELL_TYPE_GRASS;
+
+    var human = new Human(5, 5);
     world.addUnit(human);
     game.human = human;
 
-    var golem = new Golem(5, 5);
-    world.addUnit(golem);
-    golem.engageHuman(world, human);
+    // TODO: maybe later guys
+    // var golem = new Golem(5, 5);
+    // world.addUnit(golem);
+    // golem.engageHuman(world, human);
 
     human.stepOnCellCallback = function() {
         for (var i = 0; i < world.units.length;) {

@@ -372,6 +372,9 @@ function pickRandomBorderCell(world) {
 }
 
 function canBuildBuilding(world, inventory, building) {
+    if (!world.cellIsLand(building.x, building.y)) {
+        return false;
+    }
     return inventory.hasEnoughResources(building.requirements);
 }
 

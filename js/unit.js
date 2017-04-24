@@ -4,6 +4,7 @@ var HUMAN_MAX_HP = 100;
 var TREE_CUTTING_TIME = 3000; // 3 seconds.
 var FISHING_TIME = 6000; // 6 seconds.
 var HUMAN_GOLEM_DAMATE = 20;
+var HUMAN_EATING_TIME = 2000 // 2 seconds.
 
 function Unit(x, y, view, type) {
     this.x = x;
@@ -13,6 +14,7 @@ function Unit(x, y, view, type) {
     this.container.unit = this;
     this.view = view;
     this.type = type;
+    this.maxHP = 0;
 }
 
 function withDefaultValue(v, default_) {
@@ -32,6 +34,10 @@ Unit.prototype.gotoDirAnim = function(anim, refresh) {
 
 Unit.prototype.takeDamage = function(damage) {
     this.hp = Math.max(0, this.hp - damage);
+}
+
+Unit.prototype.takeHeal = function (hp) {
+    this.hp = Math.min(this.maxHP, this.hp + hp)
 }
 
 Unit.prototype.isAlive = function () {
@@ -68,6 +74,7 @@ function compareUnitContainers(a, b) {
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
     this.hp = TREE_MAX_HP;
+    this.maxHP = TREE_MAX_HP;
     var view = new createjs.Sprite(assets.resourcesSpriteSheet, "tree");
     Unit.call(this, x, y, view, UNIT_TREE);
 }
@@ -114,12 +121,14 @@ function Human(x, y) {
     this.view.regY -= CELL_SIZE / 4.;
 
     this.hp = HUMAN_MAX_HP;
+    this.maxHP = HUMAN_MAX_HP;
     this.dir = 0;
     this.currentDestination = null;
     this.finalDestination = null;
     this.treeCuttingTime = TREE_CUTTING_TIME; // 3 seconds.
     this.golemDamage = HUMAN_GOLEM_DAMATE;
     this.fishingTime = FISHING_TIME;
+    this.eatingTime = HUMAN_EATING_TIME;
     this.stepOnCellCallback = null;
     this.progressBar = null;
     this.oldDir = null;
@@ -224,6 +233,7 @@ function Golem(x, y) {
     var view = new createjs.Sprite(assets.golemSpriteSheet, "idle_se");
     this.dir = 0;
     this.hp = GOLEM_MAX_HP;
+    this.maxHP = GOLEM_MAX_HP;
     Unit.call(this, x, y, view, UNIT_GOLEM);
 }
 

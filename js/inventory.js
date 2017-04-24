@@ -6,6 +6,7 @@ var ITEM_STONES = {name: "stones", index: 0};
 var ITEM_FOOD = {name: "food", index: 1};
 var ITEM_WOOD = {name: "wood", index: 2};
 var ITEM_TYPES = 3;
+var FOOD_HEALING_VALUE = 25;
 
 function Inventory() {
     this.container = new createjs.Container();
@@ -79,3 +80,8 @@ Inventory.prototype.takeResources = function(requirements) {
         this.changeItemAmount(type, -amount);
     }
 }
+
+Inventory.prototype.mealRequirements = [
+    [ITEM_FOOD, 1]
+]
+

@@ -38,9 +38,10 @@ function loadResources(callback) {
     var queue = new createjs.LoadQueue(true);
     var handleComplete = function() {
         assets = {
-            spriteSheet: queue.getResult("resources"),
+            resourcesSpriteSheet: queue.getResult("resources"),
             humanSpriteSheet: queue.getResult("human"),
-            golemSpriteSheet: queue.getResult("golem")
+            golemSpriteSheet: queue.getResult("golem"),
+            statusBarsSpriteSheet: queue.getResult("status_bars")
         }
         callback();
     };
@@ -48,6 +49,7 @@ function loadResources(callback) {
     queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/status_bars.json", id: "status_bars", type: createjs.AbstractLoader.SPRITESHEET});
 }
 
 function play() {
@@ -192,13 +194,17 @@ function initGame() {
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
-                human.dir = dir;
-                human.gotoDirAnim("attack", true);
-                human.dealDamage(this, tree);
-                if (!tree.isAlive()) {
+                if (tree.waitingBar) {
+                    tree.waitingBar.turnOff(world);
+                }
+                tree.waitingCallback = function() {
+                    human.dir = dir;
+                    human.gotoDirAnim("attack", true);
                     inventory.addItem(ITEM_WOOD, 1);
                     world.removeUnitsInCell(tree.x, tree.y);
                 }
+                tree.waitingBar = new WaitingBar(tree.x, tree.y);
+                tree.waitingBar.turnOn(world, tree, 2000);
             }
         } else if (!tweenController.shouldStop) {
             human.setFinalDestinationCell(world, cell);
@@ -265,7 +271,7 @@ function gameLoop(game) {
     createjs.Ticker.setFPS(60);
     createjs.Ticker.addEventListener("tick", tick);
 
-    stepTicker = new StepTicker(100);
+    var stepTicker = new StepTicker(100);
 
     var sinkRandomCell = function() {
         var borderCell = pickRandomBorderCell(game.world);

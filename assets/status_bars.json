@@ -1,0 +1,11 @@
+{
+  "images": [
+    "assets/waiting.png"
+  ],
+  "frames":[
+    [ 0, 0, 100, 49]
+  ],
+  "animations": {
+    "wait": 0
+  }
+}

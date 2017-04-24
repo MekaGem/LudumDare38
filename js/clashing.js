@@ -248,7 +248,7 @@ function MergeIslands(map, myIsland, theirIsland, clashDir) {
     }
 
     var visualOffset = cartesianToIsometric(DIRS[clashDir].x * 10 * CELL_SIZE, DIRS[clashDir].y * 10 * CELL_SIZE);
-    var clashDuration = 5000;
+    var clashDuration = 1000;
     for (var i = 0; i < willMove.length; ++i) {
         willMove[i].x += visualOffset.x;
         willMove[i].y += visualOffset.y;

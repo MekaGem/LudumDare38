@@ -6,6 +6,7 @@ var camera;
 var assets;
 var muteSoundButton;
 var sound;
+var loadingText;
 
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
@@ -31,21 +32,40 @@ function resize() {
 }
 
 function init() {
+    stage = new createjs.Stage("demoCanvas");
+
     loadResources(play);
 }
 
 function loadResources(callback) {
+    loadingText = new createjs.Text("Loading 0%", "30px Arial", "Black");
+    loadingText.textAlign = "center";
+    loadingText.textBaseline = "middle";
+    loadingText.x = stage.canvas.width / 2;
+    loadingText.y = stage.canvas.height / 2;
+    stage.addChild(loadingText);
+    stage.update();
+    
     var queue = new createjs.LoadQueue(true);
     var handleComplete = function() {
+        stage.removeChild(loadingText);
         assets = {
             resourcesSpriteSheet: queue.getResult("resources"),
             humanSpriteSheet: queue.getResult("human"),
             golemSpriteSheet: queue.getResult("golem"),
             statusBarsSpriteSheet: queue.getResult("status_bars")
         }
+        assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
         callback();
     };
+    
+    var updateLoading = function() {
+        loadingText.text = "Loading " + (queue.progress * 100 | 0) + "%";
+        stage.update();
+    }
+
     queue.on("complete", handleComplete, this);
+    queue.on("progress", updateLoading);
     queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
@@ -91,8 +111,6 @@ function getFortTile() {
 
 function initGame() {
     initSound();
-
-    stage = new createjs.Stage("demoCanvas");
 
     muteSoundButton = new createjs.Shape();
     muteSoundButton.graphics.beginFill("yellow").drawRect(0, 0, 32, 32);
@@ -140,8 +158,6 @@ function initGame() {
 
     map.addWorld(world);
     camera = new Point(0, 0);
-
-    addOtherWorld(game);
 
     stage.addChild(map.container);
 
@@ -352,6 +368,30 @@ function gameLoop(game) {
             });
         }
     });
+    
+    stepTicker.addEventListener(100, function() {
+        var newWorld = new World(5, 5, 0, 0, 4);
+
+        for (var x = 0; x < newWorld.width; ++x) {
+            for (var y = 0; y < newWorld.height; ++y) {
+                if (newWorld.cells[x][y].type == "G") {
+                    var r = getRandomInt(0, 5);
+                    if (r == 0) {
+                        newWorld.addUnit(new Tree(x, y));
+                    } else if (r < 3) {
+                        newWorld.addUnit(new Rock(x, y));
+                    } else if (r == 3) {
+                        newWorld.addUnit(new Golem(x, y));
+                    }
+                }
+            }
+        }
+        
+        var mergeDir = getRandomInt(0, 4);
+        stopTweens(function() {
+            MergeIslands(game.map, game.world, newWorld, mergeDir);
+        });
+    });
 
     function tick(event) {
         if (!game.finished && !tweenController.shouldStop) {
@@ -373,8 +413,6 @@ function gameLoop(game) {
         if (stage.mouseY > stage.canvas.height - CAMERA_MOVEMENT_BORDER) {
             camera.y += CAMERA_MOVEMENT_SPEED * seconds;
         }
-
-        tickOtherWorld(game);
 
         // Camera bounds
         var worldBoundingBoxHalfWidth = (game.world.width + game.world.height) / 2. * CELL_SIZE + 100;
@@ -407,96 +445,4 @@ function gameLoop(game) {
         // Render.
         stage.update();
     }
-}
-
-function addOtherWorld(game) {
-    game.otherWorld = new World(5, 5, 0, 0, 4);
-    game.otherOff = {x: -10, y: -10};
-    game.omck = 0;
-    game.otherDrift = {x: 0, y: 0};
-    game.map.addWorld(game.otherWorld);
-}
-
-function tickOtherWorld(game) {
-    if (game.omck > 0) {
-        game.omck--;
-    } else {
-        var behind = false;
-        var changed = false;
-        var mergeDir = -1;
-
-        if (keys[KEY_1]) {
-            game.otherOff = ClashIslands(game.world, game.otherWorld, 0);
-            game.otherDrift = {x: DIRS[0].x, y: DIRS[0].y};
-            changed = true;
-        } else if (keys[KEY_2]) {
-            game.otherOff = ClashIslands(game.world, game.otherWorld, 1);
-            game.otherDrift = {x: DIRS[1].x, y: DIRS[1].y};
-            changed = true;
-        } else if (keys[KEY_3]) {
-            game.otherOff = ClashIslands(game.world, game.otherWorld, 2);
-            game.otherDrift = {x: DIRS[2].x, y: DIRS[2].y};
-            changed = true;
-            behind = true;
-        } else if (keys[KEY_4]) {
-            game.otherOff = ClashIslands(game.world, game.otherWorld, 3);
-            game.otherDrift = {x: DIRS[3].x, y: DIRS[3].y};
-            changed = true;
-            behind = true;
-        } else if (keys[KEY_Q]) {
-            mergeDir = 0;
-        } else if (keys[KEY_W]) {
-            mergeDir = 1;
-        } else if (keys[KEY_E]) {
-            mergeDir = 2;
-        } else if (keys[KEY_R]) {
-            mergeDir = 3;
-        }
-
-        if (mergeDir >= 0) {
-            var newWorld = new World(5, 5, 0, 0, 4);
-
-            for (var x = 0; x < newWorld.width; ++x) {
-                for (var y = 0; y < newWorld.height; ++y) {
-                    if (newWorld.cells[x][y].type == CELL_TYPE_GRASS) {
-                        var r = getRandomInt(0, 5);
-                        if (r == 0) {
-                            newWorld.addUnit(new Tree(x, y));
-                        } else if (r < 3) {
-                            newWorld.addUnit(new Rock(x, y));
-                        } else if (r == 3) {
-                            newWorld.addUnit(new Golem(x, y));
-                        }
-                    }
-                }
-            }
-
-            stopTweens(function() {
-                MergeIslands(game.map, game.world, newWorld, mergeDir);
-            });
-            game.omck = 300;
-        }
-
-        if (changed) {
-            game.omck = 60;
-
-            game.map.worldsContainer.removeChild(game.otherWorld.container);
-            if (behind) {
-                var idx = game.map.worldsContainer.getChildIndex(game.world.container);
-                game.map.worldsContainer.addChildAt(game.otherWorld.container, idx);
-            } else {
-                game.map.worldsContainer.addChild(game.otherWorld.container);
-            }
-
-            game.otherWorld.x = game.world.x + game.otherOff.x;
-            game.otherWorld.y = game.world.y + game.otherOff.y;
-        }
-    }
-
-    game.otherDrift.x *= 0.95;
-    game.otherDrift.y *= 0.95;
-
-    var iso = cartesianToIsometric((game.otherWorld.x + game.otherDrift.x) * CELL_SIZE, (game.otherWorld.y + game.otherDrift.y) * CELL_SIZE);
-    game.otherWorld.container.x = iso.x;
-    game.otherWorld.container.y = iso.y;
 }

@@ -1,4 +1,5 @@
 var stage;
+var gameContainer;
 var stageWidth;
 var stageHeight;
 var stageCenter;
@@ -35,47 +36,8 @@ function resize() {
 
 function init() {
     stage = new createjs.Stage("demoCanvas");
-
+    gameContainer = new createjs.Container();
     loadResources(play);
-}
-
-function loadResources(callback) {
-    loadingText = new createjs.Text("Loading 0%", "30px Arial", "Black");
-    loadingText.textAlign = "center";
-    loadingText.textBaseline = "middle";
-    loadingText.x = stage.canvas.width / 2;
-    loadingText.y = stage.canvas.height / 2;
-    stage.addChild(loadingText);
-    stage.update();
-
-    var queue = new createjs.LoadQueue(true);
-    var handleComplete = function() {
-        stage.removeChild(loadingText);
-        assets = {
-            resourcesSpriteSheet: queue.getResult("resources"),
-            humanSpriteSheet: queue.getResult("human"),
-            golemSpriteSheet: queue.getResult("golem"),
-            statusBarsSpriteSheet: queue.getResult("status_bars"),
-            healthSpriteSheet: queue.getResult("health"),
-            buttonSpriteSheet: queue.getResult("button")
-        }
-        assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
-        callback();
-    };
-
-    var updateLoading = function() {
-        loadingText.text = "Loading " + (queue.progress * 100 | 0) + "%";
-        stage.update();
-    }
-
-    queue.on("complete", handleComplete, this);
-    queue.on("progress", updateLoading);
-    queue.loadFile({src: "assets/resources.json", id: "resources", type: createjs.AbstractLoader.SPRITESHEET});
-    queue.loadFile({src: "assets/human.json", id: "human", type: createjs.AbstractLoader.SPRITESHEET});
-    queue.loadFile({src: "assets/golem.json", id: "golem", type: createjs.AbstractLoader.SPRITESHEET});
-    queue.loadFile({src: "assets/status_bars.json", id: "status_bars", type: createjs.AbstractLoader.SPRITESHEET});
-    queue.loadFile({src: "assets/health.json", id: "health", type: createjs.AbstractLoader.SPRITESHEET});
-    queue.loadFile({src: "assets/buttons.json", id: "button", type: createjs.AbstractLoader.SPRITESHEET});
 }
 
 function play() {
@@ -117,8 +79,6 @@ function getFortTile() {
 
 function initGame() {
     initSound();
-
-    stage = new createjs.Stage("demoCanvas");
 
     soundContainer = new createjs.Container();
     var soundOnButton = new createjs.Sprite(assets.buttonSpriteSheet, "sound_on");
@@ -174,7 +134,7 @@ function initGame() {
     map.addWorld(world);
     camera = new Point(0, 0);
 
-    stage.addChild(map.container);
+    gameContainer.addChild(map.container);
 
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
@@ -311,7 +271,9 @@ function initGame() {
     topBar.addItem(inventory.container, ALIGN_LEFT);
     topBar.addItem(soundContainer, ALIGN_RIGHT);
 
-    stage.addChild(topBar.container);
+    gameContainer.addChild(topBar.container);
+
+    stage.addChild(gameContainer);
 
     return game;
 }

@@ -344,6 +344,35 @@ function updateSelectedBuildTool(game) {
     }
 }
 
+function listenActionKeys(game) {
+    if (keys[KEY_H]) {
+        delete keys[KEY_H];
+        feedHuman(game, game.human);
+    }
+}
+
+function feedHuman(game, human) {
+    if (!game.inventory.hasEnoughResources(game.inventory.mealRequirements)) {
+        return;
+    }
+    var continuousActionLoopPeriod = 200;
+    var continuousActionCallback = function() {
+        human.gotoDirAnim("attack", true);
+    }
+
+    human.waitingCallback = function() {
+        game.inventory.takeResources(game.inventory.mealRequirements);
+        human.takeHeal(FOOD_HEALING_VALUE);
+        human.stopContinuousAction();
+    }
+
+    human.startContinuousAction(
+        game.world.container,
+        human.eatingTime,
+        continuousActionLoopPeriod,
+        continuousActionCallback);
+}
+
 function gameLoop(game) {
     // Setup periodic ticker.
     createjs.Ticker.setFPS(60);
@@ -448,6 +477,7 @@ function gameLoop(game) {
 
         updateSelectedBuildTool(game);
         updateSelectedCell(game);
+        listenActionKeys(game);
 
         // Render.
         stage.update();

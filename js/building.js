@@ -1,4 +1,4 @@
-var BUILDING_FORT = {name: "Fort", type: Fort};
+var BUILDING_FORT = {name: "Fort", type: Fort, buildingTime: 10000};
 
 Building.prototype = Object.create(Unit.prototype);
 function Building(x, y, view, type, buildingTime, onBuild) {
@@ -11,14 +11,13 @@ Fort.prototype = Object.create(Building.prototype);
 function Fort(x, y, world) {
     var view = new createjs.Sprite(assets.resourcesSpriteSheet, "kamushki");
     view.alpha = 0.5;
-    var buildingTime = 10000;
     var _this = this;
     var onBuild = function() {
         world.cells[_this.x][_this.y].fortify();
         world.removeUnit(_this);
         _this.progressBar.turnOff();
     }
-    Building.call(this, x, y, view, UNIT_FORT, buildingTime, onBuild);
+    Building.call(this, x, y, view, UNIT_FORT, BUILDING_FORT.buildingTime, onBuild);
 }
 
 Fort.prototype.requirements = [

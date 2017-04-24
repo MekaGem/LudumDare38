@@ -9,6 +9,7 @@ var sound;
 var loadingText;
 var topBar;
 
+var SOUND_VOLUME = 0.2;
 var CAMERA_MOVEMENT_BORDER = 80;
 var CAMERA_MOVEMENT_SPEED = 500;
 
@@ -46,7 +47,7 @@ function loadResources(callback) {
     loadingText.y = stage.canvas.height / 2;
     stage.addChild(loadingText);
     stage.update();
-    
+
     var queue = new createjs.LoadQueue(true);
     var handleComplete = function() {
         stage.removeChild(loadingText);
@@ -61,7 +62,7 @@ function loadResources(callback) {
         assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
         callback();
     };
-    
+
     var updateLoading = function() {
         loadingText.text = "Loading " + (queue.progress * 100 | 0) + "%";
         stage.update();
@@ -88,7 +89,7 @@ function initSound() {
 
     function loadHandler(event) {
         sound = createjs.Sound.play("sound", {loop: -1});
-        sound.volume = 0.01;
+        sound.volume = SOUND_VOLUME;
     }
     createjs.Sound.on("fileload", loadHandler, this);
 
@@ -136,7 +137,7 @@ function initGame() {
         } else {
             soundOnButton.alpha = 1;
             soundOffButton.alpha = 0;
-            createjs.Tween.get(sound).to({volume: 0.5}, 500);
+            createjs.Tween.get(sound).to({volume: SOUND_VOLUME}, 500);
         }
     });
 
@@ -425,7 +426,7 @@ function gameLoop(game) {
             });
         }
     });
-    
+
     stepTicker.addEventListener(100, function() {
         var newWorld = new World(5, 5, 0, 0, 4);
 
@@ -443,7 +444,7 @@ function gameLoop(game) {
                 }
             }
         }
-        
+
         var mergeDir = getRandomInt(0, 4);
         stopTweens(function() {
             MergeIslands(game.map, game.world, newWorld, mergeDir);

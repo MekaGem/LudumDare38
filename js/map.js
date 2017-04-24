@@ -97,8 +97,7 @@ function World(width, height, x, y, k) {
     this.cells = [];
     this.units = [];
     this.container = new createjs.Container();
-    this.borderWater = null;
-
+    
     var level = GenerateIsland(width, height, k);
 
     this.tilesContainer = new createjs.Container();

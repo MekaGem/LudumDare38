@@ -326,6 +326,9 @@ World.prototype.cellIsCutVertex = function(x, y) {
 }
 
 World.prototype.cellIsSelectable = function(x, y) {
+    console.log("World.prototype.cellIsSelectable(x, y): x = " + x + ", y = " + y);
+    console.log("this.cellIsWaterNearLand(x, y) = " + this.cellIsWaterNearLand(x, y));
+    console.log("this.cellIsLand(x, y) = " + this.cellIsLand(x, y));
     return this.cellIsWaterNearLand(x, y) || this.cellIsLand(x, y);
 }
 
@@ -360,13 +363,13 @@ World.prototype.shakeTiles = function() {
 
 World.prototype.updateBorderWater = function() {
     if (this.borderWater) {
-        for (i = 0; i < this.borderWater.length; ++i) {
+        for (var i = 0; i < this.borderWater.length; ++i) {
             var waterCell = new Cell(CELL_TYPE_WATER);
             this.removeShapeFromTilesContainer(waterCell.shape, this.borderWater.x, this.borderWater.y);
         }
     }
     this.borderWater = this.getBorderWater();
-    for (i = 0; i < this.borderWater.length; ++i) {
+    for (var i = 0; i < this.borderWater.length; ++i) {
         var waterCell = new Cell(CELL_TYPE_WATER);
         this.addShapeToTilesContainer(waterCell.shape, this.borderWater.x, this.borderWater.y);
     }

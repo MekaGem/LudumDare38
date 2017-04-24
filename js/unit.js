@@ -29,6 +29,18 @@ var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 
+function compareUnits(a, b) {
+    if (a.type != b.type) {
+        if (a.type == UNIT_GOLEM) return 1;
+        if (b.type == UNIT_GOLEM) return -1;
+        if (a.type == UNIT_HUMAN) return 1;
+        if (b.type == UNIT_HUMAN) return -1;
+    }
+    
+    if (a.x == b.x) return a.y - b.y;
+    return a.x - b.x;
+}
+
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
     this.hp = TREE_MAX_HP;

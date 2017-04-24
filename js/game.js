@@ -120,6 +120,7 @@ function initGame() {
         "selectedCellPosition": null,
         "selectedCellShape": new createjs.Container(),
         "inventory": inventory,
+        "finished": false,
     };
 
     game.selectedCellShape.alpha = 1;
@@ -300,13 +301,12 @@ function gameLoop(game) {
 
     var stepTicker = new StepTicker(100);
 
-    var sinkRandomCell = function() {
+    stepTicker.addEventListener(20, function() {
         var borderCell = pickRandomBorderCell(game.world);
         if (borderCell) {
             game.world.damageWithWater(borderCell.x, borderCell.y);
         }
-    }
-    stepTicker.addEventListener(20, sinkRandomCell);
+    });
 
     stepTicker.addEventListener(10, function() {
         var units = game.world.units;
@@ -317,8 +317,18 @@ function gameLoop(game) {
         }
     });
 
+    stepTicker.addEventListener(10, function() {
+        if (isGameEnded(game)) {
+            stopTweens(function() {
+                endGame(game);
+            });
+        }
+    });
+
     function tick(event) {
-        stepTicker.advanceTime(event.delta);
+        if (!game.finished) {
+            stepTicker.advanceTime(event.delta);
+        }
         var seconds = event.delta / 1000.;
 
         // Move camera.

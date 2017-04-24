@@ -1,5 +1,8 @@
-TREE_MAX_HP = 200;
-GOLEM_MAX_HP = 100;
+var TREE_MAX_HP = 200;
+var GOLEM_MAX_HP = 100;
+var HUMAN_MAX_HP = 100;
+var TREE_CUTTING_TIME = 3000; // 3 seconds.
+var HUMAN_GOLEM_DAMATE = 20;
 
 function Unit(x, y, view, type) {
     this.x = x;
@@ -109,11 +112,12 @@ function Human(x, y) {
     Unit.call(this, x, y, view, UNIT_HUMAN);
     this.view.regY -= CELL_SIZE / 4.;
 
+    this.hp = HUMAN_MAX_HP;
     this.dir = 0;
     this.currentDestination = null;
     this.finalDestination = null;
-    this.treeCuttingTime = 3000; // 3 seconds.
-    this.golemDamage = 20;
+    this.treeCuttingTime = TREE_CUTTING_TIME; // 3 seconds.
+    this.golemDamage = HUMAN_GOLEM_DAMATE;
     this.stepOnCellCallback = null;
     this.progressBar = null;
 }

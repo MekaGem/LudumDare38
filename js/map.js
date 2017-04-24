@@ -140,6 +140,7 @@ World.prototype.addUnit = function(unit) {
 World.prototype.removeUnitByIndex = function(index) {
     //console.log("Removing: " + index);
     this.unitsContainer.removeChild(this.units[index].view);
+    this.units[index].hp = 0;
     this.units.splice(index, 1);
 }
 

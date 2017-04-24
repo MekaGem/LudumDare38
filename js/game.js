@@ -194,7 +194,7 @@ function initGame() {
         console.log(game.selectedBuildTool);
         if (game.selectedBuildTool) {
             console.log("Trying to build");
-            building = new game.selectedBuildTool.type(cell.x, cell.y);
+            building = new game.selectedBuildTool.type(cell.x, cell.y, world);
             if (tryCreateBuilding(world, inventory, building)) {
                 console.log("Created building.");
                 changeBuildTool(game, null);
@@ -210,7 +210,7 @@ function initGame() {
                 human.dealDamage(this, golem);
                 if (!golem.isAlive()) {
                     tweenAdded();
-                    createjs.Tween.get(golem.view)
+                    createjs.Tween.get(golem.container)
                         .to({alpha: 0}, 1000)
                         .call(function() {
                             world.removeUnit(golem);
@@ -339,8 +339,6 @@ function gameLoop(game) {
         for (var i = 0; i < units.length; ++i) {
             if (units[i].type == UNIT_BUSH) {
                 units[i].growBerries();
-            } else if (units[i].buildTick) {
-                units[i].buildTick(game.world);
             }
         }
     });
@@ -399,7 +397,7 @@ function gameLoop(game) {
 
         if (!tweenController.shouldStop) game.world.shakeTiles();
 
-        game.world.unitsContainer.sortChildren(compareUnitViews);
+        game.world.unitsContainer.sortChildren(compareUnitContainers);
 
         updateSelectedBuildTool(game);
         updateSelectedCell(game);

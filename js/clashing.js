@@ -1,5 +1,5 @@
 function GetBBox(island) {
-    var r =  0;
+    var r = 0;
     var b = 0;
     var l = island.width;
     var t = island.height;

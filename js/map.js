@@ -295,7 +295,7 @@ World.prototype.shakeTiles = function() {
     for (var x = 0; x < this.width; x++) {
         for (var y = 0; y < this.height; y++) {
             if (!this.cellIsLand(x, y)) continue;
-            
+
             var cell = this.cells[x][y];
             var shape = cell.shape;
             cell.vel += (Math.random() * 2 - 1) * TILE_VEL_D;
@@ -369,4 +369,17 @@ function pickRandomBorderCell(world) {
 
     var id = getRandomInt(0, Math.ceil(borderCells.length / 3));
     return borderCells[id];
+}
+
+function canBuildBuilding(world, inventory, building) {
+    return inventory.hasEnoughResources(building.requirements);
+}
+
+function tryCreateBuilding(world, inventory, building) {
+    if (!canBuildBuilding(world, inventory, building)) {
+        return false;
+    }
+    inventory.takeResources(building.requirements);
+    world.addUnit(building);
+    return true;
 }

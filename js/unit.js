@@ -39,6 +39,7 @@ var UNIT_BUSH = "BUSH";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 var UNIT_PROGRESS_BAR = "PROGRESS_BAR";
+var UNIT_FORT = "FORT";
 
 function compareUnitViews(a, b) {
     if (a.y != b.y) return a.y - b.y;

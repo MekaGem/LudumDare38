@@ -7,4 +7,6 @@ var KEY_Q = 81
 var KEY_W = 87
 var KEY_E = 69
 var KEY_R = 82
+var KEY_F = 70
+var KEY_ESC = 27
 

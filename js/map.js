@@ -161,13 +161,13 @@ World.prototype.getCenter = function() {
 
 World.prototype.addUnit = function(unit) {
     this.units.push(unit);
-    this.unitsContainer.addChild(unit.view);
-    updateViewPos(unit);
+    this.unitsContainer.addChild(unit.container);
+    updateContainerPos(unit);
 }
 
 World.prototype.removeUnitByIndex = function(index) {
     //console.log("Removing: " + index);
-    this.unitsContainer.removeChild(this.units[index].view);
+    this.unitsContainer.removeChild(this.units[index].container);
     this.units[index].hp = 0;
     this.units.splice(index, 1);
 }
@@ -366,7 +366,7 @@ World.prototype.shakeTiles = function() {
         if (!unitIsStatic(unit.type)) continue;
 
         var iso = cartesianToIsometric(unit.x * CELL_SIZE, unit.y * CELL_SIZE);
-        unit.view.y = iso.y + this.cells[unit.x][unit.y].offset;
+        unit.container.y = iso.y + this.cells[unit.x][unit.y].offset;
     }
 }
 
@@ -396,13 +396,6 @@ function updateContainerPos(object) {
     var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
     object.container.x = iso.x;
     object.container.y = iso.y;
-}
-
-// Object with view
-function updateViewPos(object) {
-    var iso = cartesianToIsometric(object.x * CELL_SIZE, object.y * CELL_SIZE);
-    object.view.x = iso.x;
-    object.view.y = iso.y;
 }
 
 function getBorderCells(world) {

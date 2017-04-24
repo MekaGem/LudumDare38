@@ -34,6 +34,9 @@ Unit.prototype.gotoDirAnim = function(anim, refresh) {
 
 Unit.prototype.takeDamage = function(damage) {
     this.hp = Math.max(0, this.hp - damage);
+    if (this.healthStatus) {
+        this.healthStatus.updateHP(this.hp);
+    }
 }
 
 Unit.prototype.takeHeal = function (hp) {
@@ -114,6 +117,18 @@ Bush.prototype.growBerries = function() {
     }
 }
 
+function HealthStatus(hp) {
+    this.view = new createjs.Container();
+    this.heart = new createjs.Sprite(assets.healthSpriteSheet, "heart");
+    this.hpText = new createjs.Text(hp, "20px Arial", "#ff7700");
+    this.view.addChild(this.hpText);
+    //this.view.addChild(this.heart);
+}
+
+HealthStatus.prototype.updateHP = function(hp) {
+    this.hpText.text = hp;
+}
+
 Human.prototype = Object.create(Unit.prototype);
 function Human(x, y) {
     var view = new createjs.Sprite(assets.humanSpriteSheet, "idle_se");
@@ -132,6 +147,8 @@ function Human(x, y) {
     this.stepOnCellCallback = null;
     this.progressBar = null;
     this.oldDir = null;
+
+    this.healthStatus = new HealthStatus(this.hp);
 }
 
 Human.prototype.updatePath = function(world) {

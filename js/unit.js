@@ -285,17 +285,31 @@ Golem.prototype.engageHuman = function(world, human) {
 
 function ProgressBar() {
     this.currentTween = null;
-    this.view = new createjs.Sprite(assets.statusBarsSpriteSheet, "wait");
+    this.bg = new createjs.Sprite(assets.statusBarsSpriteSheet, "background");
+    this.fill = new createjs.Bitmap(assets.progressBarFill);
+    
+    var bounds = this.bg.getBounds();
+    this.fill.regX = -bounds.x;
+    this.fill.regY = -bounds.y;
+    
+    this.fill.sourceRect = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: bounds.height
+    };
+    
+    console.log(this, this.bg.getBounds());
 }
 
 ProgressBar.prototype.turnOn = function(container, onCompleteCallback, waitingTime) {
-    this.view.alpha = 0.1;
-    container.addChild(this.view);
+    container.addChild(this.bg);
+    container.addChild(this.fill);
 
-    var _this = this;
-    this.currentTween = createjs.Tween.get(this.view)
+    var bounds = this.bg.getBounds();
+    this.currentTween = createjs.Tween.get(this.fill.sourceRect)
         .to({
-            alpha: 1.0
+            width: bounds.width
         }, waitingTime)
         .call(onCompleteCallback);
 
@@ -307,6 +321,7 @@ ProgressBar.prototype.turnOff = function() {
         console.log("Ended previous continuous action.");
         this.currentTween.setPaused(true);
     }
-    this._container.removeChild(this.view);
+    this._container.removeChild(this.bg);
+    this._container.removeChild(this.fill);
     this.currentTween = null;
 }

@@ -132,13 +132,6 @@ World.prototype.addShapeToTilesContainer = function(shape, x, y) {
     this.tilesContainer.addChild(shape);
 }
 
-World.prototype.removeShapeFromTilesContainer = function(shape, x, y) {
-    var iso = cartesianToIsometric(x * CELL_SIZE, y * CELL_SIZE);
-    shape.x = iso.x;
-    shape.y = iso.y;
-    this.tilesContainer.removeChild(shape);
-}
-
 World.prototype.getCenter = function() {
     var x = (this.x + this.width / 2.) * CELL_SIZE;
     var y = (this.y + this.height / 2.) * CELL_SIZE;

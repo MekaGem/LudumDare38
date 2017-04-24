@@ -2,6 +2,7 @@ var TREE_MAX_HP = 200;
 var GOLEM_MAX_HP = 100;
 var HUMAN_MAX_HP = 100;
 var TREE_CUTTING_TIME = 3000; // 3 seconds.
+var FISHING_TIME = 6000; // 6 seconds.
 var HUMAN_GOLEM_DAMATE = 20;
 
 function Unit(x, y, view, type) {
@@ -118,6 +119,7 @@ function Human(x, y) {
     this.finalDestination = null;
     this.treeCuttingTime = TREE_CUTTING_TIME; // 3 seconds.
     this.golemDamage = HUMAN_GOLEM_DAMATE;
+    this.fishingTime = FISHING_TIME;
     this.stepOnCellCallback = null;
     this.progressBar = null;
 }

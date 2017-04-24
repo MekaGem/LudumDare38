@@ -144,7 +144,7 @@ function initGame() {
 
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
-            if (world.cells[x][y].type == "G") {
+            if (world.cells[x][y].type == CELL_TYPE_GRASS) {
                 var r = getRandomInt(0, 5);
                 if (r == 0) {
                     world.addUnit(new Tree(x, y));
@@ -173,7 +173,7 @@ function initGame() {
                     inventory.addItem(ITEM_STONES, 1);
                     world.removeUnitByIndex(i);
                 } else if (world.units[i].type == UNIT_BUSH && world.units[i].hasBerries()) {
-                    inventory.addItem(ITEM_BERRIES, 1);
+                    inventory.addItem(ITEM_FOOD, 1);
                     world.units[i].pickBerries();
                 } else {
                     ++i;
@@ -216,10 +216,10 @@ function initGame() {
                 }
             }
         } else if (world.cellContainsUnit(cell.x, cell.y, UNIT_TREE)) {
-            console.log("cutting tree at [" + cell.x + ", " +  cell.y + "]");
             var tree = world.getUnitFromCell(cell.x, cell.y);
             var dir = getDirection(human, tree);
             if (dir >= 0) {
+                console.log("cutting tree at [" + cell.x + ", " +  cell.y + "]");
                 human.dir = dir;
 
                 var continuousActionLoopPeriod = 400;
@@ -235,6 +235,26 @@ function initGame() {
 
                 human.startContinuousAction(world,
                     human.treeCuttingTime,
+                    continuousActionLoopPeriod,
+                    continuousActionCallback);
+            }
+        } else if (world.cellIsWaterNearLand(cell.x, cell.y)) {
+            var dir = getDirection(human, cell);
+            if (dir >= 0) {
+                console.log("fishing at [" + cell.x + ", " + cell.y + "]");
+                human.dir = dir;
+                var continuousActionLoopPeriod = 400;
+                var continuousActionCallback = function() {
+                    human.gotoDirAnim("attack", true);
+                }
+
+                human.waitingCallback = function() {
+                    inventory.addItem(ITEM_FOOD, 1);
+                    human.stopContinuousAction(world);
+                }
+
+                human.startContinuousAction(world,
+                    human.fishingTime,
                     continuousActionLoopPeriod,
                     continuousActionCallback);
             }
@@ -431,7 +451,7 @@ function tickOtherWorld(game) {
 
             for (var x = 0; x < newWorld.width; ++x) {
                 for (var y = 0; y < newWorld.height; ++y) {
-                    if (newWorld.cells[x][y].type == "G") {
+                    if (newWorld.cells[x][y].type == CELL_TYPE_GRASS) {
                         var r = getRandomInt(0, 5);
                         if (r == 0) {
                             newWorld.addUnit(new Tree(x, y));

@@ -168,9 +168,8 @@ Human.prototype.dealDamage = function(world, unit) {
 }
 
 Human.prototype.startContinuousAction = function (world, actionTime, callbackLoopPeriod, callback) {
-    if (this.continuousActionTween) {
-        this.continuousActionTween.setPaused(true);
-    }
+    this.stopContinuousAction(world);
+
     this.waitingBar = new WaitingBar(this.x, this.y);
     this.waitingBar.turnOn(world, this, actionTime);
 

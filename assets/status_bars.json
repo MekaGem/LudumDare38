@@ -3,7 +3,7 @@
     "assets/waiting.png"
   ],
   "frames":[
-    [ 0, 0, 100, 49]
+    [ 0, 0, 28, 19, 0, 10, 30]
   ],
   "animations": {
     "wait": 0

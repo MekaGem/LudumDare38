@@ -45,8 +45,6 @@ function compareUnitViews(a, b) {
 Tree.prototype = Object.create(Unit.prototype);
 function Tree(x, y) {
     this.hp = TREE_MAX_HP;
-    this.waitingBar = null;
-    this.waitingCallback = null;
     var view = new createjs.Sprite(assets.resourcesSpriteSheet, "tree");
     Unit.call(this, x, y, view, UNIT_TREE);
 }

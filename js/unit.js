@@ -121,8 +121,9 @@ function HealthStatus(hp) {
     this.view = new createjs.Container();
     this.heart = new createjs.Sprite(assets.healthSpriteSheet, "heart");
     this.hpText = new createjs.Text(hp, "20px Arial", "#ff7700");
+    this.hpText.x += this.heart.getBounds().width + INVENTORY_SPACING;
     this.view.addChild(this.hpText);
-    //this.view.addChild(this.heart);
+    this.view.addChild(this.heart);
 }
 
 HealthStatus.prototype.updateHP = function(hp) {

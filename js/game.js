@@ -65,6 +65,8 @@ function resize(width, height) {
 }
 
 function init() {
+    window.onload = function () { window.focus(); }
+    window.onclick = function () { window.focus(); }
     stage = new createjs.Stage("demoCanvas");
     gameContainer = new createjs.Container();
     resize();

@@ -136,7 +136,7 @@ function initGame() {
     // window.addEventListener('resize', resize);
 
     topBar = new Bar(TOP_BAR_X, TOP_BAR_Y);
-    bottomBar = new Bar(TOP_BAR_X, stageHeight - 30);
+    bottomBar = new Bar(TOP_BAR_X, stageHeight - 50);
 
     var inventory = new Inventory();
 

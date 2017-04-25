@@ -75,19 +75,22 @@ Cell.prototype.isAlive = function () {
     return this.hp > 0;
 }
 
-Cell.prototype.fortify = function(world) {
+Cell.prototype.fortify = function() {
     this.fortHP = FORT_HP;
     this.hp = Math.min(this.hp + FORT_HP_BOOST, this.maximumHp);
     this.updateAlpha();
     this.view.gotoAndPlay("kamushki_border");
 }
 
-Cell.prototype.makeFloating = function(world) {
+Cell.prototype.makeFloating = function() {
     this.hp = INF_HP;
     this.maximumHp = INF_HP;
     this.updateAlpha();
+    this.container.alpha = 1;
     this.type = CELL_TYPE_GRASS;
-    this.view.gotoAndPlay("raft");
+    this.container.removeChild(this.view);
+    this.view = new createjs.Sprite(assets.raftSpriteSheet, "raft");
+    this.container.addChildAt(this.view, 0);
 }
 
 function Map(width, height) {

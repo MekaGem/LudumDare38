@@ -37,8 +37,7 @@ function Raft(x, y, world) {
     var _this = this;
     var onBuild = function() {
         world.cells[_this.x][_this.y].makeFloating();
-        //world.removeUnit(_this);
-        view.alpha = 1
+        world.removeUnit(_this);
         _this.progressBar.turnOff();
     }
     Building.call(this, x, y, view, UNIT_RAFT, BUILDING_RAFT.buildingTime, onBuild);

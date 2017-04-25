@@ -30,6 +30,11 @@ Fort.prototype.requirements = [
 
 Fort.prototype.name = BUILDING_FORT.name
 
+function FortBuildingBar() {
+    var view = new createjs.Sprite(assets.resourcesSpriteSheet, "kamushki");
+    return view;
+}
+
 Raft.prototype = Object.create(Building.prototype);
 function Raft(x, y, world) {
     var view = new createjs.Sprite(assets.raftSpriteSheet, "raft");
@@ -49,3 +54,9 @@ Raft.prototype.requirements = [
 ]
 
 Raft.prototype.name = BUILDING_RAFT.name
+
+function RaftBuildingBar() {
+    var view = new createjs.Sprite(assets.raftSpriteSheet, "raft");
+    return view;
+}
+

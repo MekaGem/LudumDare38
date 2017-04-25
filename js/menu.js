@@ -1,9 +1,8 @@
 function showMenu() {
     resize();
 
-    aboutText = "";
-    var about = new createjs.Text(aboutText);
-    var rules = new createjs.Text(rulesText);
+    var about = aboutText;
+    var rules = rulesText;
 
     var menuContainer = new createjs.Container();
     var blackScreen = new createjs.Shape();
@@ -51,8 +50,10 @@ function showMenu() {
     menuContainer.x = (stageWidth - bg.getBounds().width) / 2;
     menuContainer.y = (stageHeight - bg.getBounds().height) / 2;
 
-    textContainer.x = 200;
-    textContainer.y = (stageHeight + bg.getBounds().height) / 2 + 50;
+    //textContainer.x = 200;
+    //textContainer.y = (stageHeight + bg.getBounds().height) / 2 + 50;
+
+    stage.addChild(textContainer);
 
     stage.update();
 }

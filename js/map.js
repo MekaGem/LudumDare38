@@ -452,7 +452,7 @@ function pickRandomBorderCell(world) {
     return borderCells[id];
 }
 
-function canBuildBuilding(world, inventory, x, y, name) {
+function canBuildBuilding(world, inventory, x, y, name, requirements) {
     if (name == BUILDING_FORT.name) {
         if (!world.cellIsLand(x, y)) {
             return false;
@@ -462,7 +462,7 @@ function canBuildBuilding(world, inventory, x, y, name) {
             return false;
         }
     }
-    return inventory.hasEnoughResources(building.requirements);
+    return inventory.hasEnoughResources(requirements);
 }
 
 function createBuilding(world, inventory, building) {

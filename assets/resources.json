@@ -4,7 +4,8 @@
         "assets/atlas2.png",
         "assets/inventory.png",
         "assets/kamushki.png",
-        "assets/portal.png"
+        "assets/portal.png",
+        "assets/play.png"
     ],
     "frames": [
         [ 0, 0, 128, 96, 0, 64, 0 ],
@@ -22,7 +23,8 @@
         [ 0, 0, 128, 90, 3, 64, 0 ],
         [ 0, 90, 128, 64, 3, 64, 0 ],
 
-        [ 0, 0, 63, 92, 4, 31.5, 40 ]
+        [ 0, 0, 63, 92, 4, 31.5, 40 ],
+        [ 0, 0, 328, 328, 5, 0, 0]
     ],
     "animations": {
         "grass": 0,
@@ -40,6 +42,7 @@
         "kamushki_border": 10,
         "kamushki": 11,
 
-        "portal": 12
+        "portal": 12,
+        "play":13
     }
 }

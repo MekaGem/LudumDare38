@@ -55,8 +55,7 @@ function init() {
 }
 
 function play() {
-    var game = initGame();
-    gameLoop(game);
+    startGame(stage);
 }
 
 function initSound() {

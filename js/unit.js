@@ -52,6 +52,7 @@ Unit.prototype.isAlive = function () {
 var UNIT_TREE = "TREE";
 var UNIT_ROCK = "ROCK";
 var UNIT_BUSH = "BUSH";
+var UNIT_PORTAL = "PORTAL";
 var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 var UNIT_PROGRESS_BAR = "PROGRESS_BAR";
@@ -118,6 +119,12 @@ Bush.prototype.growBerries = function() {
     if (this.hasBerries()) {
         this.view.gotoAndPlay("bush_with_berries");
     }
+}
+
+Portal.prototype = Object.create(Unit.prototype);
+function Portal(x, y) {
+    var view = new createjs.Sprite(assets.resourcesSpriteSheet, "portal");
+    Unit.call(this, x, y, view, UNIT_PORTAL);
 }
 
 function HealthStatus(hp) {

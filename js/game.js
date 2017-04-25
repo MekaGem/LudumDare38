@@ -35,6 +35,14 @@ document.onkeyup = function(e) {
 	delete keys[e.keyCode];
 };
 
+rulesText = new createjs.Text(" Are you ready to rate the game for 5 stars?\n" +
+        " How much time can you survive?\n" +
+        " Controls:\n" +
+        "1. Use your mouse!\n" +
+        "2. Press 'F' to build fortification, and 'ESC' to cancel building,\n" +
+        "3. Press 'H' to eat.\n" +
+        "4. Try to interact with water and surroundings(golems, trees, buildings), while standing near them.\n", "bold 40px Arial", "#ff7700");
+
 function resize(width, height) {
     stageWidth = Math.min(window.innerWidth, MAX_WIDTH);
     stageHeight = Math.min(window.innerHeight, MAX_HEIGHT);

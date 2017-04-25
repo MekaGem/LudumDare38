@@ -43,6 +43,14 @@ var rulesText = new createjs.Text(" Are you ready to rate the game for 5 stars?\
         "3. Press 'H' to eat.\n" +
         "4. Try to interact with water and surroundings(golems, trees, buildings), while standing near them.\n", "bold 40px Arial", "#ff7700");
 
+aboutText = new createjs.Text(" This game was created by:\n" +
+        "acid\n" +
+        "DeRubiOo\n" +
+        "Mekagem\n" +
+        "ValNykol\n" +
+        "Vol4ica\n", "bold 40px Arial", "#ff7700");
+
+
 function resize(width, height) {
     stageWidth = Math.min(window.innerWidth, MAX_WIDTH);
     stageHeight = Math.min(window.innerHeight, MAX_HEIGHT);

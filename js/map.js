@@ -88,9 +88,10 @@ Cell.prototype.makeFloating = function() {
     this.updateAlpha();
     this.container.alpha = 1;
     this.type = CELL_TYPE_GRASS;
-    this.container.removeChild(this.view);
-    this.view = new createjs.Sprite(assets.raftSpriteSheet, "raft");
-    this.container.addChildAt(this.view, 0);
+    var oldView = this.view;
+    var newView = new createjs.Sprite(assets.raftSpriteSheet, "raft");
+    this.container.addChildAt(newView, 0);
+    this.container.removeChild(oldView);
 }
 
 function Map(width, height) {
@@ -205,15 +206,6 @@ World.prototype.removeUnitByIndex = function(index) {
     this.units.splice(index, 1);
 }
 
-World.prototype.removeUnit = function(unit) {
-    for (var i = 0; i < this.units.length; i++) {
-        if (this.units[i] == unit) {
-            this.removeUnitByIndex(i);
-            break;
-        }
-    }
-}
-
 World.prototype.removeUnitsInCell = function(x, y) {
     for (var i = 0; i < this.units.length;) {
         if (this.units[i].x == x && this.units[i].y == y) {
@@ -225,6 +217,7 @@ World.prototype.removeUnitsInCell = function(x, y) {
 }
 
 World.prototype.removeUnit = function(unit) {
+    console.log("Removing unit " + unit.x + " " + unit.y + " " + unit.type);
     for (var i = 0; i < this.units.length;) {
         if (this.units[i].x == unit.x &&
             this.units[i].y == unit.y &&

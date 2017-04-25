@@ -2,7 +2,7 @@ var FORT_STONE_COST = 1;
 var RAFT_WOOD_COST = 0;
 
 var BUILDING_FORT = {name: "Fort", type: Fort, buildingTime: 10000};
-var BUILDING_RAFT = {name: "Raft", type: Raft, buildingTime: 10000};
+var BUILDING_RAFT = {name: "Raft", type: Raft, buildingTime: 3000};
 
 Building.prototype = Object.create(Unit.prototype);
 function Building(x, y, view, type, buildingTime, onBuild) {
@@ -36,8 +36,17 @@ function Raft(x, y, world) {
     view.alpha = 0.5;
     var _this = this;
     var onBuild = function() {
-        world.cells[_this.x][_this.y].makeFloating();
+        console.log(_this.x + " " + _this.y);
         world.removeUnit(_this);
+
+        world.cells[_this.x][_this.y] = new Cell(CELL_TYPE_GRASS);
+        var newView = world.cells[_this.x][_this.y].container;
+        var iso = cartesianToIsometric(_this.x * CELL_SIZE, _this.y * CELL_SIZE);
+        newView.x = iso.x;
+        newView.y = iso.y;
+        world.tilesContainer.addChild(newView);
+
+        world.cells[_this.x][_this.y].makeFloating();
         _this.progressBar.turnOff();
     }
     Building.call(this, x, y, view, UNIT_RAFT, BUILDING_RAFT.buildingTime, onBuild);

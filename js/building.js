@@ -1,5 +1,5 @@
 var FORT_STONE_COST = 1;
-var RAFT_WOOD_COST = 0;
+var RAFT_WOOD_COST = 1;
 
 var BUILDING_FORT = {name: "Fort", type: Fort, buildingTime: 10000};
 var BUILDING_RAFT = {name: "Raft", type: Raft, buildingTime: 3000};

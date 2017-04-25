@@ -31,8 +31,15 @@ Fort.prototype.requirements = [
 Fort.prototype.name = BUILDING_FORT.name
 
 function FortBuildingBar() {
+    var container = new createjs.Container();
+    var text = new createjs.Text("F", "20px Arial", "#ff7700");
     var view = new createjs.Sprite(assets.resourcesSpriteSheet, "kamushki");
-    return view;
+    container.addChild(text);
+    view.scaleX = 0.5;
+    view.scaleY = 0.5;
+    view.x += view.getBounds().width / 2;
+    container.addChild(view);
+    return container;
 }
 
 Raft.prototype = Object.create(Building.prototype);
@@ -64,7 +71,14 @@ Raft.prototype.requirements = [
 Raft.prototype.name = BUILDING_RAFT.name
 
 function RaftBuildingBar() {
+    var container = new createjs.Container();
+    var text = new createjs.Text("R", "20px Arial", "#ff7700");
     var view = new createjs.Sprite(assets.raftSpriteSheet, "raft");
-    return view;
+    container.addChild(text);
+    view.scaleX = 0.5;
+    view.scaleY = 0.5;
+    view.x += view.getBounds().width / 2;
+    container.addChild(view);
+    return container;
 }
 

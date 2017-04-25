@@ -27,6 +27,7 @@ Bar.prototype.addItem = function(item, alignment) {
     var bounds = item.getBounds();
     if (alignment == ALIGN_LEFT) {
         item.x += this.leftX + this.shift_x;
+        item.y -= bounds.height;
         this.leftContainer.addChild(item);
         this.leftX += bounds.width + SPACING;
     } else if (alignment == ALIGN_RIGHT) {

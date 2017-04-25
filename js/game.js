@@ -133,7 +133,7 @@ function initGame() {
     resize();
 
     topBar = new Bar(TOP_BAR_X, TOP_BAR_Y);
-    bottomBar = new Bar(stageHeight - BOTTOM_BAR_X, TOP_BAR_Y);
+    bottomBar = new Bar(TOP_BAR_X, stageHeight - 30);
 
     var inventory = new Inventory();
 
@@ -319,8 +319,8 @@ function initGame() {
     topBar.addItem(soundContainer, ALIGN_RIGHT);
     gameContainer.addChild(topBar.container);
 
-    bottomBar.addItem(FortBuildingBar());
-    bottomBar.addItem(RaftBuildingBar());
+    bottomBar.addItem(FortBuildingBar(), ALIGN_LEFT);
+    bottomBar.addItem(RaftBuildingBar(), ALIGN_LEFT);
     gameContainer.addChild(bottomBar.container);
 
     stage.addChild(gameContainer);

@@ -50,8 +50,8 @@ function showMenu() {
     menuContainer.x = (stageWidth - bg.getBounds().width) / 2;
     menuContainer.y = (stageHeight - bg.getBounds().height) / 2;
 
-    //textContainer.x = 200;
-    //textContainer.y = (stageHeight + bg.getBounds().height) / 2 + 50;
+    textContainer.x = 200;
+    textContainer.y = (stageHeight + bg.getBounds().height) / 2 + 50;
 
     stage.addChild(textContainer);
 

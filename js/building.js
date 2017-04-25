@@ -28,7 +28,12 @@ Fort.prototype.requirements = [
     [ITEM_STONES, FORT_STONE_COST]
 ]
 
+Fort.requirements = [
+    [ITEM_STONES, FORT_STONE_COST]
+]
+
 Fort.prototype.name = BUILDING_FORT.name
+Fort.name = BUILDING_FORT.name
 
 function FortBuildingBar() {
     var container = new createjs.Container();
@@ -68,7 +73,12 @@ Raft.prototype.requirements = [
     [ITEM_WOOD, RAFT_WOOD_COST]
 ]
 
+Raft.requirements = [
+    [ITEM_WOOD, RAFT_WOOD_COST]
+]
+
 Raft.prototype.name = BUILDING_RAFT.name
+Raft.name = BUILDING_RAFT.name
 
 function RaftBuildingBar() {
     var container = new createjs.Container();

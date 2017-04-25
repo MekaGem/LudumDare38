@@ -5,7 +5,9 @@
         "assets/inventory.png",
         "assets/kamushki.png",
         "assets/portal.png",
-        "assets/bubbles.png"
+        "assets/bubbles.png",
+        "assets/bg.png",
+        "assets/menu_buttons.png"
     ],
     "frames": [
         [ 0, 0, 128, 96, 0, 64, 0 ],
@@ -28,7 +30,12 @@
         [ 0, 0, 44, 30, 5, 22, 50 ],
         [ 0, 30, 44, 30, 5, 22, 50 ],
         [ 44, 0, 44, 30, 5, 22, 50 ],
-        [ 44, 30, 44, 30, 5, 22, 50 ]
+        [ 44, 30, 44, 30, 5, 22, 50 ],
+
+        [ 0, 0, 550, 350, 6, 0, 0 ],
+        [ 0, 0, 222, 62, 7, 0, 0 ],
+        [ 0, 62, 222, 62, 7, 0, 0 ],
+        [ 0, 124, 222, 53, 7, 0, 0 ]
     ],
     "animations": {
         "grass": 0,
@@ -51,6 +58,11 @@
         "building_bubble": 13,
         "cutting_bubble": 14,
         "eating_bubble": 15,
-        "fishing_bubble": 16
+        "fishing_bubble": 16,
+
+        "bg": 17,
+        "play_button": 18,
+        "about_button": 19,
+        "rules_button": 20
     }
 }

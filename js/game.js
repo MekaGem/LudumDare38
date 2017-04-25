@@ -51,7 +51,9 @@ function resize(width, height) {
 function init() {
     stage = new createjs.Stage("demoCanvas");
     gameContainer = new createjs.Container();
-    loadResources(play);
+    resize();
+    // loadResources(play);
+    loadResources(showMenu);
 }
 
 function play() {
@@ -126,11 +128,12 @@ function initGame() {
     var restartButton = new createjs.Sprite(assets.buttonSpriteSheet, "restart");
     restartButton.on("mousedown", function() {
         console.log("Restart game.");
+        // stage.removeAllChildren();
+        // play();
         location.reload();
     });
 
     // window.addEventListener('resize', resize);
-    resize();
 
     topBar = new Bar(TOP_BAR_X, TOP_BAR_Y);
     bottomBar = new Bar(TOP_BAR_X, stageHeight - 30);

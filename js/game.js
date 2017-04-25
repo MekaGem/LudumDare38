@@ -35,7 +35,7 @@ document.onkeyup = function(e) {
 	delete keys[e.keyCode];
 };
 
-rulesText = new createjs.Text(" Are you ready to rate the game for 5 stars?\n" +
+var rulesText = new createjs.Text(" Are you ready to rate the game for 5 stars?\n" +
         " How much time can you survive?\n" +
         " Controls:\n" +
         "1. Use your mouse!\n" +

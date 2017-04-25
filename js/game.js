@@ -227,7 +227,7 @@ function initGame() {
                     world.units[i].wasTaken = true;
                     world.removeUnitByIndex(i);
                 } else if (world.units[i].type == UNIT_BUSH && world.units[i].hasBerries()) {
-                    inventory.addItem(ITEM_FOOD, 1);
+                    inventory.addItem(ITEM_FOOD, 2);
                     world.units[i].pickBerries();
                 } else if (world.units[i].type == UNIT_PORTAL) {
                     // TODO: do something else!!!

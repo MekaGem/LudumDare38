@@ -452,23 +452,20 @@ function pickRandomBorderCell(world) {
     return borderCells[id];
 }
 
-function canBuildBuilding(world, inventory, building) {
-    if (building.name == BUILDING_FORT.name) {
-        if (!world.cellIsLand(building.x, building.y)) {
+function canBuildBuilding(world, inventory, x, y, name) {
+    if (name == BUILDING_FORT.name) {
+        if (!world.cellIsLand(x, y)) {
             return false;
         }
-    } else if (building.name == BUILDING_RAFT.name) {
-        if (!world.cellIsWaterNearLand(building.x, building.y)) {
+    } else if (name == BUILDING_RAFT.name) {
+        if (!world.cellIsWaterNearLand(x, y) || world.cellIsLand(x, y)) {
             return false;
         }
     }
     return inventory.hasEnoughResources(building.requirements);
 }
 
-function tryCreateBuilding(world, inventory, building) {
-    if (!canBuildBuilding(world, inventory, building)) {
-        return false;
-    }
+function createBuilding(world, inventory, building) {
     inventory.takeResources(building.requirements);
     world.addUnit(building);
     return true;

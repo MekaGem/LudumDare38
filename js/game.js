@@ -248,8 +248,9 @@ function initGame() {
         console.log(game.selectedBuildTool);
         if (game.selectedBuildTool) {
             console.log("Trying to build");
-            building = new game.selectedBuildTool.type(cell.x, cell.y, world);
-            if (tryCreateBuilding(world, inventory, building)) {
+            if (canBuildBuilding(world, inventory, cell.x, cell.y, game.selectedBuildTool.type.name)) {
+                building = new game.selectedBuildTool.type(cell.x, cell.y, world);
+                createBuilding(world, inventory, building);
                 console.log("Created building.");
                 human.stopContinuousAction(world);
                 changeBuildTool(game, null);

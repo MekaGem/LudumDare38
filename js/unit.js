@@ -56,12 +56,14 @@ var UNIT_HUMAN = "HUMAN";
 var UNIT_GOLEM = "GOLEM";
 var UNIT_PROGRESS_BAR = "PROGRESS_BAR";
 var UNIT_FORT = "FORT";
+var UNIT_RAFT = "RAFT";
 
 function unitIsStatic(unitType) {
     return unitType == UNIT_TREE ||
            unitType == UNIT_ROCK ||
            unitType == UNIT_BUSH ||
-           unitType == UNIT_FORT;
+           unitType == UNIT_FORT ||
+           unitType == UNIT_RAFT;
 }
 
 function compareUnitContainers(a, b) {

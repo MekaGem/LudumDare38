@@ -91,6 +91,12 @@ function getFortTile() {
     return fort;
 }
 
+function getRaftTile() {
+    var raft = new createjs.Sprite(assets.raftSpriteSheet, "raft");
+    raft.alpha = 0.5;
+    return raft;
+}
+
 function initGame() {
     initSound();
 
@@ -336,6 +342,9 @@ function updateSelectedBuildTool(game) {
     if (keys[KEY_F]) {
         changeBuildTool(game, BUILDING_FORT);
     }
+    if (keys[KEY_R]) {
+        changeBuildTool(game, BUILDING_RAFT);
+    }
     if (keys[KEY_ESC]) {
         changeBuildTool(game, null);
     }
@@ -352,6 +361,9 @@ function updateSelectedBuildTool(game) {
     } else if (game.selectedBuildTool === BUILDING_FORT) {
         console.log("Building Fort");
         game.selectedCellShape.addChild(getFortTile());
+    } else if (game.selectedBuildTool === BUILDING_RAFT) {
+        console.log("Building Raft");
+        game.selectedCellShape.addChild(getRaftTile());
     }
 }
 

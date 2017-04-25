@@ -6,6 +6,7 @@ var CELL_TYPE_GRASS = "G";
 var FORT_HP = 50;
 var FORT_PROTECTION = 10;
 var FORT_HP_BOOST = 20;
+var INF_HP = 10000000;
 
 var DIRS = [
     {x: 1, y: 0},  // down right (SE)
@@ -79,6 +80,14 @@ Cell.prototype.fortify = function(world) {
     this.hp = Math.min(this.hp + FORT_HP_BOOST, this.maximumHp);
     this.updateAlpha();
     this.view.gotoAndPlay("kamushki_border");
+}
+
+Cell.prototype.makeFloating = function(world) {
+    this.hp = INF_HP;
+    this.maximumHp = INF_HP;
+    this.updateAlpha();
+    this.type = CELL_TYPE_GRASS;
+    this.view.gotoAndPlay("raft");
 }
 
 function Map(width, height) {
@@ -448,8 +457,14 @@ function pickRandomBorderCell(world) {
 }
 
 function canBuildBuilding(world, inventory, building) {
-    if (!world.cellIsLand(building.x, building.y)) {
-        return false;
+    if (building.name == BUILDING_FORT.name) {
+        if (!world.cellIsLand(building.x, building.y)) {
+            return false;
+        }
+    } else if (building.name == BUILDING_RAFT.name) {
+        if (!world.cellIsWaterNearLand(building.x, building.y)) {
+            return false;
+        }
     }
     return inventory.hasEnoughResources(building.requirements);
 }

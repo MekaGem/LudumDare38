@@ -1,0 +1,11 @@
+{
+    "images": [
+        "assets/raft.png"
+    ],
+    "frames": [
+        [ 0, 0, 131, 76, 0, 65.5, 0 ]
+    ],
+    "animations": {
+        "raft": 0
+    }
+}

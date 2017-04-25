@@ -16,7 +16,8 @@ function loadResources(callback) {
             golemSpriteSheet: queue.getResult("golem"),
             statusBarsSpriteSheet: queue.getResult("status_bars"),
             healthSpriteSheet: queue.getResult("health"),
-            buttonSpriteSheet: queue.getResult("button")
+            buttonSpriteSheet: queue.getResult("button"),
+            raftSpriteSheet: queue.getResult("raft")
         }
         assets.heartFill = createjs.SpriteSheetUtils.extractFrame(assets.healthSpriteSheet, 1);
         assets.progressBarFill = createjs.SpriteSheetUtils.extractFrame(assets.statusBarsSpriteSheet, 1);
@@ -36,5 +37,6 @@ function loadResources(callback) {
     queue.loadFile({src: "assets/status_bars.json", id: "status_bars", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/health.json", id: "health", type: createjs.AbstractLoader.SPRITESHEET});
     queue.loadFile({src: "assets/buttons.json", id: "button", type: createjs.AbstractLoader.SPRITESHEET});
+    queue.loadFile({src: "assets/raft.json", id: "raft", type: createjs.AbstractLoader.SPRITESHEET});
 }
 

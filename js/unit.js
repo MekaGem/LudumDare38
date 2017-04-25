@@ -250,12 +250,12 @@ Human.prototype.hasActionAtDir = function(dir) {
     return dir == this.oldDir;
 }
 
-Human.prototype.startContinuousAction = function(container, actionTime, callbackLoopPeriod, callback) {
+Human.prototype.startContinuousAction = function(container, actionTime, callbackLoopPeriod, callback, bubble) {
     this.stopContinuousAction(container);
 
     this.oldDir = this.dir;
 
-    this.progressBar = new ProgressBar();
+    this.progressBar = new ProgressBar(bubble);
     this.progressBar.turnOn(this.container, this.waitingCallback, actionTime);
 
     callback();
@@ -340,10 +340,11 @@ Golem.prototype.engageHuman = function(world, human) {
     }
 }
 
-function ProgressBar() {
+function ProgressBar(bubble) {
     this.currentTween = null;
     this.bg = new createjs.Sprite(assets.statusBarsSpriteSheet, "background");
     this.fill = new createjs.Bitmap(assets.progressBarFill);
+    if (bubble) this.bubble = bubble;
 
     var bounds = this.bg.getBounds();
     this.fill.regX = -bounds.x;
@@ -362,6 +363,10 @@ function ProgressBar() {
 ProgressBar.prototype.turnOn = function(container, onCompleteCallback, waitingTime) {
     container.addChild(this.bg);
     container.addChild(this.fill);
+    if (this.bubble) {
+        this.bubbleView = new createjs.Sprite(assets.resourcesSpriteSheet, this.bubble);
+        container.addChild(this.bubbleView);
+    }
 
     var bounds = this.bg.getBounds();
     this.currentTween = createjs.Tween.get(this.fill.sourceRect)
@@ -380,5 +385,8 @@ ProgressBar.prototype.turnOff = function() {
     }
     this._container.removeChild(this.bg);
     this._container.removeChild(this.fill);
+    if (this.bubbleView) {
+        this._container.removeChild(this.bubbleView);
+    }
     this.currentTween = null;
 }

@@ -21,7 +21,7 @@ var NEW_ISLAND_TICKS = 50; //600;
 var NEW_ISLAND_MIN_SIZE = 5;
 var NEW_ISLAND_MAX_SIZE = 7;
 var NEW_ISLAND_MIN_REMOVED = 5;
-var NEW_ISLAND_MAX_REMOVED = 10;
+var NEW_ISLAND_MAX_REMOVED = 7;
 var NEW_ISLAND_MAX_GOLEMS = 3;
 var DAMAGE_WITH_WATER_TICKS = 5;
 var LAST_ISLAND = 2; // 15;
@@ -277,7 +277,9 @@ function initGame() {
                     world.container,
                     human.treeCuttingTime,
                     continuousActionLoopPeriod,
-                    continuousActionCallback);
+                    continuousActionCallback,
+                    "cutting_bubble"
+                );
             }
         } else if (world.cellIsWaterNearLand(cell.x, cell.y)) {
             var dir = getDirection(human, cell);
@@ -300,7 +302,9 @@ function initGame() {
                     world.container,
                     human.fishingTime,
                     continuousActionLoopPeriod,
-                    continuousActionCallback);
+                    continuousActionCallback,
+                    "fishing_bubble"
+                );
             }
         } else if (!tweenController.shouldStop) {
             human.stopContinuousAction(world);
@@ -398,7 +402,9 @@ function feedHuman(game, human) {
         game.world.container,
         human.eatingTime,
         continuousActionLoopPeriod,
-        continuousActionCallback);
+        continuousActionCallback,
+        "eating_bubble"
+    );
 }
 
 function gameLoop(game) {

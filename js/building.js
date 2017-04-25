@@ -7,7 +7,7 @@ var BUILDING_RAFT = {name: "Raft", type: Raft, buildingTime: 10000};
 Building.prototype = Object.create(Unit.prototype);
 function Building(x, y, view, type, buildingTime, onBuild) {
     Unit.call(this, x, y, view, type);
-    this.progressBar = new ProgressBar();
+    this.progressBar = new ProgressBar("building_bubble");
     this.progressBar.turnOn(this.container, onBuild, buildingTime);
 }
 

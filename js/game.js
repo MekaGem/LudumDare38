@@ -17,13 +17,13 @@ var CAMERA_MOVEMENT_SPEED = 500;
 var MAX_WIDTH = 1000;
 var MAX_HEIGHT = 700;
 
-var NEW_ISLAND_TICKS = 600;
+var NEW_ISLAND_TICKS = 400;
 var NEW_ISLAND_MIN_SIZE = 5;
-var NEW_ISLAND_MAX_SIZE = 7;
-var NEW_ISLAND_MIN_REMOVED = 5;
-var NEW_ISLAND_MAX_REMOVED = 7;
+var NEW_ISLAND_MAX_SIZE = 8;
+var NEW_ISLAND_MIN_REMOVED = 3;
+var NEW_ISLAND_MAX_REMOVED = 5;
 var NEW_ISLAND_MAX_GOLEMS = 3;
-var DAMAGE_WITH_WATER_TICKS = 5;
+var DAMAGE_WITH_WATER_TICKS = 4;
 var LAST_ISLAND = 15;
 
 var keys = {};
@@ -227,7 +227,7 @@ function initGame() {
                     world.units[i].wasTaken = true;
                     world.removeUnitByIndex(i);
                 } else if (world.units[i].type == UNIT_BUSH && world.units[i].hasBerries()) {
-                    inventory.addItem(ITEM_FOOD, 2);
+                    inventory.addItem(ITEM_FOOD, 1);
                     world.units[i].pickBerries();
                 } else if (world.units[i].type == UNIT_PORTAL) {
                     // TODO: do something else!!!
@@ -510,7 +510,7 @@ function gameLoop(game) {
                         } else if (r < 4) {
                             newWorld.addUnit(new Rock(x, y));
                         } else if (r < 6) {
-                            newWorld.addUnit(new Rock(x, y));
+                            newWorld.addUnit(new Bush(x, y));
                         } else if (r < 7){
                             if (golemsCreated < NEW_ISLAND_MAX_GOLEMS) {
                                 golemsCreated += 1;

@@ -431,7 +431,7 @@ function getBorderCells(world) {
 
     for (var x = 0; x < world.width; ++x) {
         for (var y = 0; y < world.height; ++y) {
-            if (world.cellIsLand(x, y) && world.cellIsBorder(x, y) && !world.cellIsCutVertex(x, y) && !(world.cells[x][y].maximumHp == INF_HP)) {
+            if (world.cellIsLand(x, y) && world.cellIsBorder(x, y) /*&& !world.cellIsCutVertex(x, y)*/ && !(world.cells[x][y].maximumHp == INF_HP)) {
                 var dist = Math.abs(x - center.x) + Math.abs(y - center.y);
                 borderCells.push({x: x, y: y, dist: dist})
             }

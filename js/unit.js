@@ -4,7 +4,7 @@ var HUMAN_MAX_HP = 100;
 var TREE_CUTTING_TIME = 3000; // 3 seconds.
 var FISHING_TIME = 8000; // 8 seconds.
 var HUMAN_GOLEM_DAMATE = 20;
-var HUMAN_EATING_TIME = 2000 // 2 seconds.
+var HUMAN_EATING_TIME = 500 // 0.5 seconds.
 var GOLEM_DAMAGE = 10;
 
 function Unit(x, y, view, type) {
@@ -101,7 +101,7 @@ function Bush(x, y) {
 }
 
 Bush.prototype.generateGrowthTime = function() {
-    return 45 + getRandomInt(0, 45);
+    return 60 + getRandomInt(0, 30);
 }
 
 Bush.prototype.hasBerries = function() {

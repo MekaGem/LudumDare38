@@ -140,7 +140,7 @@ function HealthStatus(hp) {
         x: 0,
         y: 0,
         width: bounds.width,
-        height: 0
+        height: 1
     };
 
     this.view.addChild(this.hpText);
@@ -154,7 +154,7 @@ HealthStatus.prototype.updateHP = function(hp) {
     var bounds = this.heart.getBounds();
     createjs.Tween.get(this.fill.sourceRect)
         .to({
-            height: bounds.height * (1 - hp / HUMAN_MAX_HP)
+            height: Math.max(bounds.height * (1 - hp / HUMAN_MAX_HP), 1)
         }, 100);
 }
 
@@ -353,7 +353,7 @@ function ProgressBar(bubble) {
     this.fill.sourceRect = {
         x: 0,
         y: 0,
-        width: 0,
+        width: 1,
         height: bounds.height
     };
 
